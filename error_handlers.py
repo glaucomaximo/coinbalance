@@ -34,8 +34,8 @@ class CoinBalanceError(Exception):
 
 class ValidationError(CoinBalanceError):
     """Erro de validação"""
-    def __init__(self, message: str, field: str = None):
-        super().__init__(message, "VALIDATION_ERROR", {"field": field})
+    def __init__(self, message: str, field: str = None, details: Dict = None):
+        super().__init__(message, "VALIDATION_ERROR", {"field": field, "details": details})
 
 class SecurityError(CoinBalanceError):
     """Erro de segurança"""

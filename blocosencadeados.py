@@ -21,7 +21,7 @@ class BlocosEncadeados:
             'indice': len(self.cadeia) + 1,
             'carimbo_temporal': tempo(),
             'transacoes': self.transacoes_atuais,
-            'fragmento_anterior': fragmento_anterior or self.fragmento(self.cadeia[-1]),
+            'fragmento_anterior': fragmento_anterior or (self.fragmento(self.cadeia[-1]) if self.cadeia else None),
             'prova': prova,
         }
 

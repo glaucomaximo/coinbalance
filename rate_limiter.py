@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 from fastapi.responses import JSONResponse
+from starlette.responses import JSONResponse as StarletteJSONResponse
 
 logger = logging.getLogger(__name__)
 
@@ -252,7 +253,7 @@ async def rate_limit_middleware(request, call_next):
     )
     
     if not allowed:
-        return JSONResponse(
+        return StarletteJSONResponse(
             status_code=429,
             content={
                 "error": True,

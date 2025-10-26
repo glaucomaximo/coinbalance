@@ -104,7 +104,7 @@ class DatabaseManager:
                     VALUES (?, ?, ?, ?, ?, ?)
                 ''', (
                     bloco['indice'],
-                    bloco['carimbo_temporal'],
+                    bloco.get('carimbo_temporal', bloco.get('timestamp')),
                     bloco.get('fragmento_anterior'),
                     bloco.get('hash_atual'),
                     bloco['prova'],

@@ -5,6 +5,7 @@ Implementa carteiras digitais com criptografia robusta
 
 import json
 import hashlib
+import time
 from typing import Dict, List, Optional
 from crypto_utils import CryptoUtils
 
@@ -44,6 +45,10 @@ class Carteira:
         transacao['chave_publica'] = self.public_key
         
         return transacao
+    
+    def _obter_timestamp(self) -> float:
+        """Obtém timestamp atual"""
+        return time.time()
     
     def verificar_transacao(self, transacao: Dict) -> bool:
         """Verifica se uma transação é válida"""

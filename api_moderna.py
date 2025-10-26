@@ -25,6 +25,7 @@ from crypto_utils import CryptoUtils
 from error_handlers import error_handler, setup_error_handlers, error_middleware
 from rate_limiter import rate_limit_middleware, rate_limiter
 from health_monitor import health_monitor
+from database_optimizer import DatabaseOptimizer
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +64,9 @@ wallet_manager = GerenciadorCarteiras()
 transaction_validator = TransactionValidator(db_manager)
 contract_manager = ContractManager(db_manager)
 security = HTTPBearer()
+
+# Inicializar otimizador de banco
+db_optimizer = DatabaseOptimizer(db_manager)
 
 # Inicializar tempo de início da aplicação
 app.state.start_time = time.time()
@@ -419,6 +423,119 @@ async def unblock_ip(ip: str):
         return {"success": True, "message": f"IP {ip} desbloqueado"}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+@app.post("/admin/database/optimize", summary="Otimizar Banco de Dados")
+async def optimize_database():
+    """Otimiza o banco de dados (apenas para administradores)"""
+    try:
+        # Criar índices
+        db_optimizer.criar_indices()
+        
+        # Otimizar banco
+        db_optimizer.otimizar_banco()
+        
+        return {
+            "success": True,
+            "message": "Banco de dados otimizado com sucesso",
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/admin/database/performance", summary="Análise de Performance")
+async def database_performance():
+    """Retorna análise de performance do banco de dados"""
+    try:
+        performance = db_optimizer.analisar_performance()
+        return {
+            "status": "success",
+            "performance": performance,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@app.get("/admin/database/cache", summary="Estatísticas do Cache")
+async def cache_statistics():
+    """Retorna estatísticas do cache do banco de dados"""
+    try:
+        stats = db_optimizer.obter_estatisticas_cache()
+        return {
+            "status": "success",
+            "cache": stats,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@app.post("/admin/database/cache/clear", summary="Limpar Cache")
+async def clear_cache():
+    """Limpa o cache do banco de dados"""
+    try:
+        db_optimizer.limpar_cache()
+        return {
+            "success": True,
+            "message": "Cache limpo com sucesso",
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/blocos/otimizado", summary="Listar Blocos (Otimizado)")
+async def listar_blocos_otimizado(limite: int = 10, offset: int = 0):
+    """Lista blocos com otimização de cache"""
+    try:
+        blocos = db_optimizer.obter_blocos_otimizado(limite, offset)
+        return {
+            "status": "success",
+            "blocos": blocos,
+            "total": len(blocos),
+            "limite": limite,
+            "offset": offset,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@app.get("/transacoes/otimizado", summary="Listar Transações (Otimizado)")
+async def listar_transacoes_otimizado(
+    remetente: Optional[str] = None,
+    destinatario: Optional[str] = None,
+    limite: int = 50,
+    offset: int = 0
+):
+    """Lista transações com otimização de cache e filtros"""
+    try:
+        transacoes = db_optimizer.obter_transacoes_otimizado(
+            remetente, destinatario, limite, offset
+        )
+        return {
+            "status": "success",
+            "transacoes": transacoes,
+            "total": len(transacoes),
+            "filtros": {
+                "remetente": remetente,
+                "destinatario": destinatario
+            },
+            "limite": limite,
+            "offset": offset,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@app.get("/carteiras/{endereco}/estatisticas", summary="Estatísticas da Carteira")
+async def estatisticas_carteira(endereco: str):
+    """Obtém estatísticas detalhadas de uma carteira"""
+    try:
+        stats = db_optimizer.obter_estatisticas_carteira_otimizado(endereco)
+        return {
+            "status": "success",
+            "estatisticas": stats,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 
 # Middleware para logging
 @app.middleware("http")
