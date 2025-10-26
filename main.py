@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-CryptoChain - Blockchain Moderna com DeFi
+Coinbalance - A Economia da Consciência
 Ponto de entrada principal da aplicação
+Framework proprietário para investimento consciente
 """
 
 import os
@@ -14,10 +15,10 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 def main():
-    """Função principal para inicializar a CryptoChain"""
+    """Função principal para inicializar a Coinbalance"""
     
     parser = argparse.ArgumentParser(
-        description="CoinBalance - Blockchain Moderna com DeFi",
+        description="Coinbalance - A Economia da Consciência",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Exemplos de uso:
@@ -88,13 +89,15 @@ Exemplos de uso:
         workers = 1
         log_level = args.log_level
     
-    print("⚖️ Iniciando CoinBalance Blockchain...")
+    print("🪙 Iniciando Coinbalance - A Economia da Consciência...")
     print(f"📍 Host: {args.host}")
     print(f"🔌 Porta: {args.port}")
     print(f"👥 Workers: {workers}")
     print(f"🔄 Reload: {reload}")
     print(f"📊 Log Level: {log_level}")
     print(f"⚙️  Config: {args.config}")
+    print(f"🧠 Framework: Coinbalance")
+    print(f"💰 Moeda: CNB")
     print("-" * 50)
     
     try:
@@ -109,9 +112,9 @@ Exemplos de uso:
             access_log=True
         )
     except KeyboardInterrupt:
-        print("\n🛑 CryptoChain interrompida pelo usuário")
+        print("\n🛑 Coinbalance interrompida pelo usuário")
     except Exception as e:
-        print(f"❌ Erro ao iniciar CryptoChain: {e}")
+        print(f"❌ Erro ao iniciar Coinbalance: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

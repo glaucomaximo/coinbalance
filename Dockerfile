@@ -1,10 +1,12 @@
-# Dockerfile para CryptoChain Blockchain
+# Dockerfile para Coinbalance - A Economia da Consciência
 FROM python:3.11-slim
 
 # Definir variáveis de ambiente
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
+ENV MOEDA=CNB
+ENV PLATAFORMA=Coinbalance
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \

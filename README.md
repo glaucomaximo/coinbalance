@@ -1,13 +1,19 @@
-# ⚖️ CoinBalance - Blockchain Moderna com DeFi
+# 🪙 Coinbalance - A Economia da Consciência
 
-[![CI/CD](https://github.com/seu-usuario/coinbalance/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/seu-usuario/coinbalance/actions/workflows/ci-cd.yml)
-[![Security](https://img.shields.io/badge/security-audited-green.svg)](https://github.com/seu-usuario/coinbalance/security)
+[![CI/CD](https://github.com/glaucomaximo/coinbalance/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/glaucomaximo/coinbalance/actions/workflows/ci-cd.yml)
+[![Security](https://img.shields.io/badge/security-audited-green.svg)](https://github.com/glaucomaximo/coinbalance/security)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 
-Uma blockchain moderna e escalável implementada em Python, com funcionalidades DeFi, contratos inteligentes, sistema de governança e arquitetura distribuída. **CoinBalance** oferece equilíbrio perfeito entre segurança, performance e facilidade de uso.
+A primeira plataforma de investimento consciente baseada no framework proprietário **Coinbalance**, que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar um novo paradigma econômico: **"A Economia da Consciência"**. A plataforma utiliza a moeda digital **Coinbalance (CNB)** como veículo de investimento e troca de valor.
 
 ## ✨ Características Principais
+
+### 🧠 Framework Coinbalance
+- **IA Simbólica** baseada em lógica mônadica
+- **Neuroeconomia** aplicada a investimentos
+- **Algoritmos de consciência** proprietários
+- **Processamento não-linear** de dados
 
 ### 🔐 Segurança Avançada
 - **Criptografia ECDSA** com chaves privadas/públicas
@@ -15,14 +21,14 @@ Uma blockchain moderna e escalável implementada em Python, com funcionalidades 
 - **Prevenção de gastos duplos** com validação rigorosa
 - **Auditoria de segurança** automatizada
 
-### 💰 DeFi Completo
+### 💰 DeFi Consciente
 - **Staking** com recompensas automáticas (12% APY)
-- **Empréstimos** com sistema de colateral
-- **Yield Farming** e protocolos DeFi
-- **Contratos inteligentes** programáveis
+- **Empréstimos** com sistema de colateral ético
+- **Yield Farming** baseado em impacto
+- **Contratos inteligentes** com validação consciente
 
 ### 🏛️ Governança Descentralizada
-- **Sistema de votação** baseado em tokens
+- **Sistema de votação** baseado em tokens CNB
 - **Propostas de mudança** da rede
 - **Fundo de governança** para desenvolvimento
 - **Transparência total** nas decisões
@@ -33,18 +39,24 @@ Uma blockchain moderna e escalável implementada em Python, com funcionalidades 
 - **Load balancing** automático
 - **Monitoramento** em tempo real
 
-## 🏗️ Arquitetura
+## 🏗️ Arquitetura Coinbalance
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   FastAPI API   │    │   Smart         │    │   Database      │
-│   (REST/GraphQL)│◄──►│   Contracts     │◄──►│   Manager       │
+│   FastAPI API   │    │   Framework     │    │   Database      │
+│   (REST/GraphQL)│◄──►│   Coinbalance   │◄──►│   Manager       │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Wallet        │    │   Tokenomics     │    │   Shard         │
-│   System        │    │   & Governance   │    │   Manager       │
+│   System (CNB)  │    │   & Governance   │    │   Manager       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   IA Simbólica  │    │   Neuroeconomia │    │   Blockchain    │
+│   & Consciência │    │   Aplicada      │    │   Consciente    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -65,8 +77,8 @@ cd coinbalance
 # Instalar dependências
 pip install -r requirements.txt
 
-# Executar aplicação
-python api_moderna.py
+# Executar aplicação Coinbalance
+python main.py
 ```
 
 ### Instalação com Docker
@@ -152,14 +164,15 @@ print(f"Transação: {resultado['hash_transacao']}")
 
 #### Fazer Stake
 ```python
-# Stake de tokens
+# Stake de tokens CNB
 response = requests.post('http://localhost:8000/defi/stake', json={
     'valor': 1000.0,
-    'contrato': 'STAKING_CONTRACT_001'
+    'contrato': 'STAKING_CONTRACT_001',
+    'token': 'CNB'
 })
 
 resultado = response.json()
-print(f"Stake realizado: {resultado['total_staked']} tokens")
+print(f"Stake realizado: {resultado['total_staked']} CNB")
 ```
 
 ## 🔧 Configuração
@@ -299,6 +312,19 @@ Este projeto está licenciado sob a [Licença MIT](LICENSE.md).
 - **Discord**: [discord.gg/coinbalance](https://discord.gg/coinbalance)
 - **Email**: support@coinbalance.com.br
 - **GitHub Issues**: [Issues](https://github.com/glaucomaximo/coinbalance/issues)
+- **Investimentos**: investimentos@coinbalance.com.br
+
+---
+
+## 🪙 Sobre a Moeda CNB
+
+**Coinbalance (CNB)** é a moeda digital nativa da plataforma, projetada para facilitar investimentos conscientes e promover a economia da consciência. Com supply limitado e tokenomics sustentáveis, CNB representa o equilíbrio entre valor material e consciência.
+
+### Características da CNB:
+- **Supply Total**: 100 milhões de tokens
+- **Algoritmo**: Proof of Stake Consciente
+- **Utilidade**: Pagamentos, staking, governança, acesso premium
+- **Blockchain**: Ethereum (ERC-20) com migração para blockchain própria
 
 ---
 

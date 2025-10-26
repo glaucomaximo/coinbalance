@@ -1,6 +1,6 @@
 """
-Sistema de Carteiras Seguras
-Implementa carteiras digitais com criptografia robusta
+Sistema de Carteiras Coinbalance (CNB)
+Implementa carteiras digitais com criptografia robusta para a moeda CNB
 """
 
 import json
@@ -11,7 +11,7 @@ from crypto_utils import CryptoUtils
 
 
 class Carteira:
-    """Carteira digital segura para blockchain"""
+    """Carteira digital segura para Coinbalance (CNB)"""
     
     def __init__(self, senha: str = None):
         self.private_key, self.public_key = CryptoUtils.gerar_par_chaves()
@@ -20,11 +20,13 @@ class Carteira:
         self.endereco = self._gerar_endereco()
         self.saldo = 0.0
         self.transacoes = []
+        self.moeda = "CNB"
+        self.plataforma = "Coinbalance"
     
     def _gerar_endereco(self) -> str:
         """Gera endereço único da carteira baseado na chave pública"""
         public_key_hash = hashlib.sha256(self.public_key.encode()).hexdigest()
-        return f"CRYPTO_{public_key_hash[:20]}"
+        return f"CNB_{public_key_hash[:20]}"
     
     def criar_transacao(self, destinatario: str, valor: float, dados_extra: Dict = None) -> Dict:
         """Cria uma transação assinada"""
@@ -35,6 +37,8 @@ class Carteira:
             'remetente': self.endereco,
             'destinatario': destinatario,
             'valor': valor,
+            'moeda': self.moeda,
+            'plataforma': self.plataforma,
             'timestamp': self._obter_timestamp(),
             'dados_extra': dados_extra or {}
         }
@@ -124,7 +128,9 @@ class GerenciadorCarteiras:
             {
                 'nome': nome,
                 'endereco': carteira.endereco,
-                'saldo': carteira.saldo
+                'saldo': carteira.saldo,
+                'moeda': carteira.moeda,
+                'plataforma': carteira.plataforma
             }
             for nome, carteira in self.carteiras.items()
         ]

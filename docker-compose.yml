@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  # Aplicação principal
-  cryptochain:
+  # Aplicação principal Coinbalance
+  coinbalance:
     build: .
     ports:
       - "8000:8000"
@@ -10,6 +10,8 @@ services:
       - PYTHONPATH=/app
       - DATABASE_URL=sqlite:///app/data/blockchain.db
       - LOG_LEVEL=info
+      - MOEDA=CNB
+      - PLATAFORMA=Coinbalance
     volumes:
       - ./data:/app/data
       - ./backups:/app/backups
@@ -18,7 +20,7 @@ services:
       - redis
       - postgres
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
 
   # Redis para cache
@@ -29,7 +31,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
     command: redis-server --appendonly yes
 
@@ -37,16 +39,16 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: cryptochain
-      POSTGRES_USER: cryptochain
-      POSTGRES_PASSWORD: cryptochain_password
+      POSTGRES_DB: coinbalance
+      POSTGRES_USER: coinbalance
+      POSTGRES_PASSWORD: coinbalance_password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
 
   # Nginx para load balancing
@@ -59,9 +61,9 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
     depends_on:
-      - cryptochain
+      - coinbalance
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
 
   # Monitoramento
@@ -73,7 +75,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
 
   # Grafana para visualização
@@ -86,7 +88,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
-      - cryptochain-network
+      - coinbalance-network
     restart: unless-stopped
 
 volumes:
@@ -96,5 +98,5 @@ volumes:
   grafana_data:
 
 networks:
-  cryptochain-network:
+  coinbalance-network:
     driver: bridge

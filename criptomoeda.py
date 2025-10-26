@@ -8,10 +8,10 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
-# Este realmente deve ser um UUID exclusivo para imitar um endereço de carteira criptografada, estou apenas me divertindo.
-identificador_do_elo = "Carteira virtual de criptomoeda"
+# Identificador da moeda Coinbalance (CNB)
+identificador_do_elo = "Carteira Coinbalance (CNB)"
 
-# Inicia a coisa toda
+# Inicia a blockchain Coinbalance
 blocosEncadeados = BlocosEncadeados()
 
 @app.route('/mina', methods=['GET'])
@@ -23,9 +23,9 @@ def mina():
     prova = blocosEncadeados.prova_de_trabalho(ultimo_bloco)
     decorrido = tempo() - horario_inicial
 
-    # Pague algumas moedas para uma sessão de mineração bem-sucedida.
+    # Pague algumas moedas CNB para uma sessão de mineração bem-sucedida.
     blocosEncadeados.nova_troca(
-        remetente="Recompensa da mineradora de criptomoeda",
+        remetente="Recompensa da mineradora Coinbalance",
         recebedor=identificador_do_elo,
         montante=3,
     )
@@ -35,12 +35,14 @@ def mina():
     bloco = blocosEncadeados.novo_bloco(prova, fragmento_anterior)
 
     resposta = {
-        'mensagem': "Novo bloco extraido e adicionado a cadeia!",
+        'mensagem': "Novo bloco extraído e adicionado à blockchain Coinbalance!",
         'indice': bloco['indice'],
         'transacoes': bloco['transacoes'],
         'fragmento_anterior': bloco['fragmento_anterior'],
-        'a resposta foi ': bloco['prova'],
-        'segundos necessarios para resolver ' : decorrido
+        'prova_de_trabalho': bloco['prova'],
+        'tempo_necessario_segundos': decorrido,
+        'moeda': 'CNB',
+        'plataforma': 'Coinbalance'
     }
     return jsonify(resposta), 200
 
@@ -57,7 +59,11 @@ def nova_troca():
     # Cria uma nova transação
     indice = blocosEncadeados.nova_troca(valores['remetente'], valores['recebedor'], valores['montante'])
 
-    resposta = {'mensagem': f'Sucesso! Registraremos a transacao no proximo bloco minado.'}
+    resposta = {
+        'mensagem': f'Sucesso! Transação CNB registrada e será incluída no próximo bloco minado.',
+        'moeda': 'CNB',
+        'plataforma': 'Coinbalance'
+    }
     return jsonify(resposta), 201
 
 
@@ -66,6 +72,9 @@ def cadeia_completa():
     resposta = {
         'cadeia': blocosEncadeados.cadeia,
         'comprimento': len(blocosEncadeados.cadeia),
+        'moeda': 'CNB',
+        'plataforma': 'Coinbalance',
+        'framework': 'Coinbalance'
     }
     return jsonify(resposta), 200
 

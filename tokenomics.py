@@ -1,6 +1,7 @@
 """
-Sistema de Tokenomics Avançado
+Sistema de Tokenomics Coinbalance (CNB)
 Implementa supply limitado, queima de tokens, governance e mecanismos econômicos
+para a moeda digital Coinbalance (CNB)
 """
 
 import json
@@ -10,11 +11,11 @@ from database_manager import DatabaseManager
 
 
 class Tokenomics:
-    """Sistema de tokenomics para blockchain"""
+    """Sistema de tokenomics para Coinbalance (CNB)"""
     
     def __init__(self, db_manager: DatabaseManager):
         self.db_manager = db_manager
-        self.supply_maximo = 21_000_000  # 21 milhões de tokens (como Bitcoin)
+        self.supply_maximo = 100_000_000  # 100 milhões de tokens CNB
         self.supply_atual = 0
         self.supply_queimado = 0
         self.taxa_inflacao_inicial = 0.05  # 5% ao ano
@@ -22,6 +23,8 @@ class Tokenomics:
         self.recompensa_bloco_inicial = 50.0
         self.recompensa_atual = self.recompensa_bloco_inicial
         self.ultimo_halving = time.time()
+        self.moeda = "CNB"
+        self.plataforma = "Coinbalance"
         
         # Governance
         self.propostas_governance = {}
@@ -36,6 +39,8 @@ class Tokenomics:
     def obter_supply_info(self) -> Dict[str, Any]:
         """Obtém informações sobre o supply de tokens"""
         return {
+            "moeda": self.moeda,
+            "plataforma": self.plataforma,
             "supply_maximo": self.supply_maximo,
             "supply_atual": self.supply_atual,
             "supply_queimado": self.supply_queimado,
@@ -74,7 +79,8 @@ class Tokenomics:
         
         return {
             "sucesso": True,
-            "mensagem": f"{quantidade} tokens queimados",
+            "mensagem": f"{quantidade} CNB queimados",
+            "moeda": self.moeda,
             "supply_atual": self.supply_atual,
             "supply_queimado": self.supply_queimado
         }
@@ -109,7 +115,8 @@ class Tokenomics:
         
         return {
             "sucesso": True,
-            "mensagem": f"{quantidade} tokens emitidos para {destinatario}",
+            "mensagem": f"{quantidade} CNB emitidos para {destinatario}",
+            "moeda": self.moeda,
             "supply_atual": self.supply_atual,
             "novo_saldo": novo_saldo
         }
