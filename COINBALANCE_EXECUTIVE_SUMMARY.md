@@ -9,7 +9,7 @@
 
 ## 🎯 VISÃO EXECUTIVA
 
-**Coinbalance** é a primeira plataforma de investimento consciente que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar um novo paradigma econômico: **"A Economia da Consciência"**.
+**Coinbalance** é a primeira plataforma de investimento consciente baseada no framework proprietário Coinbalance, que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar um novo paradigma econômico: **"A Economia da Consciência"**.
 
 ### Proposta de Valor Única
 > *"Where Meaning Meets Money"*
@@ -20,17 +20,17 @@ Transformamos investimentos tradicionais em veículos de impacto consciente, uti
 
 ## 🧠 FUNDAMENTAÇÃO TECNOLÓGICA
 
-### 1. **Inteligência Artificial Simbólica**
+### 1. **Framework Coinbalance - IA Simbólica**
 - Algoritmos baseados em lógica mônadica
 - Processamento de dados não-lineares
 - Predição de tendências através de padrões conscientes
 
-### 2. **Neuroeconomia Aplicada**
+### 2. **Neuroeconomia Aplicada (Framework Coinbalance)**
 - Análise comportamental de investidores
 - Modelagem de decisões baseada em consciência
 - Otimização de portfólio através de princípios éticos
 
-### 3. **Blockchain Consciente**
+### 3. **Blockchain Consciente (Framework Coinbalance)**
 - Smart contracts com validação ética
 - Transparência total nas operações
 - Sistema de reputação baseado em impacto real
@@ -85,13 +85,13 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 
 ## 🚀 DIFERENCIAIS COMPETITIVOS
 
-### 1. **Tecnologia Proprietária**
+### 1. **Framework Coinbalance Proprietário**
 - IA simbólica única no mercado
 - Algoritmos de consciência não replicáveis
 - Vantagem competitiva sustentável
 
 ### 2. **Metodologia Exclusiva**
-- Framework Or Ha-Da'at
+- Framework Coinbalance proprietário
 - Integração ciência-consciência
 - Resultados comprovados
 
@@ -163,7 +163,7 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 ### **Glauco - CEO & Fundador**
 - 15 anos em tecnologia e investimentos
 - Especialista em IA simbólica
-- Criador do framework Or Ha-Da'at
+- Criador do framework Coinbalance
 
 ### **Equipe Técnica (a contratar):**
 - CTO com experiência em fintech
@@ -232,7 +232,7 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 
 ## 🌟 VISÃO DE LONGO PRAZO
 
-**Coinbalance** será a principal plataforma de investimento consciente do Brasil e uma das líderes globais em neuroeconomia aplicada, transformando a forma como o mundo investe e criando um novo paradigma econômico baseado em consciência, propósito e impacto positivo.
+**Coinbalance** será a principal plataforma de investimento consciente do Brasil e uma das líderes globais em neuroeconomia aplicada, utilizando o framework proprietário Coinbalance para transformar a forma como o mundo investe e criar um novo paradigma econômico baseado em consciência, propósito e impacto positivo.
 
 ### **Missão:**
 > *"Democratizar o investimento consciente e criar uma economia que equilibre prosperidade com sabedoria."*
