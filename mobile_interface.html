@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinbalance - A Economia da Consciência</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #4169E1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            background: #4169E1;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: #FFD700;
+            color: #333;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 20px 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4169E1;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .card-button:hover {
+            background: #FFD700;
+            color: #333;
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .wallet-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wallet-header h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .wallet-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .wallet-item h4 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .wallet-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .wallet-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .wallet-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-button.primary {
+            background: #FFD700;
+            color: #333;
+        }
+
+        .wallet-button.secondary {
+            background: #4169E1;
+            color: white;
+        }
+
+        .wallet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        .footer h4 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+            }
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .wallet-info {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .nav {
+                gap: 30px;
+            }
+
+            .nav-item {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🪙 Coinbalance</h1>
+                <p>A Economia da Consciência</p>
+            </div>
+            <nav class="nav">
+                <a href="#inicio" class="nav-item">Início</a>
+                <a href="#carteira" class="nav-item">Carteira</a>
+                <a href="#investimentos" class="nav-item">Investimentos</a>
+                <a href="#sobre" class="nav-item">Sobre</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero" id="inicio">
+                <h2>Bem-vindo à Revolução dos Investimentos Conscientes</h2>
+                <p>Coinbalance é a primeira plataforma que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar investimentos baseados em consciência e propósito.</p>
+                <a href="#carteira" class="cta-button">Começar Agora</a>
+            </section>
+
+            <!-- Features Cards -->
+            <section class="cards">
+                <div class="card">
+                    <h3>🧠 IA Simbólica</h3>
+                    <p>Algoritmos baseados em lógica mônadica para análise de projetos conscientes e recomendações personalizadas de investimento.</p>
+                    <a href="#" class="card-button">Saiba Mais</a>
+                </div>
+
+                <div class="card">
+                    <h3>💰 Moeda CNB</h3>
+                    <p>Token digital nativo com supply limitado, staking de 12% APY e governança descentralizada para uma economia consciente.</p>
+                    <a href="#" class="card-button">Comprar CNB</a>
+                </div>
+
+                <div class="card">
+                    <h3>⚖️ Blockchain Consciente</h3>
+                    <p>Validação ética de transações, transparência total e sistema de reputação baseado em impacto real.</p>
+                    <a href="#" class="card-button">Explorar</a>
+                </div>
+            </section>
+
+            <!-- Wallet Section -->
+            <section class="wallet-section" id="carteira">
+                <div class="wallet-header">
+                    <h3>🪙 Sua Carteira CNB</h3>
+                    <p>Gerencie seus tokens Coinbalance de forma segura e consciente</p>
+                </div>
+
+                <div class="wallet-info">
+                    <div class="wallet-item">
+                        <h4>Saldo CNB</h4>
+                        <p id="saldo-cnb">0.00 CNB</p>
+                    </div>
+                    <div class="wallet-item">
+                        <h4>Valor USD</h4>
+                        <p id="valor-usd">$0.00</p>
+                    </div>
+                    <div class="wallet-item">
+                        <h4>Staking Ativo</h4>
+                        <p id="staking-ativo">0.00 CNB</p>
+                    </div>
+                    <div class="wallet-item">
+                        <h4>Recompensas</h4>
+                        <p id="recompensas">0.00 CNB</p>
+                    </div>
+                </div>
+
+                <div class="wallet-actions">
+                    <button class="wallet-button primary" onclick="criarCarteira()">Criar Carteira</button>
+                    <button class="wallet-button secondary" onclick="fazerStake()">Fazer Stake</button>
+                    <button class="wallet-button secondary" onclick="enviarCNB()">Enviar CNB</button>
+                    <button class="wallet-button secondary" onclick="receberCNB()">Receber CNB</button>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="hero" id="sobre">
+                <h2>Sobre o Coinbalance</h2>
+                <p>Somos pioneiros em criar uma nova economia baseada em consciência, onde cada investimento é analisado não apenas pelo retorno financeiro, mas pelo impacto positivo na sociedade e no planeta.</p>
+                <p>Nossa tecnologia proprietária combina inteligência artificial simbólica com neuroeconomia para oferecer recomendações de investimento que alinham prosperidade com propósito.</p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <h4>🪙 Coinbalance - A Economia da Consciência</h4>
+            <p>Moeda: CNB | Framework: Coinbalance | Versão: 1.0</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Documentação</a>
+                <a href="#" class="footer-link">API</a>
+                <a href="#" class="footer-link">Suporte</a>
+                <a href="#" class="footer-link">Investimentos</a>
+                <a href="#" class="footer-link">Discord</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simulação de dados da carteira
+        let carteira = {
+            saldo: 0,
+            staking: 0,
+            recompensas: 0,
+            endereco: null
+        };
+
+        // Função para criar carteira
+        function criarCarteira() {
+            if (carteira.endereco) {
+                alert('Carteira já existe!');
+                return;
+            }
+
+            // Simular criação de carteira
+            carteira.endereco = 'CNB_' + Math.random().toString(36).substr(2, 20);
+            carteira.saldo = 1000; // CNB inicial
+
+            atualizarInterface();
+            mostrarMensagem('Carteira criada com sucesso!', 'success');
+        }
+
+        // Função para fazer stake
+        function fazerStake() {
+            if (!carteira.endereco) {
+                alert('Crie uma carteira primeiro!');
+                return;
+            }
+
+            const valor = prompt('Quantos CNB deseja fazer stake?');
+            if (valor && valor > 0 && valor <= carteira.saldo) {
+                carteira.staking += parseFloat(valor);
+                carteira.saldo -= parseFloat(valor);
+                atualizarInterface();
+                mostrarMensagem(`Stake de ${valor} CNB realizado!`, 'success');
+            }
+        }
+
+        // Função para enviar CNB
+        function enviarCNB() {
+            if (!carteira.endereco) {
+                alert('Crie uma carteira primeiro!');
+                return;
+            }
+
+            const destinatario = prompt('Endereço do destinatário:');
+            const valor = prompt('Quantos CNB deseja enviar?');
+            
+            if (destinatario && valor && valor > 0 && valor <= carteira.saldo) {
+                carteira.saldo -= parseFloat(valor);
+                atualizarInterface();
+                mostrarMensagem(`Enviados ${valor} CNB para ${destinatario}`, 'success');
+            }
+        }
+
+        // Função para receber CNB
+        function receberCNB() {
+            if (!carteira.endereco) {
+                alert('Crie uma carteira primeiro!');
+                return;
+            }
+
+            alert(`Seu endereço para receber CNB:\n${carteira.endereco}`);
+        }
+
+        // Função para atualizar interface
+        function atualizarInterface() {
+            document.getElementById('saldo-cnb').textContent = carteira.saldo.toFixed(2) + ' CNB';
+            document.getElementById('valor-usd').textContent = '$' + (carteira.saldo * 0.1).toFixed(2);
+            document.getElementById('staking-ativo').textContent = carteira.staking.toFixed(2) + ' CNB';
+            document.getElementById('recompensas').textContent = carteira.recompensas.toFixed(2) + ' CNB';
+        }
+
+        // Função para mostrar mensagens
+        function mostrarMensagem(texto, tipo) {
+            const message = document.createElement('div');
+            message.className = `message ${tipo}`;
+            message.textContent = texto;
+            
+            const hero = document.querySelector('.hero');
+            hero.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+
+        // Simular recompensas de staking
+        setInterval(() => {
+            if (carteira.staking > 0) {
+                const recompensa = carteira.staking * 0.12 / 365 / 24 / 60; // 12% APY
+                carteira.recompensas += recompensa;
+                atualizarInterface();
+            }
+        }, 60000); // A cada minuto
+
+        // Inicializar interface
+        atualizarInterface();
+
+        // Smooth scrolling para navegação
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
