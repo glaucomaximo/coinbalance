@@ -43,7 +43,7 @@ Transformamos investimentos tradicionais em veículos de impacto consciente, uti
 ### **Nome:** Coinbalance
 - **Coin** = Valor material, energia, manifestação, moeda digital
 - **Balance** = Equilíbrio, consciência, harmonia
-- **Moeda:** Coinbalance (COIN) - Token digital proprietário
+- **Moeda:** Coinbalance (CNB) - Token digital proprietário
 
 ### **Slogan Principal:**
 > *"The Economy of Consciousness"*
@@ -74,7 +74,7 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
    - Sobre operações de compra/venda
    - Receita recorrente
 
-4. **Moeda Coinbalance (COIN)**
+4. **Moeda Coinbalance (CNB)**
    - Apreciação do valor do token
    - Staking e yield farming
    - Utilidade como meio de pagamento
@@ -84,11 +84,11 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
    - Serviços de transformação organizacional
 
 ### **Projeção de Receita (3 anos):**
-- **Ano 1:** R$ 2.5M (100 clientes) + Valorização COIN
-- **Ano 2:** R$ 8.5M (350 clientes) + Valorização COIN
-- **Ano 3:** R$ 25M (1.000 clientes) + Valorização COIN
+- **Ano 1:** R$ 2.5M (100 clientes) + Valorização CNB
+- **Ano 2:** R$ 8.5M (350 clientes) + Valorização CNB
+- **Ano 3:** R$ 25M (1.000 clientes) + Valorização CNB
 
-### **Tokenomics Coinbalance (COIN):**
+### **Tokenomics Coinbalance (CNB):**
 - **Supply Total:** 100 milhões de tokens
 - **Distribuição:** 40% público, 30% equipe, 20% reserva, 10% parcerias
 - **Utilidade:** Pagamentos, staking, governança, acesso premium
@@ -110,7 +110,7 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 
 ### 3. **Ecosistema Completo**
 - Plataforma de investimento
-- Moeda digital Coinbalance (COIN)
+- Moeda digital Coinbalance (CNB)
 - Consultoria empresarial
 - Instituto de pesquisa
 - Comunidade de impacto
@@ -143,20 +143,20 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 
 ### **Fase 1: Fundação (Meses 1-6)**
 - Desenvolvimento da plataforma MVP
-- Criação e lançamento do token Coinbalance (COIN)
+- Criação e lançamento do token Coinbalance (CNB)
 - Validação com 50 investidores piloto
 - Captação de R$ 5M em seed funding
 
 ### **Fase 2: Escala (Meses 7-18)**
 - Lançamento comercial completo
-- Listagem do token COIN em exchanges
+- Listagem do token CNB em exchanges
 - Expansão para 350 clientes
 - Captação de R$ 15M em Series A
 
 ### **Fase 3: Consolidação (Meses 19-36)**
 - Expansão nacional
 - Desenvolvimento de produtos avançados
-- Blockchain própria para o token COIN
+- Blockchain própria para o token CNB
 - Preparação para IPO
 
 ---
@@ -172,7 +172,7 @@ Plataforma premium de investimento consciente para investidores de alto patrimô
 ### **Uso dos Recursos:**
 1. **Equipe técnica especializada** (8 desenvolvedores)
 2. **Infraestrutura de IA e blockchain**
-3. **Desenvolvimento e lançamento do token COIN**
+3. **Desenvolvimento e lançamento do token CNB**
 4. **Marketing para investidores qualificados**
 5. **Compliance e regulamentação**
 6. **Pesquisa e desenvolvimento**
