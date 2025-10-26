@@ -3,7 +3,7 @@ API Moderna com FastAPI
 Implementa endpoints RESTful com documentação automática, validação e segurança
 """
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
@@ -11,6 +11,8 @@ from typing import List, Dict, Any, Optional
 import uvicorn
 import time
 import json
+import logging
+import psutil
 
 # Importar módulos do sistema
 from database_manager import DatabaseManager
@@ -19,16 +21,25 @@ from transaction_validator import TransactionValidator
 from smart_contracts import ContractManager
 from crypto_utils import CryptoUtils
 
+# Importar melhorias
+from error_handlers import error_handler, setup_error_handlers, error_middleware
+from rate_limiter import rate_limit_middleware, rate_limiter
+from health_monitor import health_monitor
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Inicializar aplicação FastAPI
 app = FastAPI(
     title="CoinBalance API",
     description="Blockchain moderna com DeFi, staking e contratos inteligentes - Equilíbrio perfeito entre segurança e performance",
-    version="2.0.0",
+    version="2.1.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
-# Configurar CORS
+# Configurar middlewares
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -37,12 +48,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Adicionar middleware de tratamento de erros
+app.middleware("http")(error_middleware)
+
+# Adicionar middleware de rate limiting
+app.middleware("http")(rate_limit_middleware)
+
+# Configurar handlers de erro
+setup_error_handlers(app)
+
 # Inicializar componentes do sistema
 db_manager = DatabaseManager()
 wallet_manager = GerenciadorCarteiras()
 transaction_validator = TransactionValidator(db_manager)
 contract_manager = ContractManager(db_manager)
 security = HTTPBearer()
+
+# Inicializar tempo de início da aplicação
+app.state.start_time = time.time()
 
 # Modelos Pydantic para validação
 class TransacaoRequest(BaseModel):
@@ -292,15 +315,126 @@ async def estatisticas():
         }
     }
 
+@app.get("/health", summary="Health Check Avançado")
+async def health_check():
+    """Verifica saúde completa do sistema"""
+    try:
+        # Executar todos os health checks
+        checks = await health_monitor.run_all_checks()
+        summary = health_monitor.get_health_summary()
+        
+        return {
+            "status": "success",
+            "timestamp": time.time(),
+            "overall_status": summary["overall_status"],
+            "checks": summary["checks"],
+            "summary": {
+                "total_checks": summary["total_checks"],
+                "healthy": summary["healthy_checks"],
+                "warnings": summary["warning_checks"],
+                "critical": summary["critical_checks"]
+            }
+        }
+    except Exception as e:
+        logger.error(f"Erro no health check: {e}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "timestamp": time.time()
+        }
+
+@app.get("/health/simple", summary="Health Check Simples")
+async def health_simple():
+    """Health check simples para load balancers"""
+    try:
+        # Verificação básica
+        blocos = db_manager.obter_todos_blocos()
+        
+        return {
+            "status": "healthy",
+            "timestamp": time.time(),
+            "blockchain": len(blocos),
+            "version": "2.1.0"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": time.time()
+        }
+
+@app.get("/metrics", summary="Métricas do Sistema")
+async def metrics():
+    """Retorna métricas detalhadas do sistema"""
+    try:
+        # Estatísticas de erro
+        error_stats = error_handler.get_error_statistics()
+        
+        # Estatísticas de rate limiting
+        rate_limit_stats = rate_limiter.get_rate_limit_stats()
+        
+        # Estatísticas da blockchain
+        blocos = db_manager.obter_todos_blocos()
+        
+        return {
+            "timestamp": time.time(),
+            "version": "2.1.0",
+            "blockchain": {
+                "total_blocks": len(blocos),
+                "last_block_time": blocos[-1].get('carimbo_temporal') if blocos else None
+            },
+            "errors": error_stats,
+            "rate_limiting": rate_limit_stats,
+            "system": {
+                "uptime": time.time() - app.state.start_time if hasattr(app.state, 'start_time') else 0,
+                "memory_usage": psutil.virtual_memory().percent if 'psutil' in globals() else 0
+            }
+        }
+    except Exception as e:
+        logger.error(f"Erro ao obter métricas: {e}")
+        return {"error": str(e), "timestamp": time.time()}
+
+@app.get("/admin/errors", summary="Estatísticas de Erros")
+async def admin_errors():
+    """Retorna estatísticas detalhadas de erros (apenas para administradores)"""
+    try:
+        return error_handler.get_error_statistics()
+    except Exception as e:
+        return {"error": str(e), "timestamp": time.time()}
+
+@app.post("/admin/rate-limit/block", summary="Bloquear IP")
+async def block_ip(ip: str, reason: str = "Manual block"):
+    """Bloqueia um IP (apenas para administradores)"""
+    try:
+        rate_limiter.block_ip(ip, reason)
+        return {"success": True, "message": f"IP {ip} bloqueado", "reason": reason}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.delete("/admin/rate-limit/unblock", summary="Desbloquear IP")
+async def unblock_ip(ip: str):
+    """Desbloqueia um IP (apenas para administradores)"""
+    try:
+        rate_limiter.unblock_ip(ip)
+        return {"success": True, "message": f"IP {ip} desbloqueado"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 # Middleware para logging
 @app.middleware("http")
 async def log_requests(request, call_next):
     start_time = time.time()
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    
-    print(f"{request.method} {request.url} - {response.status_code} - {process_time:.4f}s")
-    return response
+    try:
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        
+        logger.info(f"{request.method} {request.url} - {response.status_code} - {process_time:.4f}s")
+        
+        return response
+    except Exception as e:
+        process_time = time.time() - start_time
+        logger.error(f"{request.method} {request.url} - ERROR - {process_time:.4f}s - {str(e)}")
+        raise
 
 if __name__ == "__main__":
     uvicorn.run(
