@@ -270,13 +270,13 @@ python tests/benchmark.py
 
 ## 📈 Roadmap
 
-### Versão 2.1 (Q1 2024)
+### Versão 2.1 (Q1 2025)
 - [ ] **Layer 2** solutions
 - [ ] **Cross-chain** bridges
 - [ ] **NFT** marketplace
 - [ ] **Mobile** wallet
 
-### Versão 2.2 (Q2 2024)
+### Versão 2.2 (Q2 2025)
 - [ ] **Zero-knowledge** proofs
 - [ ] **Privacy** features
 - [ ] **Advanced** DeFi protocols
