@@ -1,7 +1,7 @@
 # ⚖️ CoinBalance - Blockchain Moderna com DeFi
 
-[![CI/CD](https://github.com/seu-usuario/cryptochain/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/seu-usuario/cryptochain/actions/workflows/ci-cd.yml)
-[![Security](https://img.shields.io/badge/security-audited-green.svg)](https://github.com/seu-usuario/cryptochain/security)
+[![CI/CD](https://github.com/seu-usuario/coinbalance/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/seu-usuario/coinbalance/actions/workflows/ci-cd.yml)
+[![Security](https://img.shields.io/badge/security-audited-green.svg)](https://github.com/seu-usuario/coinbalance/security)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 
@@ -59,8 +59,8 @@ Uma blockchain moderna e escalável implementada em Python, com funcionalidades 
 
 ```bash
 # Clonar repositório
-git clone https://github.com/seu-usuario/cryptochain.git
-cd cryptochain
+git clone https://github.com/glaucomaximo/coinbalance.git
+cd coinbalance
 
 # Instalar dependências
 pip install -r requirements.txt
