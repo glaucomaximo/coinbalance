@@ -295,9 +295,9 @@ Este projeto está licenciado sob a [Licença MIT](LICENSE.md).
 
 ## 📞 Suporte
 
-- **Documentação**: [docs.cryptochain.com](https://docs.coinbalance.com.br)
-- **Discord**: [discord.gg/cryptochain](https://discord.gg/coinbalance)
-- **Email**: support@cryptochain.com
+- **Documentação**: [docs.coinbalance.com.br](https://docs.coinbalance.com.br)
+- **Discord**: [discord.gg/coinbalance](https://discord.gg/coinbalance)
+- **Email**: support@coinbalance.com.br
 - **GitHub Issues**: [Issues](https://github.com/glaucomaximo/coinbalance/issues)
 
 ---
