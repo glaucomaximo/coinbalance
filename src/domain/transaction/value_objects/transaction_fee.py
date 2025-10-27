@@ -22,10 +22,10 @@ class TransactionFee:
     
     def __post_init__(self):
         """Validação da taxa"""
-        if self.value.value < 0:
+        if self.value.to_cnb() < 0:
             raise ValueError("Transaction fee cannot be negative")
         
-        if self.value.value > Decimal("1000"):  # Max fee
+        if self.value.to_cnb() > Decimal("1000"):  # Max fee
             raise ValueError("Transaction fee too high")
     
     def to_cnb(self) -> Decimal:

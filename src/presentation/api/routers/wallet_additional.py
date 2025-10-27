@@ -2,7 +2,7 @@
 Router adicional para endpoints de Wallet (listagem e operações)
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 
 from src.presentation.schemas.wallet_schema import (
     GetWalletResponse,
@@ -16,6 +16,7 @@ from src.domain.shared.exceptions import (
     DomainException,
     EntityNotFoundError,
 )
+from src.infrastructure.security.auth import get_current_user, AuthenticatedUser, require_scope
 
 router = APIRouter(
     prefix="/carteiras",
@@ -23,6 +24,8 @@ router = APIRouter(
     responses={
         404: {"description": "Carteira não encontrada"},
         400: {"description": "Requisição inválida"},
+        401: {"description": "Não autorizado"},
+        403: {"description": "Permissão negada"},
     },
 )
 
@@ -33,7 +36,10 @@ router = APIRouter(
     summary="Listar Carteiras",
     description="Lista todas as carteiras cadastradas no sistema",
 )
-async def list_wallets(handler: GetWalletHandlerDep) -> WalletListResponse:
+async def list_wallets(
+    handler: GetWalletHandlerDep,
+    current_user: AuthenticatedUser = Depends(require_scope("admin:read"))
+) -> WalletListResponse:
     """
     Lista todas as carteiras cadastradas.
     """

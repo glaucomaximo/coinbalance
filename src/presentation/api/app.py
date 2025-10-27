@@ -11,6 +11,7 @@ import time
 import logging
 
 from src.infrastructure.config.settings import settings
+from src.infrastructure.monitoring.security_monitor import security_monitor
 from src.presentation.api.routers import wallet_router, health_router
 from src.presentation.api.routers.wallet_additional import router as wallet_additional_router
 from src.presentation.api.routers.consensus.consensus_router import router as consensus_router
@@ -18,8 +19,13 @@ from src.presentation.api.routers.transaction_router import router as transactio
 from src.presentation.api.routers.system_router import router as system_router
 from src.presentation.api.routers.auth_router import router as auth_router
 from src.presentation.api.routers.transfer_router import router as transfer_router
+from src.presentation.api.routers.security_router import router as security_router
 from src.presentation.api.routers.transaction_history_router import router as history_router
 from src.presentation.api.routers.monitoring_dashboard_router import router as dashboard_router
+from src.presentation.api.routers.blockchain_router import router as blockchain_router
+from src.presentation.api.routers.consciousness_economy_router import router as consciousness_economy_router
+from src.presentation.api.routers.monitoring_router import router as monitoring_router
+from src.presentation.api.routers.fractal_router import router as fractal_router
 from src.domain.shared.exceptions import DomainException
 from src.infrastructure.security.rate_limiter import rate_limit_middleware
 
@@ -91,8 +97,55 @@ def create_app() -> FastAPI:
     )
 
     # Rate Limiting Avançado
-    # Rate limiting middleware (desabilitado para testes)
-    # app.middleware("http")(rate_limit_middleware)
+    # Habilitar rate limiting para produção
+    app.middleware("http")(rate_limit_middleware)
+
+    # Security Monitoring Middleware
+    @app.middleware("http")
+    async def security_monitoring_middleware(request: Request, call_next):
+        """Middleware para monitoramento de segurança"""
+        start_time = time.time()
+        
+        # Extrair informações da requisição
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "unknown")
+        
+        try:
+            # Processar requisição
+            response = await call_next(request)
+            
+            # Monitorar respostas de erro
+            if response.status_code == 401:
+                security_monitor.log_auth_failure(
+                    wallet_address="unknown",
+                    source_ip=client_ip,
+                    user_agent=user_agent
+                )
+            elif response.status_code == 429:
+                security_monitor.log_rate_limit_exceeded(
+                    endpoint=str(request.url.path),
+                    source_ip=client_ip,
+                    user_agent=user_agent
+                )
+            elif response.status_code >= 500:
+                security_monitor.log_suspicious_activity(
+                    activity_type="SERVER_ERROR",
+                    description=f"Erro interno do servidor: {response.status_code}",
+                    source_ip=client_ip,
+                    severity="MEDIUM"
+                )
+            
+            return response
+            
+        except Exception as e:
+            # Monitorar exceções
+            security_monitor.log_suspicious_activity(
+                activity_type="EXCEPTION",
+                description=f"Exceção não tratada: {str(e)}",
+                source_ip=client_ip,
+                severity="HIGH"
+            )
+            raise
 
     # Logging Middleware
     @app.middleware("http")
@@ -194,16 +247,29 @@ def create_app() -> FastAPI:
     # Monitoring Dashboard endpoints
     app.include_router(dashboard_router, prefix="/api/v1")
 
+    # Blockchain endpoints
+    app.include_router(blockchain_router, prefix="/api/v1")
+    app.include_router(consciousness_economy_router, prefix="/api/v1")
+
+    # Monitoring endpoints
+    app.include_router(monitoring_router, prefix="/api/v1")
+
+    # Fractal Architecture endpoints
+    app.include_router(fractal_router, prefix="/api/v1")
+
+    # Security endpoints
+    app.include_router(security_router, prefix="/api/v1")
+
     # Wallet endpoints
     app.include_router(wallet_router.router, prefix="/api/v1")
     app.include_router(wallet_additional_router, prefix="/api/v1")
-    
+
     # Consensus endpoints
     app.include_router(consensus_router, prefix="/api/v1")
-    
+
     # Transaction endpoints
     app.include_router(transaction_router, prefix="/api/v1")
-    
+
     # System endpoints (faucet, minting, etc.)
     app.include_router(system_router, prefix="/api/v1")
 

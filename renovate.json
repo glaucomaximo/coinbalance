@@ -1,0 +1,150 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "schedule:weekly"
+  ],
+  "timezone": "America/Sao_Paulo",
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "assignees": [
+    "coinbalance-maintainers"
+  ],
+  "reviewers": [
+    "coinbalance-maintainers"
+  ],
+  "commitMessagePrefix": "chore:",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "packageRules": [
+    {
+      "description": "Group Python dependencies",
+      "matchManagers": ["pip_requirements"],
+      "groupName": "python dependencies",
+      "groupSlug": "python-deps"
+    },
+    {
+      "description": "Group GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "description": "Group Docker dependencies",
+      "matchManagers": ["dockerfile"],
+      "groupName": "docker dependencies",
+      "groupSlug": "docker-deps"
+    },
+    {
+      "description": "Major version updates",
+      "matchUpdateTypes": ["major"],
+      "labels": [
+        "dependencies",
+        "major"
+      ],
+      "prTitle": "{{commitMessagePrefix}}{{commitMessageAction}} {{commitMessageTopic}} {{commitMessageExtra}}",
+      "prBody": "## 🔄 Major Version Update\n\nThis PR updates {{depName}} to version {{newVersion}}.\n\n### ⚠️ Breaking Changes\n\nPlease review the changelog for breaking changes:\n- [Changelog](https://github.com/{{depName}}/releases)\n\n### 🧪 Testing\n\n- [ ] All tests pass\n- [ ] No breaking changes detected\n- [ ] Manual testing completed\n\n### 📋 Checklist\n\n- [ ] Review dependency changes\n- [ ] Test locally if needed\n- [ ] Update documentation if necessary\n- [ ] Approve if everything looks good"
+    },
+    {
+      "description": "Minor and patch updates",
+      "matchUpdateTypes": ["minor", "patch"],
+      "labels": [
+        "dependencies",
+        "minor-patch"
+      ],
+      "prTitle": "{{commitMessagePrefix}}{{commitMessageAction}} {{commitMessageTopic}} {{commitMessageExtra}}",
+      "prBody": "## 🔄 Dependency Update\n\nThis PR updates {{depName}} to version {{newVersion}}.\n\n### 🧪 Testing\n\n- [ ] All tests pass\n- [ ] No breaking changes detected\n\n### 📋 Checklist\n\n- [ ] Review dependency changes\n- [ ] Test locally if needed\n- [ ] Approve if everything looks good"
+    },
+    {
+      "description": "Security updates",
+      "matchUpdateTypes": ["patch"],
+      "matchPackageNames": [
+        "requests",
+        "urllib3",
+        "cryptography",
+        "pyyaml",
+        "jinja2"
+      ],
+      "labels": [
+        "dependencies",
+        "security"
+      ],
+      "prTitle": "🔒 security: update {{depName}} to {{newVersion}}",
+      "prBody": "## 🔒 Security Update\n\nThis PR updates {{depName}} to version {{newVersion}} to address security vulnerabilities.\n\n### 🛡️ Security Impact\n\nThis update addresses security vulnerabilities in {{depName}}.\n\n### 🧪 Testing\n\n- [ ] All tests pass\n- [ ] Security scan completed\n- [ ] No breaking changes detected\n\n### 📋 Checklist\n\n- [ ] Review security changes\n- [ ] Test locally\n- [ ] Approve if everything looks good"
+    }
+  ],
+  "pip_requirements": {
+    "fileMatch": [
+      "requirements\\.txt$",
+      "requirements-dev\\.txt$",
+      "requirements-prod\\.txt$"
+    ]
+  },
+  "github-actions": {
+    "fileMatch": [
+      "\\.github/workflows/.*\\.yml$",
+      "\\.github/workflows/.*\\.yaml$"
+    ]
+  },
+  "dockerfile": {
+    "fileMatch": [
+      "Dockerfile$",
+      "Dockerfile\\..*$",
+      "docker-compose\\.yml$",
+      "docker-compose\\.yaml$"
+    ]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "dependencies",
+      "security",
+      "vulnerability"
+    ],
+    "prTitle": "🔒 security: update {{depName}} to {{newVersion}}",
+    "prBody": "## 🚨 Security Vulnerability Alert\n\nThis PR updates {{depName}} to version {{newVersion}} to address a security vulnerability.\n\n### 🛡️ Vulnerability Details\n\n- **Package**: {{depName}}\n- **Current Version**: {{currentVersion}}\n- **New Version**: {{newVersion}}\n- **Severity**: {{vulnerability.severity}}\n- **CVSS Score**: {{vulnerability.cvssScore}}\n\n### 🔗 References\n\n- [CVE Details]({{vulnerability.cve}})\n- [Package Changelog](https://github.com/{{depName}}/releases)\n\n### 🧪 Testing\n\n- [ ] All tests pass\n- [ ] Security scan completed\n- [ ] Vulnerability resolved\n\n### 📋 Checklist\n\n- [ ] Review security changes\n- [ ] Test locally\n- [ ] Verify vulnerability is resolved\n- [ ] Approve if everything looks good"
+  },
+  "schedule": [
+    "every monday at 9am"
+  ],
+  "automerge": false,
+  "automergeType": "pr",
+  "requiredStatusChecks": null,
+  "prCreation": "immediate",
+  "rebaseWhen": "behind-base-branch",
+  "platform": "github",
+  "onboarding": true,
+  "onboardingConfig": {
+    "extends": ["config:base"]
+  },
+  "enabledManagers": [
+    "pip_requirements",
+    "github-actions",
+    "dockerfile",
+    "docker-compose",
+    "npm"
+  ],
+  "ignoreDeps": [
+    "python"
+  ],
+  "rangeStrategy": "bump",
+  "bumpVersion": "patch",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "branchPrefix": "renovate/",
+  "separateMajorMinor": true,
+  "separateMinorPatch": true,
+  "separateMultipleMajor": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "every monday at 9am"
+    ]
+  }
+}

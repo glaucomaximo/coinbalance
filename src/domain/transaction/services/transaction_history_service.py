@@ -10,20 +10,7 @@ from enum import Enum
 from src.domain.shared.value_objects.wallet_address import WalletAddress
 from src.domain.shared.value_objects.money import Money
 from src.domain.shared.value_objects.timestamp import Timestamp
-
-class TransactionType(Enum):
-    """Tipos de transação"""
-    TRANSFER = "transfer"
-    CREDIT = "credit"
-    DEBIT = "debit"
-    FEE = "fee"
-
-class TransactionStatus(Enum):
-    """Status da transação"""
-    PENDING = "pending"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+from src.domain.transaction.entities.transaction import TransactionStatus, TransactionType
 
 @dataclass
 class TransactionRecord:
@@ -107,7 +94,7 @@ class TransactionHistoryService:
         amount: Decimal,
         fee: Decimal,
         reason: str,
-        status: TransactionStatus = TransactionStatus.COMPLETED,
+        status: TransactionStatus = TransactionStatus.CONFIRMED,
         metadata: Optional[Dict[str, Any]] = None
     ) -> TransactionRecord:
         """Registra uma transferência no histórico"""
@@ -139,7 +126,7 @@ class TransactionHistoryService:
         operation_type: TransactionType,
         amount: Decimal,
         reason: str,
-        status: TransactionStatus = TransactionStatus.COMPLETED,
+        status: TransactionStatus = TransactionStatus.CONFIRMED,
         metadata: Optional[Dict[str, Any]] = None
     ) -> TransactionRecord:
         """Registra uma operação de carteira no histórico"""

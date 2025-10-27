@@ -16,7 +16,7 @@ from src.domain.wallet.value_objects.public_key import PublicKey
 from src.domain.wallet.value_objects.balance import Balance
 from src.domain.shared.value_objects.timestamp import Timestamp
 from src.infrastructure.persistence.database_manager import DatabaseManager
-from src.infrastructure.security.encryption import encryption_service
+from src.infrastructure.security.encryption import EncryptionService
 
 
 class WalletRepositoryImpl(WalletRepository):
@@ -36,6 +36,7 @@ class WalletRepositoryImpl(WalletRepository):
         """
         self.db = db_manager
         self._cache: dict[str, Wallet] = {}
+        self._encryption_service = EncryptionService()
 
     async def save(self, wallet: Wallet) -> None:
         """Salva ou atualiza carteira"""
@@ -162,7 +163,7 @@ class WalletRepositoryImpl(WalletRepository):
             "address": wallet.address.value,
             "name": wallet.name,
             "public_key": wallet.public_key.value,
-            "private_key": encryption_service.encrypt_private_key(wallet.private_key.reveal()),
+            "private_key": self._encryption_service.encrypt_private_key(wallet.private_key.reveal()),
             "balance_cnb": float(wallet.balance.to_cnb()),
             "balance_satoshi": wallet.balance.to_satoshi(),
             "created_at": wallet.created_at.value,
@@ -178,7 +179,7 @@ class WalletRepositoryImpl(WalletRepository):
             name=data["name"],
             public_key=PublicKey.create(data["public_key"]),
             private_key=(
-                PrivateKey.from_string(encryption_service.decrypt_private_key(data["private_key"]))
+                PrivateKey.from_string(self._encryption_service.decrypt_private_key(data["private_key"]))
                 if data["private_key"]
                 else PrivateKey.generate()
             ),

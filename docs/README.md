@@ -11,8 +11,8 @@ Esta documentação abrange todos os aspectos do projeto CoinBalance, uma plataf
 ### **1. Documentação Técnica**
 - [Arquitetura do Sistema](architecture/README.md)
 - [API Reference](api/README.md)
-- [Guia de Desenvolvimento](development/README.md)
-- [Configuração e Deploy](deployment/README.md)
+- [Guia de Desenvolvimento](DEVELOPMENT.md)
+- [Guia de Instalação](INSTALLATION.md)
 
 ### **2. Documentação de Negócio**
 - [Requisitos Funcionais](requirements/functional.md)
@@ -23,8 +23,8 @@ Esta documentação abrange todos os aspectos do projeto CoinBalance, uma plataf
 ### **3. Documentação de Qualidade**
 - [Relatórios de Qualidade](reports/README.md)
 - [Artefatos do Software](artifacts/README.md)
-- [Logs e Monitoramento](monitoring/README.md)
-- [Testes e Cobertura](testing/README.md)
+- [Relatório de Cobertura](reports/coverage-report.md)
+- [Relatório de Logs](reports/logs-report.md)
 
 ### **4. Documentação de Engenharia**
 - [Gestão de Configuração](engenharia/gestao-configuracao.md)
@@ -57,10 +57,10 @@ python main.py --port 8001
 
 ## 📊 **Status do Projeto**
 
-- **Versão**: 1.0.0
-- **Status**: ✅ Funcional
-- **Testes**: 95/95 passando (100%)
-- **Cobertura**: ~85%
+- **Versão**: 2.1.1
+- **Status**: ✅ COMPLETAMENTE FUNCIONAL
+- **Testes**: 106/106 passando (100%)
+- **Cobertura**: 50.38% (meta mínima atingida)
 - **Performance**: Otimizada
 
 ---

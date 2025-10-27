@@ -1,354 +1,470 @@
-# 🔌 API Reference - CoinBalance
+# CoinBalance API Documentation
 
-## 📋 **Visão Geral**
+## 🚀 Visão Geral
 
-A API CoinBalance fornece endpoints RESTful para gerenciamento de carteiras digitais e operações de criptomoeda.
+A API do CoinBalance é um sistema de carteira digital robusto construído com FastAPI, oferecendo endpoints seguros e bem documentados para gerenciamento de carteiras, transferências e autenticação.
 
-**Base URL**: `http://localhost:8001/api/v1`
-
----
-
-## 🚀 **Endpoints Disponíveis**
-
-### **1. Carteiras**
-
-#### **Criar Carteira**
-```http
-POST /api/v1/carteiras/
+### Base URL
+```
+http://localhost:8001
 ```
 
-**Request Body**:
+### Autenticação
+A API utiliza JWT (JSON Web Tokens) para autenticação. Inclua o token no header:
+```
+Authorization: Bearer <seu_token>
+```
+
+## 📋 Endpoints da API
+
+### 🔐 Autenticação
+
+#### POST /api/v1/auth/register
+Registrar um novo usuário.
+
+**Request Body:**
 ```json
 {
-  "name": "Minha Carteira",
-  "password": "senha12345",
-  "metadata": {
-    "description": "Carteira principal"
-  }
+  "username": "usuario123",
+  "email": "usuario@email.com",
+  "password": "senha123456"
 }
 ```
 
-**Response** (201 Created):
+**Response (201):**
 ```json
 {
-  "address": "a1b2c3d4e5f6...",
-  "name": "Minha Carteira",
-  "public_key": "pub_key_here",
-  "balance_cnb": 0.0,
-  "balance_satoshi": 0,
-  "created_at": 1761582890.0854228,
-  "updated_at": 1761582890.0854228,
-  "is_active": true,
-  "metadata": {
-    "description": "Carteira principal"
-  }
+  "message": "Usuário registrado com sucesso",
+  "user_id": "uuid-do-usuario"
 }
 ```
 
-#### **Buscar Carteira por Endereço**
-```http
-GET /api/v1/carteiras/{address}
-```
+#### POST /api/v1/auth/login
+Fazer login e obter token JWT.
 
-**Response** (200 OK):
+**Request Body:**
 ```json
 {
-  "address": "a1b2c3d4e5f6...",
+  "username": "usuario123",
+  "password": "senha123456"
+}
+```
+
+**Response (200):**
+```json
+{
+  "access_token": "jwt-token-aqui",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+```
+
+#### GET /api/v1/auth/me
+Obter informações do usuário autenticado.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response (200):**
+```json
+{
+  "user_id": "uuid-do-usuario",
+  "username": "usuario123",
+  "email": "usuario@email.com"
+}
+```
+
+### 💰 Carteiras
+
+#### POST /api/v1/carteiras/
+Criar uma nova carteira.
+
+**Request Body:**
+```json
+{
   "name": "Minha Carteira",
-  "public_key": "pub_key_here",
+  "password": "senha123456"
+}
+```
+
+**Response (201):**
+```json
+{
+  "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "public_key": "04a1b2c3d4e5f6...",
+  "balance": 0.0,
+  "created_at": "2024-10-27T10:30:00Z"
+}
+```
+
+#### GET /api/v1/carteiras/{address}
+Obter informações de uma carteira específica.
+
+**Path Parameters:**
+- `address` (string): Endereço da carteira
+
+**Response (200):**
+```json
+{
+  "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "public_key": "04a1b2c3d4e5f6...",
   "balance_cnb": 100.0,
   "balance_satoshi": 10000000000,
-  "created_at": 1761582890.0854228,
-  "updated_at": 1761582890.0854228,
-  "is_active": true,
-  "metadata": {
-    "description": "Carteira principal"
-  }
+  "created_at": "2024-10-27T10:30:00Z"
 }
 ```
 
-#### **Listar Todas as Carteiras**
-```http
-GET /api/v1/carteiras/
-```
+#### GET /api/v1/carteiras/
+Listar todas as carteiras.
 
-**Response** (200 OK):
+**Response (200):**
 ```json
 {
   "wallets": [
     {
-      "address": "a1b2c3d4e5f6...",
-      "name": "Carteira 1",
-      "public_key": "pub_key_1",
-      "balance_cnb": 50.0,
-      "balance_satoshi": 5000000000,
-      "created_at": 1761582890.0854228,
-      "updated_at": 1761582890.0854228,
-      "is_active": true,
-      "metadata": {}
+      "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+      "public_key": "04a1b2c3d4e5f6...",
+      "balance_cnb": 100.0,
+      "balance_satoshi": 10000000000,
+      "created_at": "2024-10-27T10:30:00Z"
     }
   ],
   "total": 1
 }
 ```
 
-#### **Creditar Saldo**
-```http
-POST /api/v1/carteiras/{address}/credit
-```
+#### POST /api/v1/carteiras/{address}/creditar
+Creditar saldo em uma carteira.
 
-**Request Body**:
-```json
-{
-  "amount": 100.0,
-  "reason": "Depósito inicial"
-}
-```
+**Path Parameters:**
+- `address` (string): Endereço da carteira
 
-**Response** (200 OK):
-```json
-{
-  "address": "a1b2c3d4e5f6...",
-  "name": "Minha Carteira",
-  "public_key": "pub_key_here",
-  "balance_cnb": 100.0,
-  "balance_satoshi": 10000000000,
-  "created_at": 1761582890.0854228,
-  "updated_at": 1761582890.0854228,
-  "is_active": true,
-  "metadata": {}
-}
-```
-
-#### **Debitar Saldo**
-```http
-POST /api/v1/carteiras/{address}/debit
-```
-
-**Request Body**:
+**Request Body:**
 ```json
 {
   "amount": 50.0,
-  "reason": "Pagamento de serviço"
+  "description": "Depósito inicial"
 }
 ```
 
-**Response** (200 OK):
+**Response (200):**
 ```json
 {
-  "address": "a1b2c3d4e5f6...",
-  "name": "Minha Carteira",
-  "public_key": "pub_key_here",
-  "balance_cnb": 50.0,
-  "balance_satoshi": 5000000000,
-  "created_at": 1761582890.0854228,
-  "updated_at": 1761582890.0854228,
-  "is_active": true,
-  "metadata": {}
+  "message": "Saldo creditado com sucesso",
+  "new_balance": 150.0
 }
 ```
 
----
+#### POST /api/v1/carteiras/{address}/debitar
+Debitar saldo de uma carteira.
 
-## 📊 **Códigos de Status HTTP**
+**Path Parameters:**
+- `address` (string): Endereço da carteira
 
-| Código | Descrição | Uso |
-|--------|-----------|-----|
-| `200` | OK | Operação bem-sucedida |
-| `201` | Created | Carteira criada com sucesso |
-| `400` | Bad Request | Dados inválidos |
-| `404` | Not Found | Carteira não encontrada |
-| `409` | Conflict | Nome de carteira já existe |
-| `422` | Unprocessable Entity | Erro de validação |
-| `500` | Internal Server Error | Erro interno do servidor |
-
----
-
-## ⚠️ **Tratamento de Erros**
-
-### **Formato Padrão de Erro**
+**Request Body:**
 ```json
 {
-  "success": false,
-  "error": "Descrição do erro",
-  "code": "ERROR_CODE",
-  "details": [
+  "amount": 25.0,
+  "description": "Pagamento de serviço"
+}
+```
+
+**Response (200):**
+```json
+{
+  "message": "Saldo debitado com sucesso",
+  "new_balance": 125.0
+}
+```
+
+### 🔄 Transferências
+
+#### POST /api/v1/transferencias/
+Realizar transferência entre carteiras.
+
+**Request Body:**
+```json
+{
+  "from_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "to_address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+  "amount": 10.0,
+  "description": "Transferência entre carteiras"
+}
+```
+
+**Response (200):**
+```json
+{
+  "transaction_id": "uuid-da-transacao",
+  "from_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "to_address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+  "amount": 10.0,
+  "status": "completed",
+  "timestamp": "2024-10-27T10:30:00Z"
+}
+```
+
+### 📊 Histórico de Transações
+
+#### GET /api/v1/transacoes/historico
+Obter histórico de transações.
+
+**Query Parameters:**
+- `address` (string, opcional): Filtrar por endereço específico
+- `limit` (integer, opcional): Limite de resultados (padrão: 50)
+- `offset` (integer, opcional): Offset para paginação (padrão: 0)
+
+**Response (200):**
+```json
+{
+  "transactions": [
     {
-      "type": "validation_error",
-      "loc": ["body", "field"],
-      "msg": "Mensagem específica",
-      "input": "valor_inválido"
+      "transaction_id": "uuid-da-transacao",
+      "from_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+      "to_address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+      "amount": 10.0,
+      "status": "completed",
+      "timestamp": "2024-10-27T10:30:00Z"
     }
   ],
-  "timestamp": 1761582890.0854228
+  "total": 1,
+  "limit": 50,
+  "offset": 0
 }
 ```
 
-### **Exemplos de Erros**
+### 🔍 Monitoramento
 
-#### **Carteira Não Encontrada** (404)
+#### GET /api/v1/health
+Health check da API.
+
+**Response (200):**
 ```json
 {
-  "success": false,
-  "error": "Wallet with address 'invalid_address' not found",
-  "code": "WALLET_NOT_FOUND",
-  "details": [],
-  "timestamp": 1761582890.0854228
+  "status": "healthy",
+  "timestamp": "2024-10-27T10:30:00Z",
+  "version": "2.1.1"
 }
 ```
 
-#### **Saldo Insuficiente** (400)
+#### GET /api/v1/monitoring/dashboard
+Dashboard de monitoramento do sistema.
+
+**Response (200):**
 ```json
 {
-  "success": false,
-  "error": "Insufficient balance",
-  "code": "INSUFFICIENT_BALANCE",
-  "details": [
+  "system_info": {
+    "cpu_percent": 15.2,
+    "memory_percent": 45.8,
+    "disk_percent": 23.1
+  },
+  "api_stats": {
+    "total_requests": 1250,
+    "successful_requests": 1200,
+    "failed_requests": 50,
+    "average_response_time": 0.15
+  },
+  "database_stats": {
+    "total_wallets": 150,
+    "total_transactions": 500,
+    "database_size_mb": 2.5
+  }
+}
+```
+
+#### GET /api/v1/monitoring/metrics
+Métricas detalhadas do sistema.
+
+**Response (200):**
+```json
+{
+  "performance": {
+    "cpu_usage": 15.2,
+    "memory_usage": 45.8,
+    "disk_usage": 23.1
+  },
+  "api_metrics": {
+    "requests_per_minute": 25,
+    "average_response_time": 0.15,
+    "error_rate": 0.04
+  },
+  "business_metrics": {
+    "active_wallets": 150,
+    "total_transactions": 500,
+    "total_volume": 10000.0
+  }
+}
+```
+
+## 🚨 Códigos de Erro
+
+### 400 Bad Request
+```json
+{
+  "detail": {
+    "error": "Dados inválidos fornecidos",
+    "code": "INVALID_DATA"
+  }
+}
+```
+
+### 401 Unauthorized
+```json
+{
+  "detail": {
+    "error": "Token de autenticação inválido",
+    "code": "INVALID_TOKEN"
+  }
+}
+```
+
+### 404 Not Found
+```json
+{
+  "detail": {
+    "error": "Carteira não encontrada",
+    "code": "WALLET_NOT_FOUND"
+  }
+}
+```
+
+### 409 Conflict
+```json
+{
+  "detail": {
+    "error": "Nome de carteira já existe",
+    "code": "WALLET_NAME_EXISTS"
+  }
+}
+```
+
+### 422 Unprocessable Content
+```json
+{
+  "detail": [
     {
-      "type": "business_rule",
-      "loc": ["body", "amount"],
-      "msg": "Saldo insuficiente para esta operação",
-      "input": 1000.0
+      "field": "amount",
+      "message": "Valor deve ser positivo",
+      "type": "value_error"
     }
-  ],
-  "timestamp": 1761582890.0854228
+  ]
 }
 ```
 
-#### **Validação de Dados** (422)
+### 429 Too Many Requests
 ```json
 {
-  "success": false,
-  "error": "Validation error",
-  "code": "VALIDATION_ERROR",
-  "details": [
-    {
-      "type": "string_too_short",
-      "loc": ["body", "password"],
-      "msg": "String should have at least 8 characters",
-      "input": "123",
-      "ctx": {
-        "min_length": 8
-      }
-    }
-  ],
-  "timestamp": 1761582890.0854228
+  "detail": {
+    "error": "Muitas requisições. Tente novamente em alguns minutos",
+    "code": "RATE_LIMIT_EXCEEDED"
+  }
 }
 ```
 
----
-
-## 🔒 **Validações**
-
-### **Criação de Carteira**
-- **name**: String, obrigatório, 1-100 caracteres
-- **password**: String, obrigatório, mínimo 8 caracteres
-- **metadata**: Object, opcional
-
-### **Operações Monetárias**
-- **amount**: Number, obrigatório, > 0
-- **reason**: String, obrigatório, 1-200 caracteres
-
-### **Endereços**
-- **address**: String, formato hexadecimal, 40 caracteres
-
----
-
-## 📈 **Limites e Rate Limiting**
-
-### **Limites Atuais**
-- **Criação de carteiras**: Sem limite
-- **Operações por minuto**: Sem limite
-- **Tamanho de requisição**: 1MB
-- **Timeout**: 30 segundos
-
-### **Recomendações**
-- Implementar rate limiting em produção
-- Adicionar autenticação/autorização
-- Implementar logs de auditoria
-
----
-
-## 🧪 **Exemplos de Uso**
-
-### **Python (requests)**
-```python
-import requests
-
-base_url = "http://localhost:8001/api/v1"
-
-# Criar carteira
-response = requests.post(f"{base_url}/carteiras/", json={
-    "name": "Minha Carteira",
-    "password": "senha12345"
-})
-wallet = response.json()
-
-# Creditar saldo
-requests.post(f"{base_url}/carteiras/{wallet['address']}/credit", json={
-    "amount": 100.0,
-    "reason": "Depósito inicial"
-})
-
-# Debitar saldo
-requests.post(f"{base_url}/carteiras/{wallet['address']}/debit", json={
-    "amount": 50.0,
-    "reason": "Pagamento"
-})
+### 500 Internal Server Error
+```json
+{
+  "detail": {
+    "error": "Erro interno do servidor",
+    "code": "INTERNAL_ERROR"
+  }
+}
 ```
 
-### **JavaScript (fetch)**
-```javascript
-const baseUrl = "http://localhost:8001/api/v1";
+## 🔧 Exemplos de Uso
 
-// Criar carteira
-const createWallet = async () => {
-  const response = await fetch(`${baseUrl}/carteiras/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: "Minha Carteira",
-      password: "senha12345"
-    })
-  });
-  return await response.json();
-};
+### Criar Carteira e Fazer Transferência
 
-// Creditar saldo
-const creditWallet = async (address, amount) => {
-  const response = await fetch(`${baseUrl}/carteiras/${address}/credit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      amount: amount,
-      reason: "Depósito"
-    })
-  });
-  return await response.json();
-};
-```
-
-### **cURL**
 ```bash
-# Criar carteira
+# 1. Criar carteira
 curl -X POST "http://localhost:8001/api/v1/carteiras/" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Minha Carteira", "password": "senha12345"}'
+  -d '{
+    "name": "Minha Carteira",
+    "password": "senha123456"
+  }'
 
-# Creditar saldo
-curl -X POST "http://localhost:8001/api/v1/carteiras/{address}/credit" \
+# 2. Creditar saldo
+curl -X POST "http://localhost:8001/api/v1/carteiras/1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa/creditar" \
   -H "Content-Type: application/json" \
-  -d '{"amount": 100.0, "reason": "Depósito"}'
+  -d '{
+    "amount": 100.0,
+    "description": "Depósito inicial"
+  }'
+
+# 3. Fazer transferência
+curl -X POST "http://localhost:8001/api/v1/transferencias/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "to_address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+    "amount": 10.0,
+    "description": "Transferência entre carteiras"
+  }'
 ```
 
+### Autenticação e Acesso Protegido
+
+```bash
+# 1. Registrar usuário
+curl -X POST "http://localhost:8001/api/v1/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "usuario123",
+    "email": "usuario@email.com",
+    "password": "senha123456"
+  }'
+
+# 2. Fazer login
+curl -X POST "http://localhost:8001/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "usuario123",
+    "password": "senha123456"
+  }'
+
+# 3. Usar token para acessar endpoint protegido
+curl -X GET "http://localhost:8001/api/v1/auth/me" \
+  -H "Authorization: Bearer <seu_token_aqui>"
+```
+
+## 📚 Recursos Adicionais
+
+### Documentação Interativa
+- **Swagger UI:** http://localhost:8001/docs
+- **ReDoc:** http://localhost:8001/redoc
+
+### Rate Limiting
+- **Limite padrão:** 100 requisições por minuto
+- **Burst limit:** 50 requisições simultâneas
+- **Headers de resposta:**
+  ```
+  X-RateLimit-Limit: 100
+  X-RateLimit-Remaining: 95
+  X-RateLimit-Reset: 1640995200
+  ```
+
+### Logs Estruturados
+Todos os logs são gerados em formato JSON para facilitar análise:
+```json
+{
+  "timestamp": "2024-10-27T10:30:00Z",
+  "level": "INFO",
+  "message": "Carteira criada com sucesso",
+  "wallet_address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "user_id": "uuid-do-usuario"
+}
+```
+
+## 🚀 Próximos Passos
+
+1. **Implementar cache** para melhorar performance
+2. **Adicionar mais endpoints** de relatórios
+3. **Implementar webhooks** para notificações
+4. **Adicionar suporte** a múltiplas moedas
+
 ---
 
-## 📚 **Documentação Interativa**
-
-- **Swagger UI**: http://localhost:8001/docs
-- **ReDoc**: http://localhost:8001/redoc
-- **OpenAPI Schema**: http://localhost:8001/openapi.json
-
----
-
-*API Reference atualizada em 27 de Outubro de 2024*
+**📞 Suporte:** Para dúvidas sobre a API, consulte a documentação interativa em `/docs` ou abra uma issue no repositório.

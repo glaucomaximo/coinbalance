@@ -22,10 +22,10 @@ class TransactionAmount:
     
     def __post_init__(self):
         """Validação do valor"""
-        if self.value.value <= 0:
+        if self.value.to_cnb() <= 0:
             raise ValueError("Transaction amount must be positive")
         
-        if self.value.value > Decimal("21000000"):  # Max supply
+        if self.value.to_cnb() > Decimal("21000000"):  # Max supply
             raise ValueError("Transaction amount exceeds maximum supply")
     
     def to_cnb(self) -> Decimal:

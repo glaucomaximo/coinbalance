@@ -1,41 +1,54 @@
 ---
-name: Bug report
-about: Reportar um bug encontrado no CoinBalance
-title: "[BUG] "
-labels: bug
-assignees: ""
+name: 🐛 Bug Report
+about: Reporte um bug para nos ajudar a melhorar
+title: '[BUG] '
+labels: ['bug', 'needs-triage']
+assignees: ''
 ---
 
-**Descrição**
+## 🐛 Descrição do Bug
+
 Uma descrição clara e concisa do bug.
 
-**Reproduzir**
-Passos para reproduzir o comportamento:
+## 🔄 Passos para Reproduzir
+
 1. Vá para '...'
-2. Execute '...'
-3. Observe o erro
+2. Clique em '...'
+3. Role até '...'
+4. Veja o erro
 
-**Comportamento esperado**
-Descreva o que você esperava que acontecesse.
+## ✅ Comportamento Esperado
 
-**Logs / Saída**
-Cole aqui mensagens de erro, stack traces, logs relevantes.
+Uma descrição clara e concisa do que deveria acontecer.
 
-**Ambiente**
-- Versão do CoinBalance (commit/branch): 
-- Sistema operacional: (Linux, macOS, Windows)
-- Python versão:
-- Configuração (ex.: testnet/local/mainnet):
-- Passos já tentados para resolver:
+## ❌ Comportamento Atual
 
-**Gravidade**
-- [ ] Bloqueante (impede uso)
-- [ ] Alto (impacto grande funcionalidade)
-- [ ] Médio
-- [ ] Baixo (cosmético)
+Uma descrição clara e concisa do que está acontecendo.
 
-**Screenshots / anexos**
-Se aplicável, anexe imagens ou arquivos que ajudem a entender o problema.
+## 📸 Screenshots
 
-**Notas adicionais**
-Qualquer informação extra relevante.
+Se aplicável, adicione screenshots para ajudar a explicar o problema.
+
+## 🖥️ Ambiente
+
+- **OS**: [ex: Windows 10, macOS 12.0, Ubuntu 20.04]
+- **Python**: [ex: 3.11.5]
+- **Versão do CoinBalance**: [ex: 2.1.0]
+- **Browser**: [ex: Chrome 120, Firefox 119] (se aplicável)
+
+## 📋 Logs
+
+```
+Cole aqui os logs relevantes
+```
+
+## 🔍 Contexto Adicional
+
+Adicione qualquer outro contexto sobre o problema aqui.
+
+## ✅ Checklist
+
+- [ ] Verifiquei se este bug não foi reportado anteriormente
+- [ ] Incluí todos os passos necessários para reproduzir o bug
+- [ ] Incluí informações do ambiente
+- [ ] Incluí logs relevantes se aplicável

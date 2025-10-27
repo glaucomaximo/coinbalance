@@ -46,7 +46,13 @@ class Balance:
 
     def subtract(self, money: Money) -> "Balance":
         """Subtrai valor do saldo"""
-        return Balance(self.amount - money)
+        new_amount = self.amount - money
+        
+        # Validar que o resultado não seja negativo
+        if new_amount.to_cnb() < 0:
+            raise ValueError(f"Cannot subtract {money.to_cnb()} CNB from balance of {self.amount.to_cnb()} CNB")
+        
+        return Balance(new_amount)
 
     def is_sufficient_for(self, money: Money) -> bool:
         """Verifica se o saldo é suficiente"""

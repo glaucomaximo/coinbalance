@@ -9,9 +9,10 @@ from src.domain.transaction.entities.transaction import Transaction
 from src.domain.transaction.repositories.transaction_repository import TransactionRepository
 from src.domain.wallet.repositories.wallet_repository import WalletRepository
 from src.domain.shared.exceptions import DomainException, InsufficientFundsError
+from src.application.common.interfaces.use_case import UseCase
 
 
-class CreateTransferHandler(Protocol):
+class CreateTransferHandler(UseCase[CreateTransferCommand, Transaction]):
     """
     Interface para handler de criação de transferência.
     """

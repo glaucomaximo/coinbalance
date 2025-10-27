@@ -38,9 +38,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
 
     # CORS
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000", "http://localhost:8001"]
     CORS_ALLOW_CREDENTIALS: bool = True
-    CORS_ALLOW_METHODS: List[str] = ["*"]
+    CORS_ALLOW_METHODS: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     CORS_ALLOW_HEADERS: List[str] = ["*"]
 
     # ========== DATABASE ==========
@@ -50,13 +50,13 @@ class Settings(BaseSettings):
     DATABASE_MAX_OVERFLOW: int = 20
 
     # ========== SECURITY ==========
-    SECRET_KEY: str = "dev-secret-key-change-in-production"
+    SECRET_KEY: str = "dev-secret-key-change-in-production-32-chars"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Crypto
-    ENCRYPTION_KEY: Optional[str] = None
+    ENCRYPTION_KEY: Optional[str] = "dev-encryption-key-32-chars-long"
     PASSWORD_MIN_LENGTH: int = 8
     PASSWORD_REQUIRE_UPPERCASE: bool = True
     PASSWORD_REQUIRE_LOWERCASE: bool = True

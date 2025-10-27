@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from ..value_objects.consensus_round import ConsensusRound
 from ...shared.value_objects.money import Money
+from ...shared.config.blockchain_config import BlockchainConfig
 
 
 @dataclass(frozen=True)
@@ -22,12 +23,12 @@ class MonetaryPolicy:
     - Recompensas para stakers: 15% do total
     """
     
-    # Parâmetros da política monetária
-    INITIAL_SUPPLY: Decimal = Decimal("21000000")  # 21M CNB
-    ANNUAL_INFLATION_RATE: Decimal = Decimal("0.02")  # 2% ao ano
-    STAKING_REWARD_RATE: Decimal = Decimal("0.15")  # 15% para stakers
-    BLOCKS_PER_YEAR: int = 6307200  # ~5 segundos por bloco
-    HALVING_INTERVAL_YEARS: int = 10  # Halving a cada 10 anos
+    # Parâmetros da política monetária (usando configurações centralizadas)
+    INITIAL_SUPPLY: Decimal = BlockchainConfig.INITIAL_SUPPLY
+    ANNUAL_INFLATION_RATE: Decimal = BlockchainConfig.ANNUAL_INFLATION_RATE
+    STAKING_REWARD_RATE: Decimal = BlockchainConfig.STAKING_REWARD_RATE
+    BLOCKS_PER_YEAR: int = BlockchainConfig.BLOCKS_PER_YEAR
+    HALVING_INTERVAL_YEARS: int = BlockchainConfig.HALVING_INTERVAL_YEARS
     
     @classmethod
     def calculate_current_supply(cls, block_height: int) -> Money:

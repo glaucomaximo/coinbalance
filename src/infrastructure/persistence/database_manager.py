@@ -17,6 +17,7 @@ class DatabaseManager:
     - Pool de conexões thread-safe
     - Transações automáticas
     - Migração de schema
+    - Criptografia de dados sensíveis
     """
 
     def __init__(self, db_path: Optional[str] = None):
@@ -27,19 +28,20 @@ class DatabaseManager:
     def _init_database(self):
         """Inicializa o banco de dados e cria tabelas necessárias"""
         with self.get_connection() as conn:
+            # Criar tabela de carteiras com constraints de integridade
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS wallets (
-                    address TEXT PRIMARY KEY,
-                    name TEXT NOT NULL UNIQUE,
-                    public_key TEXT NOT NULL,
-                    private_key TEXT NOT NULL,
-                    balance_cnb REAL NOT NULL DEFAULT 0.0,
-                    balance_satoshi INTEGER NOT NULL DEFAULT 0,
+                    address TEXT PRIMARY KEY CHECK(length(address) >= 26 AND length(address) <= 62),
+                    name TEXT NOT NULL UNIQUE CHECK(length(name) >= 3 AND length(name) <= 50),
+                    public_key TEXT NOT NULL CHECK(length(public_key) >= 32),
+                    private_key TEXT NOT NULL CHECK(length(private_key) >= 32),
+                    balance_cnb REAL NOT NULL DEFAULT 0.0 CHECK(balance_cnb >= 0),
+                    balance_satoshi INTEGER NOT NULL DEFAULT 0 CHECK(balance_satoshi >= 0),
                     is_active BOOLEAN NOT NULL DEFAULT 1,
                     metadata TEXT,
-                    created_at REAL NOT NULL,
-                    updated_at REAL NOT NULL
+                    created_at REAL NOT NULL CHECK(created_at > 0),
+                    updated_at REAL NOT NULL CHECK(updated_at >= created_at)
                 )
             """
             )
@@ -47,19 +49,19 @@ class DatabaseManager:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS transactions (
-                    id TEXT PRIMARY KEY,
-                    from_address TEXT,
-                    to_address TEXT NOT NULL,
-                    amount_cnb REAL NOT NULL,
-                    amount_satoshi INTEGER NOT NULL,
-                    fee_cnb REAL NOT NULL DEFAULT 0.0,
-                    fee_satoshi INTEGER NOT NULL DEFAULT 0,
-                    status TEXT NOT NULL DEFAULT 'pending',
+                    id TEXT PRIMARY KEY CHECK(length(id) >= 16),
+                    from_address TEXT CHECK(length(from_address) >= 26 AND length(from_address) <= 62),
+                    to_address TEXT NOT NULL CHECK(length(to_address) >= 26 AND length(to_address) <= 62),
+                    amount_cnb REAL NOT NULL CHECK(amount_cnb > 0),
+                    amount_satoshi INTEGER NOT NULL CHECK(amount_satoshi > 0),
+                    fee_cnb REAL NOT NULL DEFAULT 0.0 CHECK(fee_cnb >= 0),
+                    fee_satoshi INTEGER NOT NULL DEFAULT 0 CHECK(fee_satoshi >= 0),
+                    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'confirmed', 'failed')),
                     metadata TEXT,
-                    created_at REAL NOT NULL,
-                    updated_at REAL NOT NULL,
-                    FOREIGN KEY (from_address) REFERENCES wallets (address),
-                    FOREIGN KEY (to_address) REFERENCES wallets (address)
+                    created_at REAL NOT NULL CHECK(created_at > 0),
+                    updated_at REAL NOT NULL CHECK(updated_at >= created_at),
+                    FOREIGN KEY (from_address) REFERENCES wallets (address) ON DELETE SET NULL,
+                    FOREIGN KEY (to_address) REFERENCES wallets (address) ON DELETE RESTRICT
                 )
             """
             )
@@ -67,18 +69,31 @@ class DatabaseManager:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS blocks (
-                    id TEXT PRIMARY KEY,
-                    previous_hash TEXT,
-                    merkle_root TEXT NOT NULL,
-                    timestamp REAL NOT NULL,
-                    nonce INTEGER NOT NULL DEFAULT 0,
-                    difficulty INTEGER NOT NULL DEFAULT 1,
-                    transactions_count INTEGER NOT NULL DEFAULT 0,
-                    created_at REAL NOT NULL
+                    id TEXT PRIMARY KEY CHECK(length(id) >= 16),
+                    height INTEGER NOT NULL UNIQUE CHECK(height >= 0),
+                    hash TEXT NOT NULL UNIQUE CHECK(length(hash) = 64),
+                    previous_hash TEXT CHECK(length(previous_hash) = 64),
+                    merkle_root TEXT NOT NULL CHECK(length(merkle_root) = 64),
+                    timestamp REAL NOT NULL CHECK(timestamp > 0),
+                    nonce INTEGER NOT NULL DEFAULT 0 CHECK(nonce >= 0),
+                    difficulty INTEGER NOT NULL DEFAULT 1 CHECK(difficulty > 0),
+                    transactions_count INTEGER NOT NULL DEFAULT 0 CHECK(transactions_count >= 0),
+                    created_at REAL NOT NULL CHECK(created_at > 0)
                 )
             """
             )
 
+            # Criar índices para melhorar performance
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_wallets_name ON wallets(name)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_wallets_active ON wallets(is_active)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_transactions_from ON transactions(from_address)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_transactions_to ON transactions(to_address)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_transactions_created ON transactions(created_at)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_blocks_height ON blocks(height)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_blocks_hash ON blocks(hash)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_blocks_previous_hash ON blocks(previous_hash)")
+            
             conn.commit()
 
     def get_connection(self):

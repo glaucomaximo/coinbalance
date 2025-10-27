@@ -1,31 +1,73 @@
 ---
-name: Feature request
-about: Sugerir uma nova funcionalidade ou melhoria
-title: "[FEATURE] "
-labels: enhancement
-assignees: ""
+name: 💡 Feature Request
+about: Sugira uma nova funcionalidade para o CoinBalance
+title: '[FEATURE] '
+labels: ['enhancement', 'needs-triage']
+assignees: ''
 ---
 
-**Resumo**
-Descrição curta da funcionalidade proposta.
+## 💡 Descrição da Feature
 
-**Motivação**
-Por que essa feature é importante? Qual problema resolve?
+Uma descrição clara e concisa da funcionalidade que você gostaria de ver implementada.
 
-**Proposta**
-Detalhes da solução proposta (pseudocódigo, endpoints, UX, exemplos).
+## 🎯 Problema Relacionado
 
-**Alternativas consideradas**
-Outras soluções avaliadas e por que não foram escolhidas.
+Esta feature request está relacionada a um problema? Descreva-o.
+Ex: "Sempre fico frustrado quando [...]"
 
-**Impacto**
-- [ ] Breaking change
-- [ ] Requer migração de dados
-- [ ] Requer alterações em contratos/consenso
-- [ ] Segurança (req. revisão adicional)
+## 🚀 Solução Proposta
 
-**Critérios de aceitação**
-- O que precisa acontecer para considerar a feature pronta?
+Uma descrição clara e concisa do que você quer que aconteça.
 
-**Notas adicionais**
-Links, referências, ou RFCs relacionadas.
+## 🔄 Alternativas Consideradas
+
+Uma descrição clara e concisa de quaisquer soluções alternativas ou funcionalidades que você considerou.
+
+## 📊 Impacto Esperado
+
+- **Usuários Afetados**: [ex: Todos os usuários, Desenvolvedores, Administradores]
+- **Complexidade**: [ex: Baixa, Média, Alta]
+- **Prioridade**: [ex: Baixa, Média, Alta]
+
+## 🎨 Mockups/Exemplos
+
+Se aplicável, adicione mockups, wireframes ou exemplos visuais.
+
+## 🔧 Implementação Técnica
+
+Se você tem ideias sobre como implementar esta feature, descreva aqui.
+
+## 📚 Documentação Necessária
+
+Que tipo de documentação seria necessária para esta feature?
+
+## 🧪 Testes
+
+Que tipos de testes seriam necessários?
+
+## 🌍 Compatibilidade
+
+Esta feature afeta:
+- [ ] API
+- [ ] Interface Web
+- [ ] CLI
+- [ ] Docker
+- [ ] Sistemas Fractais
+- [ ] Blockchain
+- [ ] Consenso
+
+## 📅 Timeline
+
+Tem alguma preferência de timeline para esta feature?
+
+## 🔗 Contexto Adicional
+
+Adicione qualquer outro contexto sobre a feature request aqui.
+
+## ✅ Checklist
+
+- [ ] Verifiquei se esta feature não foi solicitada anteriormente
+- [ ] Descrevi claramente o problema e a solução proposta
+- [ ] Considerei alternativas
+- [ ] Incluí informações sobre impacto e complexidade
+- [ ] Verifiquei compatibilidade com arquitetura fractal

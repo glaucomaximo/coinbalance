@@ -1,26 +1,106 @@
-## Descrição
+## 📋 Descrição
 
-Por favor, inclua um resumo das mudanças e o contexto. Explique qual problema foi resolvido ou qual funcionalidade foi adicionada.
+Descreva brevemente as mudanças incluídas neste PR.
 
-Fixes: #<issue_number> (se aplicável)
+## 🔗 Issue Relacionada
 
-## Tipo de mudança
-- [ ] Bugfix (não quebra funcionalidade)
-- [ ] Feature (adiciona nova funcionalidade)
-- [ ] Breaking change (mudança que requer ação dos usuários)
-- [ ] Docs / CI / Build
+Closes #(número da issue)
 
-## Checklist
-- [ ] Meu código segue as diretrizes do projeto (format, lint)
-- [ ] Adicionei/atualizei testes relevantes
-- [ ] Documentei mudanças no README/API quando aplicável
-- [ ] Pipeline CI está verde
+## 🎯 Tipo de Mudança
 
-## Como testar
-Descreva os passos para testar as mudanças localmente:
-1. Comandos para preparar ambiente
-2. Comandos para executar testes
-3. Cenários para validar
+- [ ] 🐛 Bug fix (mudança que corrige um problema)
+- [ ] ✨ Nova feature (mudança que adiciona funcionalidade)
+- [ ] 💥 Breaking change (correção ou feature que causaria mudança em funcionalidade existente)
+- [ ] 📚 Documentação (mudanças apenas na documentação)
+- [ ] 🎨 Estilo (formatação, ponto e vírgula, etc; sem mudança de código)
+- [ ] ♻️ Refatoração (mudança de código que não corrige bug nem adiciona feature)
+- [ ] ⚡ Performance (mudança de código que melhora performance)
+- [ ] ✅ Teste (adição de testes ou correção de testes existentes)
+- [ ] 🔧 Build (mudanças no sistema de build ou dependências externas)
 
-## Observações
-Adicione notas adicionais para revisores (decisões de design, trade-offs, ponto de atenção).
+## 🧪 Como Testar
+
+Descreva os testes que você executou para verificar suas mudanças:
+
+1. 
+2. 
+3. 
+
+## 📸 Screenshots
+
+Se aplicável, adicione screenshots para ajudar a explicar suas mudanças.
+
+## ✅ Checklist
+
+### Código
+- [ ] Meu código segue os padrões de estilo do projeto
+- [ ] Realizei uma auto-revisão do meu código
+- [ ] Comentei código difícil de entender
+- [ ] Minhas mudanças não geram warnings
+- [ ] Adicionei testes que provam que minha correção é eficaz ou que minha feature funciona
+- [ ] Testes novos e existentes passam localmente com minhas mudanças
+- [ ] Qualquer mudança dependente foi mergeada e publicada
+
+### Documentação
+- [ ] Atualizei a documentação correspondente
+- [ ] Minhas mudanças não requerem atualização da documentação
+
+### Arquitetura
+- [ ] Minhas mudanças são compatíveis com a arquitetura fractal
+- [ ] Não quebrei princípios de Clean Architecture
+- [ ] Mantive separação de responsabilidades
+
+## 🔍 Detalhes Técnicos
+
+### Mudanças Principais
+- 
+- 
+- 
+
+### Arquivos Modificados
+- 
+- 
+- 
+
+### Dependências
+- [ ] Não adicionei novas dependências
+- [ ] Adicionei dependências: ___________
+- [ ] Removi dependências: ___________
+
+## 🚀 Deploy
+
+### Configuração Necessária
+- [ ] Nenhuma configuração adicional necessária
+- [ ] Configuração adicional necessária: ___________
+
+### Migrações
+- [ ] Não há migrações de banco de dados
+- [ ] Migrações necessárias: ___________
+
+## 📊 Impacto
+
+### Performance
+- [ ] Não há impacto na performance
+- [ ] Melhoria na performance
+- [ ] Possível degradação na performance (justificada)
+
+### Compatibilidade
+- [ ] Mudanças backward-compatible
+- [ ] Breaking changes (documentados)
+
+### Segurança
+- [ ] Não há impacto na segurança
+- [ ] Melhoria na segurança
+- [ ] Mudanças de segurança (revisar cuidadosamente)
+
+## 🔮 Próximos Passos
+
+Se aplicável, descreva próximos passos ou melhorias futuras.
+
+## 📝 Notas Adicionais
+
+Adicione qualquer informação adicional que possa ser útil para os revisores.
+
+---
+
+**Obrigado por contribuir para o CoinBalance! 🚀**

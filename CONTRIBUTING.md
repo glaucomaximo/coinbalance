@@ -1,635 +1,482 @@
 # 🤝 Guia de Contribuição - CoinBalance
 
-## 📋 **VISÃO GERAL**
+<div align="center">
 
-Este documento estabelece os padrões de desenvolvimento e contribuição para o projeto CoinBalance, garantindo qualidade, consistência e manutenibilidade do código.
+![Contributing](https://img.shields.io/badge/Contributing-Welcome-FF6B6B?style=for-the-badge)
+![Community](https://img.shields.io/badge/Community-Driven-4ECDC4?style=for-the-badge)
+![Open Source](https://img.shields.io/badge/Open%20Source-MIT-00D4AA?style=for-the-badge)
 
----
+**Contribua para a Revolução da Blockchain Consciente**
 
-## 🎯 **PRINCÍPIOS FUNDAMENTAIS**
-
-### **1. Qualidade de Código**
-- ✅ **SOLID Principles** rigorosamente aplicados
-- ✅ **Clean Code** em todas as implementações
-- ✅ **Testes automatizados** obrigatórios
-- ✅ **Documentação clara** e precisa
-
-### **2. Arquitetura**
-- ✅ **Domain-Driven Design (DDD)**
-- ✅ **Clean Architecture**
-- ✅ **Hexagonal Architecture (Ports & Adapters)**
-- ✅ **CQRS Pattern**
-
-### **3. Segurança**
-- ✅ **OWASP Top 10** compliance
-- ✅ **Validação rigorosa** de entrada
-- ✅ **Princípio do menor privilégio**
-- ✅ **Logging seguro**
+</div>
 
 ---
 
-## 🛠️ **CONFIGURAÇÃO DO AMBIENTE**
+## 🌟 **Bem-vindo Contribuidor!**
 
-### **Pré-requisitos**
+Obrigado por considerar contribuir para o **CoinBalance**! Este projeto representa uma revolução na tecnologia blockchain através da implementação de uma arquitetura fractal consciente. Sua contribuição é fundamental para o sucesso desta iniciativa.
+
+### 🎯 **Como Contribuir**
+
+Existem várias maneiras de contribuir para o projeto:
+
+- 🐛 **Reportar Bugs**: Encontrou um bug? Reporte-o!
+- 💡 **Sugerir Melhorias**: Tem uma ideia? Compartilhe!
+- 🔧 **Corrigir Bugs**: Corrija bugs existentes
+- ✨ **Implementar Features**: Adicione novas funcionalidades
+- 📚 **Melhorar Documentação**: Ajude a melhorar a documentação
+- 🧪 **Escrever Testes**: Adicione ou melhore testes
+- 🌍 **Tradução**: Ajude com traduções
+
+---
+
+## 🚀 **Início Rápido**
+
+### **1. Fork e Clone**
+
 ```bash
-# Python 3.10+
-python --version
-
-# Git
-git --version
-
-# Docker (opcional)
-docker --version
-```
-
-## 🛠️ **CONFIGURAÇÃO DO AMBIENTE**
-
-### **Pré-requisitos**
-```bash
-# Python 3.10+
-python --version
-
-# Git
-git --version
-
-# Docker (opcional)
-docker --version
-```
-
-### **Instalação**
-```bash
-# 1. Clonar repositório
-git clone https://github.com/coinbalance/coinbalance.git
+# Fork o repositório no GitHub
+# Depois clone seu fork
+git clone https://github.com/SEU_USUARIO/coinbalance.git
 cd coinbalance
 
-# 2. Instalar dependências
+# Adicionar upstream
+git remote add upstream https://github.com/coinbalance/coinbalance.git
+```
+
+### **2. Configurar Ambiente**
+
+```bash
+# Criar ambiente virtual
+python -m venv venv
+
+# Ativar ambiente virtual
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
+# Instalar dependências
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
-# 3. Instalar ferramentas de qualidade
-pip install black isort flake8 mypy bandit coverage
-
-# 4. Instalar pre-commit hooks
+# Instalar pre-commit hooks
 pre-commit install
+```
 
-# 5. Verificar qualidade do projeto
-./scripts/quality-check.sh  # Linux/Mac
+### **3. Criar Branch**
+
+```bash
+# Atualizar main
+git checkout main
+git pull upstream main
+
+# Criar nova branch
+git checkout -b feature/nova-funcionalidade
 # ou
-./scripts/quality-check.ps1  # Windows
-
-# 6. Verificar instalação
-python main.py --help
-```
-
-### **Estrutura do Projeto**
-```
-coinbalance/
-├── src/                          # 🏗️ Código fonte principal
-│   ├── domain/                   # 💎 Camada de Domínio (DDD)
-│   ├── application/              # 🎯 Camada de Aplicação (CQRS)
-│   ├── infrastructure/           # 🔧 Camada de Infraestrutura
-│   └── presentation/              # 🌐 Camada de Apresentação
-├── tests/                        # 🧪 Testes automatizados
-├── docs/                         # 📚 Documentação
-├── scripts/                      # 🔧 Scripts utilitários
-├── .github/workflows/            # 🚀 CI/CD Pipeline
-├── pyproject.toml               # ⚙️ Configurações de qualidade
-├── .pre-commit-config.yaml      # 🔍 Pre-commit hooks
-└── requirements.txt              # 📦 Dependências
+git checkout -b bugfix/correcao-bug
+# ou
+git checkout -b docs/melhoria-documentacao
 ```
 
 ---
 
-## ⚠️ **PROTOCOLO OBRIGATÓRIO DE MANUTENÇÃO**
+## 📋 **Processo de Contribuição**
 
-### **🚨 REGRA FUNDAMENTAL**
-> **NENHUMA MANUTENÇÃO PODE SER INICIADA SEM COMPLETAR 100% DO PROTOCOLO**
+### **1. Antes de Começar**
 
-### **📋 Processo Obrigatório**
-Antes de qualquer manutenção, consulte **OBRIGATORIAMENTE**:
+- ✅ Verifique se já existe uma issue relacionada
+- ✅ Se não existir, crie uma issue descrevendo sua proposta
+- ✅ Aguarde feedback da equipe antes de começar
+- ✅ Certifique-se de que está seguindo o roadmap do projeto
 
-1. **[docs/PROTOCOLO_MANUTENCAO.md](docs/PROTOCOLO_MANUTENCAO.md)** - Processo completo de 6 fases
-2. **[docs/SISTEMA_ORGANIZACIONAL.md](docs/SISTEMA_ORGANIZACIONAL.md)** - Sistema de qualidade
-3. **[docs/ARQUITETURA_DETALHADA.md](docs/ARQUITETURA_DETALHADA.md)** - Arquitetura técnica
-4. **[docs/DECISOES_ARQUITETURAIS.md](docs/DECISOES_ARQUITETURAIS.md)** - ADRs
+### **2. Durante o Desenvolvimento**
 
-### **🔍 Scripts de Verificação**
-```bash
-# Verificação completa de qualidade
-./scripts/quality-check.sh  # Linux/Mac
-./scripts/quality-check.ps1  # Windows
+- ✅ Mantenha commits pequenos e focados
+- ✅ Use mensagens de commit descritivas
+- ✅ Siga os padrões de código do projeto
+- ✅ Escreva testes para suas mudanças
+- ✅ Atualize documentação quando necessário
 
-# Verificação arquitetural específica
-python scripts/check_architecture.py
+### **3. Antes de Enviar**
 
-# Validação de mudanças
-python scripts/validate_change.py
+- ✅ Execute todos os testes: `pytest`
+- ✅ Execute linting: `flake8 src/`
+- ✅ Execute formatação: `black src/`
+- ✅ Verifique cobertura: `pytest --cov=src`
+- ✅ Atualize CHANGELOG.md se necessário
 
-# Geração de relatórios
-python scripts/generate_reports.py
-```
+### **4. Pull Request**
 
-### **🚨 Gates de Bloqueio**
-- ❌ **Documentação** não consultada → BLOQUEIA
-- ❌ **Qualidade** insuficiente → BLOQUEIA
-- ❌ **Arquitetura** não conforme → BLOQUEIA
-- ❌ **Segurança** comprometida → BLOQUEIA
+- ✅ Título descritivo e claro
+- ✅ Descrição detalhada das mudanças
+- ✅ Referência à issue relacionada
+- ✅ Screenshots/GIFs se aplicável
+- ✅ Checklist preenchido
 
 ---
 
-## 📝 **PADRÕES DE CÓDIGO**
+## 🏗️ **Padrões de Código**
 
-### **1. Formatação**
-```bash
-# Formatação automática com Black
-black .
+### **Python**
 
-# Organização de imports com isort
-isort .
+Seguimos as seguintes convenções:
 
-# Verificação de formatação
-black --check .
-isort --check-only .
+- **PEP 8**: Style guide para código Python
+- **PEP 257**: Docstring conventions
+- **Type Hints**: Sempre use type hints
+- **Black**: Formatação automática
+- **isort**: Organização de imports
+- **flake8**: Linting
+
+### **Estrutura de Commits**
+
+Usamos [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
 ```
 
-### **2. Linting**
-```bash
-# Verificação de qualidade com Flake8
-flake8 .
+**Tipos:**
+- `feat`: Nova funcionalidade
+- `fix`: Correção de bug
+- `docs`: Mudanças na documentação
+- `style`: Formatação, ponto e vírgula, etc.
+- `refactor`: Refatoração de código
+- `test`: Adição ou correção de testes
+- `chore`: Mudanças em build, dependências, etc.
 
-# Verificação de tipos com MyPy
-mypy src/
-
-# Verificação de segurança com Bandit
-bandit -r src/
+**Exemplos:**
+```
+feat(fractal): adicionar sistema de cache inteligente
+fix(api): corrigir validação de JWT tokens
+docs(readme): atualizar instruções de instalação
+test(consensus): adicionar testes para validação de blocos
 ```
 
-### **3. Convenções de Nomenclatura**
+### **Estrutura de Arquivos**
 
-#### **Classes e Interfaces**
-```python
-# ✅ CORRETO
-class WalletRepository(ABC):
-    pass
-
-class CreateWalletCommand:
-    pass
-
-# ❌ INCORRETO
-class wallet_repository:
-    pass
 ```
+src/
+├── domain/           # Camada de domínio (DDD)
+├── application/      # Camada de aplicação (Use Cases)
+├── infrastructure/   # Camada de infraestrutura
+└── presentation/    # Camada de apresentação (API)
 
-#### **Funções e Métodos**
-```python
-# ✅ CORRETO
-def create_wallet(name: str) -> Wallet:
-    pass
-
-async def find_by_address(address: str) -> Optional[Wallet]:
-    pass
-
-# ❌ INCORRETO
-def CreateWallet(name: str):
-    pass
-```
-
-#### **Constantes**
-```python
-# ✅ CORRETO
-MAX_WALLET_BALANCE = 1000000
-DEFAULT_CURRENCY = "CNB"
-
-# ❌ INCORRETO
-maxWalletBalance = 1000000
-```
-
-### **4. Documentação**
-
-#### **Docstrings**
-```python
-def create_wallet(name: str, password: Optional[str] = None) -> Wallet:
-    """
-    Cria uma nova carteira com nome e senha opcional.
-    
-    Args:
-        name: Nome da carteira (obrigatório)
-        password: Senha para proteção (opcional)
-        
-    Returns:
-        Wallet: Nova instância de carteira
-        
-    Raises:
-        ValidationError: Se o nome for inválido
-        DuplicateEntityError: Se já existir carteira com mesmo nome
-        
-    Example:
-        >>> wallet = create_wallet("Minha Carteira", "senha123")
-        >>> print(wallet.name)
-        Minha Carteira
-    """
-    pass
-```
-
-#### **Type Hints**
-```python
-from typing import Optional, List, Dict, Any
-
-def process_transaction(
-    amount: float,
-    from_wallet: str,
-    to_wallet: str,
-    metadata: Optional[Dict[str, Any]] = None
-) -> Transaction:
-    pass
-```
-
----
-
-## 🧪 **ESTRATÉGIA DE TESTES**
-
-### **1. Estrutura de Testes**
-```
 tests/
-├── unit/                         # 🧪 Testes unitários
-│   ├── domain/                   # Testes de domínio
-│   ├── application/              # Testes de aplicação
-│   └── infrastructure/           # Testes de infraestrutura
-├── integration/                  # 🔗 Testes de integração
-├── e2e/                          # 🌐 Testes end-to-end
-├── performance/                  # ⚡ Testes de performance
-├── fixtures/                     # 🎭 Fixtures e helpers
-└── conftest.py                   # ⚙️ Configuração global
+├── unit/            # Testes unitários
+├── integration/     # Testes de integração
+├── e2e/            # Testes end-to-end
+└── performance/    # Testes de performance
 ```
 
-### **2. Tipos de Testes**
+---
 
-#### **Testes Unitários**
-```python
-import pytest
-from src.domain.wallet.entities.wallet import Wallet
+## 🧪 **Testes**
 
-@pytest.mark.unit
-class TestWallet:
-    def test_create_wallet_with_valid_name(self):
-        """Testa criação de carteira com nome válido"""
-        wallet = Wallet.create("Test Wallet")
-        assert wallet.name == "Test Wallet"
-        assert wallet.is_active is True
-        
-    def test_create_wallet_with_invalid_name_raises_error(self):
-        """Testa que nome inválido gera exceção"""
-        with pytest.raises(ValidationError):
-            Wallet.create("")
-```
+### **Executar Testes**
 
-#### **Testes de Integração**
-```python
-import pytest
-from src.application.wallet.commands.create_wallet import CreateWalletCommandHandler
-
-@pytest.mark.integration
-class TestCreateWalletIntegration:
-    async def test_create_wallet_command_handler(self, mock_wallet_repository):
-        """Testa handler de comando de criação"""
-        handler = CreateWalletCommandHandler(mock_wallet_repository)
-        command = CreateWalletCommand(name="Test Wallet")
-        
-        result = await handler.execute(command)
-        
-        assert result.name == "Test Wallet"
-        mock_wallet_repository.save.assert_called_once()
-```
-
-#### **Testes E2E**
-```python
-import pytest
-from fastapi.testclient import TestClient
-
-@pytest.mark.e2e
-class TestWalletAPI:
-    def test_create_wallet_endpoint(self, async_client):
-        """Testa endpoint de criação de carteira"""
-        response = async_client.post(
-            "/api/v1/wallets/",
-            json={"name": "Test Wallet", "password": "test123"}
-        )
-        
-        assert response.status_code == 201
-        data = response.json()
-        assert data["name"] == "Test Wallet"
-```
-
-### **3. Execução de Testes**
 ```bash
 # Todos os testes
 pytest
 
-# Testes unitários apenas
-pytest -m unit
-
-# Testes de integração
-pytest -m integration
-
-# Testes E2E
-pytest -m e2e
-
-# Testes de performance
-pytest -m performance
+# Testes específicos
+pytest tests/unit/
+pytest tests/integration/
+pytest tests/e2e/
 
 # Com cobertura
 pytest --cov=src --cov-report=html
 
-# Testes específicos
-pytest tests/unit/domain/entities/test_wallet.py
+# Com verbose
+pytest -v
+
+# Testes de performance
+pytest tests/performance/ --benchmark-only
+```
+
+### **Escrever Testes**
+
+- ✅ Teste casos positivos e negativos
+- ✅ Use fixtures apropriadas
+- ✅ Mock dependências externas
+- ✅ Mantenha testes isolados
+- ✅ Use nomes descritivos
+
+**Exemplo:**
+```python
+def test_create_wallet_success():
+    """Testa criação bem-sucedida de carteira."""
+    # Arrange
+    wallet_data = {"name": "Test Wallet", "description": "Test"}
+    
+    # Act
+    result = wallet_service.create_wallet(wallet_data)
+    
+    # Assert
+    assert result.name == "Test Wallet"
+    assert result.is_active is True
+    assert result.balance.total == 0.0
 ```
 
 ---
 
-## 🔄 **WORKFLOW DE DESENVOLVIMENTO**
+## 📚 **Documentação**
 
-### **1. Branching Strategy**
-```
-main                    # 🚀 Branch principal (produção)
-├── develop            # 🔄 Branch de desenvolvimento
-├── feature/nome       # ✨ Features novas
-├── bugfix/nome        # 🐛 Correções de bugs
-├── hotfix/nome        # 🔥 Correções urgentes
-└── release/versao     # 📦 Preparação de releases
-```
+### **Padrões de Documentação**
 
-### **2. Processo de Contribuição**
+- ✅ Use docstrings em todas as funções públicas
+- ✅ Inclua exemplos de uso quando apropriado
+- ✅ Mantenha documentação atualizada
+- ✅ Use type hints para clareza
 
-#### **Passo 1: Preparação**
-```bash
-# 1. Fork do repositório
-# 2. Clone local
-git clone https://github.com/seu-usuario/coinbalance.git
-cd coinbalance
-
-# 3. Criar branch
-git checkout -b feature/nova-funcionalidade
-
-# 4. Instalar pre-commit
-pre-commit install
-```
-
-#### **Passo 2: Desenvolvimento**
-```bash
-# 1. Fazer alterações
-# 2. Executar testes
-pytest
-
-# 3. Verificar qualidade
-black --check .
-flake8 .
-mypy src/
-
-# 4. Commit
-git add .
-git commit -m "feat: adiciona nova funcionalidade X"
+**Exemplo:**
+```python
+def create_wallet(self, wallet_data: dict) -> Wallet:
+    """
+    Cria uma nova carteira no sistema.
+    
+    Args:
+        wallet_data: Dados da carteira contendo nome e descrição
+        
+    Returns:
+        Wallet: Instância da carteira criada
+        
+    Raises:
+        ValidationError: Se os dados forem inválidos
+        DuplicateWalletError: Se já existir carteira com mesmo nome
+        
+    Example:
+        >>> wallet_data = {"name": "My Wallet", "description": "Personal"}
+        >>> wallet = service.create_wallet(wallet_data)
+        >>> print(wallet.name)
+        My Wallet
+    """
 ```
 
-#### **Passo 3: Pull Request**
-```bash
-# 1. Push
-git push origin feature/nova-funcionalidade
+### **Atualizar Documentação**
 
-# 2. Criar PR no GitHub
-# 3. Aguardar review
-# 4. Fazer correções se necessário
-# 5. Merge após aprovação
-```
+- ✅ README.md para mudanças principais
+- ✅ Documentação de API para endpoints
+- ✅ Documentação de arquitetura para mudanças estruturais
+- ✅ CHANGELOG.md para releases
 
-### **3. Convenções de Commit**
-```
-feat: nova funcionalidade
-fix: correção de bug
-docs: documentação
-style: formatação
-refactor: refatoração
-test: testes
-chore: tarefas de manutenção
+---
 
-Exemplos:
-feat: adiciona endpoint de criação de carteira
-fix: corrige validação de senha
-docs: atualiza README
-test: adiciona testes para Wallet entity
+## 🔍 **Code Review**
+
+### **Como Revisar**
+
+- ✅ Verifique se o código segue os padrões
+- ✅ Teste as funcionalidades localmente
+- ✅ Verifique se os testes cobrem as mudanças
+- ✅ Confirme se a documentação está atualizada
+- ✅ Seja construtivo e educacional
+
+### **Respondendo a Reviews**
+
+- ✅ Seja respeitoso e profissional
+- ✅ Responda a todos os comentários
+- ✅ Faça as mudanças solicitadas
+- ✅ Explique decisões quando necessário
+- ✅ Agradeça o feedback
+
+---
+
+## 🐛 **Reportando Bugs**
+
+### **Template de Bug Report**
+
+```markdown
+**Descrição do Bug**
+Uma descrição clara e concisa do bug.
+
+**Passos para Reproduzir**
+1. Vá para '...'
+2. Clique em '...'
+3. Role até '...'
+4. Veja o erro
+
+**Comportamento Esperado**
+O que deveria acontecer.
+
+**Comportamento Atual**
+O que está acontecendo.
+
+**Screenshots**
+Se aplicável, adicione screenshots.
+
+**Ambiente:**
+- OS: [ex: Windows 10, macOS 12, Ubuntu 20.04]
+- Python: [ex: 3.11.5]
+- Versão: [ex: 2.1.0]
+
+**Contexto Adicional**
+Qualquer outra informação relevante.
 ```
 
 ---
 
-## 🚀 **CI/CD PIPELINE**
+## 💡 **Sugerindo Melhorias**
 
-### **1. Pre-commit Hooks**
-```bash
-# Instalar hooks
-pre-commit install
+### **Template de Feature Request**
 
-# Executar manualmente
-pre-commit run --all-files
+```markdown
+**É sua feature request relacionada a um problema?**
+Uma descrição clara e concisa do problema.
 
-# Hooks configurados:
-# - Black (formatação)
-# - isort (imports)
-# - Flake8 (linting)
-# - MyPy (type checking)
-# - Bandit (segurança)
-# - pytest (testes)
+**Descreva a solução que você gostaria**
+Uma descrição clara e concisa do que você quer que aconteça.
+
+**Descreva alternativas que você considerou**
+Uma descrição clara e concisa de soluções alternativas.
+
+**Contexto Adicional**
+Qualquer outro contexto sobre a feature request.
 ```
 
-### **2. GitHub Actions**
-```yaml
-# Workflows automáticos:
-# - Code Quality (Black, Flake8, MyPy, Bandit)
-# - Tests (Unit, Integration, E2E, Performance)
-# - Build & Deploy (Docker, Staging)
-# - Notifications (Success/Failure)
-```
+---
 
-### **3. Métricas de Qualidade**
-- ✅ **Cobertura de testes:** >80%
-- ✅ **Complexidade ciclomática:** <10
-- ✅ **Duplicação de código:** 0%
-- ✅ **Vulnerabilidades:** 0 críticas
-- ✅ **Performance:** <100ms por endpoint
+## 🏷️ **Labels e Milestones**
+
+### **Labels Disponíveis**
+
+- `bug`: Algo não está funcionando
+- `enhancement`: Nova feature ou melhoria
+- `documentation`: Melhorias na documentação
+- `good first issue`: Bom para novos contribuidores
+- `help wanted`: Precisa de ajuda extra
+- `priority: high`: Alta prioridade
+- `priority: medium`: Prioridade média
+- `priority: low`: Baixa prioridade
+- `area: fractal`: Relacionado a sistemas fractais
+- `area: api`: Relacionado à API
+- `area: blockchain`: Relacionado à blockchain
+- `area: consensus`: Relacionado ao consenso
+
+### **Milestones**
+
+- `v2.2.0`: Próxima versão menor
+- `v2.3.0`: Versão futura
+- `v3.0.0`: Próxima versão maior
 
 ---
 
-## 📚 **DOCUMENTAÇÃO**
+## 🌍 **Comunidade**
 
-### **1. Documentação Técnica**
-- 📖 **README.md** - Visão geral do projeto
-- 🏗️ **docs/ARCHITECTURE.md** - Arquitetura detalhada
-- 🚀 **docs/DEPLOYMENT.md** - Guia de deploy
-- 🔧 **docs/API.md** - Documentação da API
+### **Canais de Comunicação**
 
-### **2. Documentação de Código**
-- 📝 **Docstrings** em todas as funções públicas
-- 🏷️ **Type hints** em todas as funções
-- 📋 **Exemplos** nos docstrings
-- 🔍 **Comentários** explicativos em código complexo
+- 💬 **Discord**: [Discord Server](https://discord.gg/coinbalance)
+- 🐦 **Twitter**: [@coinbalance](https://twitter.com/coinbalance)
+- 📧 **Email**: community@coinbalance.com
+- 📺 **YouTube**: [CoinBalance Channel](https://youtube.com/coinbalance)
 
-### **3. Documentação de Decisões**
-- 📊 **ADRs** (Architecture Decision Records)
-- 🔄 **Changelog** detalhado
-- 📈 **Roadmap** do projeto
+### **Eventos**
+
+- 🎯 **Sprints**: Sprints de desenvolvimento mensais
+- 🎓 **Workshops**: Workshops sobre arquitetura fractal
+- 🏆 **Hackathons**: Hackathons temáticos
+- 📚 **Study Groups**: Grupos de estudo sobre blockchain consciente
 
 ---
 
-## 🔒 **SEGURANÇA**
+## 🏆 **Reconhecimento**
 
-### **1. Práticas de Segurança**
-- ✅ **Validação rigorosa** de entrada
-- ✅ **Sanitização** de dados
-- ✅ **Rate limiting** em endpoints
-- ✅ **Logging seguro** (sem dados sensíveis)
-- ✅ **Princípio do menor privilégio**
+### **Contribuidores**
 
-### **2. Verificações Automáticas**
-```bash
-# Verificação de segurança
-bandit -r src/
+Todos os contribuidores são reconhecidos:
 
-# Verificação de dependências
-safety check
+- 📝 **Contributors.md**: Lista de todos os contribuidores
+- 🏅 **Badges**: Badges especiais para contribuidores
+- 🎉 **Releases**: Menção em releases
+- 🌟 **Hall of Fame**: Contribuidores destacados
 
-# Verificação de secrets
-git-secrets --scan
-```
+### **Tipos de Contribuição**
 
-### **3. Responsabilidade de Segurança**
-- 🚨 **Reportar vulnerabilidades** imediatamente
-- 🔒 **Nunca commitar** secrets ou chaves
-- 🛡️ **Usar HTTPS** em produção
-- 📊 **Monitorar logs** de segurança
+- 🥇 **Gold**: Contribuições significativas
+- 🥈 **Silver**: Contribuições regulares
+- 🥉 **Bronze**: Primeiras contribuições
+- 🌟 **Special**: Contribuições especiais
 
 ---
 
-## 📊 **MÉTRICAS E MONITORAMENTO**
+## 📋 **Checklist para Contribuidores**
 
-### **🛠️ Sistema de Monitoramento Automatizado**
-O CoinBalance possui um **sistema completo de monitoramento** que gera relatórios detalhados:
+### **Antes de Contribuir**
 
-```bash
-# Gerar relatórios completos
-python scripts/generate_reports.py
+- [ ] Li e entendi o [README](README.md)
+- [ ] Li e entendi este guia de contribuição
+- [ ] Verifiquei se já existe uma issue relacionada
+- [ ] Configurei meu ambiente de desenvolvimento
+- [ ] Executei os testes e passaram
 
-# Relatórios gerados:
-# - quality-report.html (Dashboard visual)
-# - quality-report.json (Dados estruturados)
-# - quality-report.md (Relatório markdown)
-```
+### **Durante o Desenvolvimento**
 
-### **📊 Dashboard de Qualidade**
-- **[docs/DASHBOARD_QUALIDADE.md](docs/DASHBOARD_QUALIDADE.md)** - Monitoramento em tempo real
-- **Score geral**: 95/100 ⭐⭐⭐⭐⭐
-- **Arquitetura**: 100/100 ✅
-- **Testes**: 87.5% ✅
-- **Segurança**: 90/100 ✅
-- **Documentação**: 100/100 ✅
+- [ ] Segui os padrões de código do projeto
+- [ ] Escrevi testes para minhas mudanças
+- [ ] Atualizei documentação quando necessário
+- [ ] Mantive commits pequenos e focados
+- [ ] Usei mensagens de commit descritivas
 
-### **1. Métricas de Código**
-- 📈 **Cobertura de testes** (≥80% obrigatório)
-- 🔍 **Complexidade ciclomática** (≤10)
-- 📊 **Duplicação de código** (0%)
-- ⚡ **Performance dos endpoints** (<100ms)
+### **Antes de Enviar PR**
 
-### **2. Métricas de Qualidade**
-- ✅ **Build success rate** (100%)
-- 🚀 **Deploy frequency** (Contínuo)
-- 🐛 **Bug rate** (Monitorado)
-- 📚 **Documentation coverage** (100%)
-
-### **3. Ferramentas de Monitoramento**
-- 📊 **Scripts automatizados** - Verificação contínua
-- 🔍 **Gates de qualidade** - Bloqueio automático
-- 📈 **Relatórios HTML** - Dashboard visual
-- 🚨 **Alertas automáticos** - CI/CD pipeline
+- [ ] Todos os testes passam
+- [ ] Linting passa sem erros
+- [ ] Cobertura de testes mantida
+- [ ] Documentação atualizada
+- [ ] CHANGELOG.md atualizado
+- [ ] PR tem título e descrição claros
 
 ---
 
-## 🎓 **EDUCAÇÃO E TREINAMENTO**
+## ❓ **FAQ**
 
-### **1. Recursos de Aprendizado**
-- 📚 **Clean Code** - Robert C. Martin
-- 🏗️ **Domain-Driven Design** - Eric Evans
-- 🔧 **Clean Architecture** - Robert C. Martin
-- 🧪 **Test-Driven Development** - Kent Beck
+### **P: Como começar a contribuir?**
 
-### **2. Treinamentos Internos**
-- 🎯 **Workshops** de arquitetura
-- 🧪 **Sessões** de testes
-- 🔒 **Treinamentos** de segurança
-- 📊 **Code reviews** em grupo
+R: Comece lendo este guia, configurando seu ambiente e escolhendo uma issue marcada com `good first issue`.
 
-### **3. Certificações**
-- 🏆 **Clean Code** certification
-- 🔒 **Security** best practices
-- 🧪 **Testing** methodologies
-- 🏗️ **Architecture** patterns
+### **P: Preciso de permissão para contribuir?**
 
----
+R: Não! Qualquer um pode contribuir. Só precisamos que você siga este guia.
 
-## ✅ **CHECKLIST DE CONTRIBUIÇÃO**
+### **P: Como escolher uma issue?**
 
-### **⚠️ ANTES de Submeter PR (OBRIGATÓRIO):**
-- [ ] ✅ **Protocolo de manutenção** consultado
-- [ ] ✅ **Documentação obrigatória** lida
-- [ ] ✅ **Verificação de qualidade** executada: `./scripts/quality-check.sh`
-- [ ] ✅ **Verificação arquitetural** executada: `python scripts/check_architecture.py`
-- [ ] ✅ **Validação de mudanças** executada: `python scripts/validate_change.py`
-- [ ] ✅ Código formatado com Black
-- [ ] ✅ Imports organizados com isort
-- [ ] ✅ Linting passou (Flake8)
-- [ ] ✅ Type checking passou (MyPy)
-- [ ] ✅ Testes unitários passaram
-- [ ] ✅ Testes de integração passaram
-- [ ] ✅ Cobertura de testes ≥80%
-- [ ] ✅ Documentação atualizada
-- [ ] ✅ Commits seguem convenção
-- [ ] ✅ Branch atualizada com main
+R: Procure por issues marcadas com `good first issue` ou `help wanted`. Comece com algo pequeno.
 
-### **Code Review (OBRIGATÓRIO):**
-- [ ] ✅ **Arquitetura DDD** respeitada
-- [ ] ✅ **SOLID principles** aplicados
-- [ ] ✅ **Segurança** verificada
-- [ ] ✅ **Performance** adequada
-- [ ] ✅ **Testes** abrangentes
-- [ ] ✅ **Documentação** clara
-- [ ] ✅ **Gates de qualidade** passaram
+### **P: E se minha PR for rejeitada?**
+
+R: Não se preocupe! Feedback é parte do processo. Revise os comentários e melhore sua contribuição.
+
+### **P: Posso contribuir com documentação?**
+
+R: Sim! Documentação é muito importante. Procure por issues marcadas com `documentation`.
 
 ---
 
-## 🆘 **SUPORTE E CONTATO**
+## 📄 **Licença**
 
-### **Canais de Suporte:**
-- 📧 **Email:** dev@coinbalance.com
-- 💬 **Slack:** #coinbalance-dev
-- 📱 **Discord:** CoinBalance Community
-- 🐛 **Issues:** GitHub Issues
-
-### **Horários de Suporte:**
-- 🕐 **Segunda a Sexta:** 9h às 18h (BRT)
-- 🚨 **Emergências:** 24/7 via Slack
+Ao contribuir, você concorda que suas contribuições serão licenciadas sob a [Licença MIT](LICENSE.md).
 
 ---
 
-**Versão:** 1.0  
-**Data:** 27 de Outubro de 2025  
-**Status:** ✅ Ativo
+## 🙏 **Agradecimentos**
+
+Obrigado por considerar contribuir para o CoinBalance! Sua contribuição é fundamental para o sucesso deste projeto revolucionário.
 
 ---
 
-## 🎯 **RESUMO**
+<div align="center">
 
-Este guia estabelece os padrões de qualidade e contribuição para o CoinBalance, garantindo:
+**🤝 Contribua para a Revolução da Blockchain Consciente**
 
-- ✅ **Código limpo** e manutenível
-- ✅ **Arquitetura sólida** e escalável
-- ✅ **Testes abrangentes** e confiáveis
-- ✅ **Segurança robusta** e monitorada
-- ✅ **Documentação clara** e atualizada
-- ✅ **Processo eficiente** e colaborativo
+![Contributing](https://img.shields.io/badge/Contributing-Welcome-FF6B6B?style=for-the-badge)
+![Community](https://img.shields.io/badge/Community-Driven-4ECDC4?style=for-the-badge)
+![Open Source](https://img.shields.io/badge/Open%20Source-MIT-00D4AA?style=for-the-badge)
 
-**Seguindo estes padrões, garantimos um projeto de qualidade acadêmica e profissional! 🚀**
+**🌟 Juntos Construímos o Futuro da Tecnologia**
+
+</div>

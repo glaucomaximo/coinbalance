@@ -10,14 +10,15 @@ from src.domain.consensus.entities.validator import Validator
 from src.domain.consensus.services.consensus_service import ConsensusService
 from src.domain.consensus.repositories.validator_repository import ValidatorRepository
 from src.domain.shared.exceptions import DomainException
+from src.application.common.interfaces.use_case import UseCase
 
 
-class RegisterValidatorHandler(Protocol):
+class RegisterValidatorHandler(UseCase[RegisterValidatorCommand, StakeReceiptDTO]):
     """
     Interface para handler de registro de validador.
     """
     
-    async def handle(self, command: RegisterValidatorCommand) -> StakeReceiptDTO:
+    async def execute(self, command: RegisterValidatorCommand) -> StakeReceiptDTO:
         """
         Executa o comando de registro de validador.
         
@@ -46,7 +47,7 @@ class RegisterValidatorHandlerImpl:
         self.validator_repository = validator_repository
         self.consensus_service = consensus_service
     
-    async def handle(self, command: RegisterValidatorCommand) -> StakeReceiptDTO:
+    async def execute(self, command: RegisterValidatorCommand) -> StakeReceiptDTO:
         """
         Executa o comando de registro de validador.
         

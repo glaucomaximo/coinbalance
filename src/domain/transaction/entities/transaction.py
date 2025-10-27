@@ -32,6 +32,7 @@ class TransactionType(Enum):
     UNSTAKE = "unstake"
     REWARD = "reward"
     FEE = "fee"
+    GENESIS = "genesis"
 
 
 @dataclass
@@ -92,10 +93,10 @@ class Transaction:
         if self.from_address == self.to_address:
             raise ValidationError("Cannot send to same address")
         
-        if self.amount.value <= 0:
+        if self.amount.value.to_cnb() <= 0:
             raise ValidationError("Transaction amount must be positive")
         
-        if self.fee.value < 0:
+        if self.fee.value.to_cnb() < 0:
             raise ValidationError("Transaction fee cannot be negative")
         
         if self.status == TransactionStatus.CONFIRMED and not self.confirmed_at:
@@ -305,6 +306,55 @@ class Transaction:
     def is_pending(self) -> bool:
         """Verifica se a transação está pendente"""
         return self.status == TransactionStatus.PENDING
+    
+    def is_valid(self) -> bool:
+        """
+        Valida se a transação é válida.
+        
+        Returns:
+            True se a transação for válida, False caso contrário
+        """
+        try:
+            # Validar endereço de destino
+            if not self.to_address:
+                return False
+            
+            # Validar que não está enviando para o mesmo endereço (exceto para staking)
+            if (self.from_address and 
+                self.from_address == self.to_address and 
+                self.transaction_type != TransactionType.STAKE):
+                return False
+            
+            # Validar valor positivo
+            if self.amount.value.to_cnb() <= 0:
+                return False
+            
+            # Validar taxa não negativa
+            if self.fee.value.to_cnb() < 0:
+                return False
+            
+            # Validar timestamp de criação
+            if not self.created_at:
+                return False
+            
+            # Validar que transações confirmadas têm timestamp de confirmação
+            if (self.status == TransactionStatus.CONFIRMED and 
+                not self.confirmed_at):
+                return False
+            
+            # Validar que transações confirmadas têm altura de bloco
+            if (self.status == TransactionStatus.CONFIRMED and 
+                self.block_height is None):
+                return False
+            
+            # Validar hash da transação se existir
+            if self.transaction_hash and len(self.transaction_hash) < 10:
+                return False
+            
+            return True
+            
+        except Exception:
+            return False
     
     def get_events(self) -> List[DomainEvent]:
         """Retorna eventos de domínio pendentes"""

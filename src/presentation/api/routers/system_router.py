@@ -10,6 +10,7 @@ from src.presentation.schemas.wallet_schema import GetWalletResponse
 from src.domain.shared.value_objects.wallet_address import WalletAddress
 from src.domain.shared.value_objects.money import Money
 from src.domain.shared.exceptions import DomainException
+from src.infrastructure.security.auth import get_current_user, AuthenticatedUser, require_scope
 
 
 router = APIRouter(
@@ -18,6 +19,8 @@ router = APIRouter(
     responses={
         404: {"description": "Carteira não encontrada"},
         400: {"description": "Requisição inválida"},
+        401: {"description": "Não autorizado"},
+        403: {"description": "Permissão negada"},
     },
 )
 
@@ -30,7 +33,8 @@ router = APIRouter(
 )
 async def add_balance_faucet(
     address: str,
-    amount: float = 100.0
+    amount: float = 100.0,
+    current_user: AuthenticatedUser = Depends(require_scope("admin:faucet"))
 ) -> GetWalletResponse:
     """
     Adiciona saldo a uma carteira usando o sistema de faucet.
@@ -91,7 +95,8 @@ async def add_balance_faucet(
 )
 async def mint_cnb(
     address: str,
-    amount: float = 1000.0
+    amount: float = 1000.0,
+    current_user: AuthenticatedUser = Depends(require_scope("admin:mint"))
 ) -> GetWalletResponse:
     """
     Cria novos CNB para uma carteira (minting).
