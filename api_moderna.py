@@ -75,8 +75,21 @@ app.state.start_time = time.time()
 class TransacaoRequest(BaseModel):
     remetente: str = Field(..., description="Endereço do remetente")
     destinatario: str = Field(..., description="Endereço do destinatário")
+    valor: float = Field(..., gt=0, description="Valor da transação em CNB")
+    taxa: Optional[float] = Field(None, description="Taxa da transação (calculada automaticamente se não fornecida)")
+    dados_extra: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    unidade: Optional[str] = Field("cnb", description="Unidade do valor (cnb, satoshi, mcnb)")
+
+class ConversaoRequest(BaseModel):
+    valor: float = Field(..., gt=0, description="Valor a ser convertido")
+    unidade_origem: str = Field(..., description="Unidade de origem (cnb, satoshi, mcnb)")
+    unidade_destino: str = Field(..., description="Unidade de destino (cnb, satoshi, mcnb)")
+
+class TransacaoFracionadaRequest(BaseModel):
+    remetente: str = Field(..., description="Endereço do remetente")
+    destinatario: str = Field(..., description="Endereço do destinatário")
     valor: float = Field(..., gt=0, description="Valor da transação")
-    taxa: Optional[float] = Field(0.001, description="Taxa da transação")
+    unidade: str = Field("cnb", description="Unidade do valor")
     dados_extra: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 class CarteiraRequest(BaseModel):
@@ -157,7 +170,7 @@ async def obter_carteira(nome: str):
 
 @app.post("/transacoes/criar", summary="Criar Transação")
 async def criar_transacao(request: TransacaoRequest):
-    """Cria e valida uma nova transação"""
+    """Cria e valida uma nova transação com suporte a frações decimais"""
     try:
         # Obter carteira do remetente
         carteira_remetente = None
@@ -169,10 +182,15 @@ async def criar_transacao(request: TransacaoRequest):
         if not carteira_remetente:
             raise HTTPException(status_code=404, detail="Carteira remetente não encontrada")
         
+        # Converter valor se necessário
+        valor_cnb = request.valor
+        if request.unidade != "cnb":
+            valor_cnb = transaction_validator.converter_de_unidades(request.valor, request.unidade)
+        
         # Criar transação
         transacao = carteira_remetente.criar_transacao(
             request.destinatario,
-            request.valor,
+            valor_cnb,
             request.dados_extra
         )
         
@@ -190,6 +208,53 @@ async def criar_transacao(request: TransacaoRequest):
             "sucesso": True,
             "mensagem": "Transação criada e processada com sucesso",
             "hash_transacao": transaction_validator._gerar_hash_transacao(transacao),
+            "validacao": validacao,
+            "valor_formatado": transaction_validator.formatar_valor_cnb(valor_cnb)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/transacoes/fracionada", summary="Criar Transação Fracionada")
+async def criar_transacao_fracionada(request: TransacaoFracionadaRequest):
+    """Cria transação com valores fracionados em diferentes unidades"""
+    try:
+        # Obter carteira do remetente
+        carteira_remetente = None
+        for nome, carteira in wallet_manager.carteiras.items():
+            if carteira.endereco == request.remetente:
+                carteira_remetente = carteira
+                break
+        
+        if not carteira_remetente:
+            raise HTTPException(status_code=404, detail="Carteira remetente não encontrada")
+        
+        # Converter valor para CNB
+        valor_cnb = transaction_validator.converter_de_unidades(request.valor, request.unidade)
+        
+        # Criar transação
+        transacao = carteira_remetente.criar_transacao(
+            request.destinatario,
+            valor_cnb,
+            request.dados_extra
+        )
+        
+        # Validar transação
+        validacao = transaction_validator.validar_transacao(transacao)
+        if not validacao['valida']:
+            raise HTTPException(status_code=400, detail=f"Transação inválida: {validacao['erros']}")
+        
+        # Processar transação
+        sucesso = transaction_validator.processar_transacao(transacao)
+        if not sucesso:
+            raise HTTPException(status_code=500, detail="Erro ao processar transação")
+        
+        return {
+            "sucesso": True,
+            "mensagem": "Transação fracionada criada e processada com sucesso",
+            "hash_transacao": transaction_validator._gerar_hash_transacao(transacao),
+            "valor_original": f"{request.valor} {request.unidade.upper()}",
+            "valor_cnb": transaction_validator.formatar_valor_cnb(valor_cnb),
             "validacao": validacao
         }
         
@@ -536,6 +601,125 @@ async def estatisticas_carteira(endereco: str):
         }
     except Exception as e:
         return {"status": "error", "error": str(e)}
+
+@app.post("/conversao/unidades", summary="Converter Unidades")
+async def converter_unidades(request: ConversaoRequest):
+    """Converte valores entre diferentes unidades (CNB, Satoshi, mCNB)"""
+    try:
+        # Converter de unidade origem para CNB
+        valor_cnb = transaction_validator.converter_de_unidades(request.valor, request.unidade_origem)
+        
+        # Converter de CNB para unidade destino
+        valor_destino = transaction_validator.converter_para_unidades(valor_cnb, request.unidade_destino)
+        
+        return {
+            "sucesso": True,
+            "conversao": {
+                "valor_origem": f"{request.valor} {request.unidade_origem.upper()}",
+                "valor_cnb": transaction_validator.formatar_valor_cnb(valor_cnb),
+                "valor_destino": f"{valor_destino:.8f} {request.unidade_destino.upper()}",
+                "taxa_conversao": f"1 {request.unidade_origem.upper()} = {valor_destino/request.valor:.8f} {request.unidade_destino.upper()}"
+            },
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/conversao/info", summary="Informações de Conversão")
+async def info_conversao():
+    """Obtém informações sobre as unidades disponíveis e taxas de conversão"""
+    return {
+        "unidades_disponiveis": {
+            "cnb": {
+                "nome": "Coinbalance",
+                "descricao": "Unidade principal da moeda",
+                "precisao": 8,
+                "simbolo": "CNB"
+            },
+            "satoshi": {
+                "nome": "Satoshi",
+                "descricao": "Menor unidade (1 CNB = 100,000,000 satoshis)",
+                "precisao": 0,
+                "simbolo": "sat"
+            },
+            "mcnb": {
+                "nome": "Micro CNB",
+                "descricao": "Unidade intermediária (1 CNB = 1,000,000 mCNB)",
+                "precisao": 6,
+                "simbolo": "mCNB"
+            }
+        },
+        "taxas_conversao": {
+            "cnb_para_satoshi": 100000000,
+            "cnb_para_mcnb": 1000000,
+            "satoshi_para_cnb": 0.00000001,
+            "mcnb_para_cnb": 0.000001
+        },
+        "precisao_decimal": 8,
+        "valor_minimo": "0.00000001 CNB (1 satoshi)",
+        "timestamp": time.time()
+    }
+
+@app.get("/carteiras/{endereco}/saldo/detalhado", summary="Saldo Detalhado da Carteira")
+async def saldo_detalhado_carteira(endereco: str):
+    """Obtém saldo da carteira em todas as unidades disponíveis"""
+    try:
+        # Obter carteira
+        carteira = None
+        for nome, c in wallet_manager.carteiras.items():
+            if c.endereco == endereco:
+                carteira = c
+                break
+        
+        if not carteira:
+            raise HTTPException(status_code=404, detail="Carteira não encontrada")
+        
+        saldo_cnb = float(carteira.saldo)
+        
+        return {
+            "endereco": endereco,
+            "saldo": {
+                "cnb": transaction_validator.formatar_valor_cnb(saldo_cnb),
+                "satoshi": f"{transaction_validator.converter_para_unidades(saldo_cnb, 'satoshi'):.0f} sat",
+                "mcnb": f"{transaction_validator.converter_para_unidades(saldo_cnb, 'mcnb'):.6f} mCNB"
+            },
+            "unidades": {
+                "cnb": saldo_cnb,
+                "satoshi": transaction_validator.converter_para_unidades(saldo_cnb, 'satoshi'),
+                "mcnb": transaction_validator.converter_para_unidades(saldo_cnb, 'mcnb')
+            },
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/transacoes/calcular-taxa", summary="Calcular Taxa de Transação")
+async def calcular_taxa_transacao(valor: float, unidade: str = "cnb"):
+    """Calcula a taxa necessária para uma transação"""
+    try:
+        # Converter valor para CNB
+        valor_cnb = transaction_validator.converter_de_unidades(valor, unidade)
+        
+        # Criar transação temporária para cálculo
+        transacao_temp = {
+            'valor': valor_cnb,
+            'remetente': 'temp',
+            'destinatario': 'temp'
+        }
+        
+        taxa_cnb = transaction_validator._calcular_taxa_decimal(transacao_temp)
+        
+        return {
+            "valor_original": f"{valor} {unidade.upper()}",
+            "valor_cnb": transaction_validator.formatar_valor_cnb(valor_cnb),
+            "taxa_cnb": transaction_validator.formatar_valor_cnb(float(taxa_cnb)),
+            "taxa_satoshi": f"{transaction_validator.converter_para_unidades(float(taxa_cnb), 'satoshi'):.0f} sat",
+            "taxa_mcnb": f"{transaction_validator.converter_para_unidades(float(taxa_cnb), 'mcnb'):.6f} mCNB",
+            "total_necessario": transaction_validator.formatar_valor_cnb(valor_cnb + float(taxa_cnb)),
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Middleware para logging
 @app.middleware("http")

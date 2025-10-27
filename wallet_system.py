@@ -1,27 +1,30 @@
 """
 Sistema de Carteiras Coinbalance (CNB)
 Implementa carteiras digitais com criptografia robusta para a moeda CNB
+Suporte completo a frações decimais e precisão de 8 casas decimais
 """
 
 import json
 import hashlib
 import time
+import decimal
 from typing import Dict, List, Optional
 from crypto_utils import CryptoUtils
 
 
 class Carteira:
-    """Carteira digital segura para Coinbalance (CNB)"""
+    """Carteira digital segura para Coinbalance (CNB) com suporte a frações"""
     
     def __init__(self, senha: str = None):
         self.private_key, self.public_key = CryptoUtils.gerar_par_chaves()
         self.senha = senha
         self.salt = CryptoUtils.gerar_salt()
         self.endereco = self._gerar_endereco()
-        self.saldo = 0.0
+        self.saldo = decimal.Decimal('0.00000000')  # Precisão de 8 casas decimais
         self.transacoes = []
         self.moeda = "CNB"
         self.plataforma = "Coinbalance"
+        self.precision = 8  # 8 casas decimais
     
     def _gerar_endereco(self) -> str:
         """Gera endereço único da carteira baseado na chave pública"""
@@ -29,14 +32,16 @@ class Carteira:
         return f"CNB_{public_key_hash[:20]}"
     
     def criar_transacao(self, destinatario: str, valor: float, dados_extra: Dict = None) -> Dict:
-        """Cria uma transação assinada"""
-        if valor > self.saldo:
-            raise ValueError("Saldo insuficiente")
+        """Cria uma transação assinada com suporte a frações decimais"""
+        valor_decimal = decimal.Decimal(str(valor))
+        
+        if valor_decimal > self.saldo:
+            raise ValueError(f"Saldo insuficiente. Disponível: {self.saldo:.8f} CNB, Necessário: {valor_decimal:.8f} CNB")
         
         transacao = {
             'remetente': self.endereco,
             'destinatario': destinatario,
-            'valor': valor,
+            'valor': float(valor_decimal.quantize(decimal.Decimal('0.00000001'))),
             'moeda': self.moeda,
             'plataforma': self.plataforma,
             'timestamp': self._obter_timestamp(),
@@ -70,8 +75,26 @@ class Carteira:
             return False
     
     def atualizar_saldo(self, valor: float):
-        """Atualiza saldo da carteira"""
-        self.saldo += valor
+        """Atualiza saldo da carteira com precisão decimal"""
+        valor_decimal = decimal.Decimal(str(valor))
+        self.saldo = (self.saldo + valor_decimal).quantize(decimal.Decimal('0.00000001'))
+    
+    def obter_saldo_formatado(self) -> str:
+        """Retorna saldo formatado com 8 casas decimais"""
+        return f"{self.saldo:.8f} CNB"
+    
+    def obter_saldo_em_unidades(self, unidade: str = "satoshi") -> float:
+        """Converte saldo para diferentes unidades"""
+        if unidade == "satoshi":
+            # 1 CNB = 100,000,000 satoshis
+            return float(self.saldo * decimal.Decimal('100000000'))
+        elif unidade == "mcnb":
+            # 1 CNB = 1,000,000 mCNB (micro CNB)
+            return float(self.saldo * decimal.Decimal('1000000'))
+        elif unidade == "cnb":
+            return float(self.saldo)
+        else:
+            return float(self.saldo)
     
     def _obter_timestamp(self) -> float:
         """Obtém timestamp atual"""
