@@ -266,6 +266,74 @@ class ConsciousSecurityMonitor:
             # Aprende com o evento
             self._learn_from_event(event_type, source_ip, user_agent, details, timestamp)
     
+    def log_suspicious_activity(self, activity_type: str, description: str,
+                               source_ip: str, severity: str = "MEDIUM") -> None:
+        """
+        Registra atividade suspeita.
+        
+        Args:
+            activity_type: Tipo da atividade
+            description: Descrição da atividade
+            source_ip: IP de origem
+            severity: Severidade (LOW, MEDIUM, HIGH, CRITICAL)
+        """
+        try:
+            threat_level = ThreatLevel(severity.lower())
+        except ValueError:
+            threat_level = ThreatLevel.MEDIUM
+        
+        incident = SecurityIncident(
+            id="",
+            incident_type=AttackType.UNKNOWN,
+            threat_level=threat_level,
+            source_ip=source_ip,
+            user_agent="",
+            timestamp=time.time(),
+            description=f"{activity_type}: {description}",
+            evidence={"activity_type": activity_type, "description": description}
+        )
+        
+        with self._lock:
+            self.incidents.append(incident)
+            
+            # Manter apenas últimos 500 incidentes
+            if len(self.incidents) > 500:
+                self.incidents = self.incidents[-500:]
+            
+            logger.warning(f"Suspicious activity detected: {activity_type} from {source_ip} - {description}")
+    
+    def log_auth_failure(self, wallet_address: str, source_ip: str, user_agent: str = "") -> None:
+        """
+        Registra falha de autenticação.
+        
+        Args:
+            wallet_address: Endereço da carteira
+            source_ip: IP de origem
+            user_agent: User agent
+        """
+        self.log_security_event(
+            SecurityEvent.LOGIN_FAILURE,
+            source_ip,
+            user_agent,
+            {"wallet_address": wallet_address}
+        )
+    
+    def log_rate_limit_exceeded(self, endpoint: str, source_ip: str, user_agent: str = "") -> None:
+        """
+        Registra excedência de rate limit.
+        
+        Args:
+            endpoint: Endpoint acessado
+            source_ip: IP de origem
+            user_agent: User agent
+        """
+        self.log_security_event(
+            SecurityEvent.RATE_LIMIT_EXCEEDED,
+            source_ip,
+            user_agent,
+            {"endpoint": endpoint}
+        )
+    
     def _update_behavioral_profile(self, source_ip: str, event_type: SecurityEvent, 
                                   timestamp: float, details: Dict[str, Any]):
         """Atualiza perfil comportamental de um IP"""

@@ -465,7 +465,7 @@ class UnifiedConsciousMonitoringSystem:
             recommendations.append("Otimize performance do sistema")
         
         return SystemInsight(
-            id=f"health_analysis_{int(current_time)}",
+            id=f"health_analysis_{int(time.time())}",
             insight_type="system_health",
             title=title,
             description=description,
