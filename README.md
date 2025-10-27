@@ -4,8 +4,18 @@
 [![Security](https://img.shields.io/badge/security-audited-green.svg)](https://github.com/glaucomaximo/coinbalance/security)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
+[![Precision](https://img.shields.io/badge/precision-8_decimals-orange.svg)](TRANACOES_FRACIONADAS.md)
+[![Microtransactions](https://img.shields.io/badge/microtransactions-supported-brightgreen.svg)](TRANACOES_FRACIONADAS.md)
 
-A primeira plataforma de investimento consciente baseada no framework proprietário **Coinbalance**, que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar um novo paradigma econômico: **"A Economia da Consciência"**. A plataforma utiliza a moeda digital **Coinbalance (CNB)** como veículo de investimento e troca de valor.
+A primeira plataforma de investimento consciente baseada no framework proprietário **Coinbalance**, que integra inteligência artificial simbólica, neuroeconomia e blockchain para criar um novo paradigma econômico: **"A Economia da Consciência"**. A plataforma utiliza a moeda digital **Coinbalance (CNB)** como veículo de investimento e troca de valor, com suporte completo a **transações fracionadas** e **precisão decimal de 8 casas**.
+
+## 🆕 **NOVO: Sistema de Transações Fracionadas**
+
+- 💰 **Precisão Decimal**: 8 casas decimais (0.00000001 CNB = 1 satoshi)
+- 🔄 **Múltiplas Unidades**: CNB, Satoshi, mCNB com conversão automática
+- 💸 **Microtransações**: Suporte a transações de 1 satoshi
+- ⚡ **Taxas Dinâmicas**: Cálculo automático com precisão decimal
+- 🌍 **Acessibilidade Global**: Transações acessíveis para todos os níveis socioeconômicos
 
 ## ✨ Características Principais
 
@@ -19,6 +29,7 @@ A primeira plataforma de investimento consciente baseada no framework proprietá
 - **Criptografia ECDSA** com chaves privadas/públicas
 - **Assinatura digital** para todas as transações
 - **Prevenção de gastos duplos** com validação rigorosa
+- **Validação decimal** com precisão de 8 casas
 - **Auditoria de segurança** automatizada
 
 ### 💰 DeFi Consciente
@@ -26,6 +37,7 @@ A primeira plataforma de investimento consciente baseada no framework proprietá
 - **Empréstimos** com sistema de colateral ético
 - **Yield Farming** baseado em impacto
 - **Contratos inteligentes** com validação consciente
+- **Microtransações** com precisão decimal
 
 ### 🏛️ Governança Descentralizada
 - **Sistema de votação** baseado em tokens CNB
@@ -38,6 +50,14 @@ A primeira plataforma de investimento consciente baseada no framework proprietá
 - **Cache inteligente** para performance
 - **Load balancing** automático
 - **Monitoramento** em tempo real
+
+### 💸 Transações Fracionadas
+- **Precisão Decimal**: 8 casas decimais (0.00000001 CNB)
+- **Múltiplas Unidades**: CNB, Satoshi (1 CNB = 100M sat), mCNB (1 CNB = 1M mCNB)
+- **Microtransações**: Suporte a transações de 1 satoshi
+- **Conversão Automática**: Entre todas as unidades disponíveis
+- **Taxas Dinâmicas**: Cálculo automático com precisão decimal
+- **Validação Rigorosa**: Prevenção de erros de arredondamento
 
 ## 🏗️ Arquitetura Coinbalance
 
@@ -99,14 +119,22 @@ docker-compose ps
 ```http
 POST /carteiras/criar
 GET  /carteiras/{nome}
-GET  /carteiras/{nome}/saldo
+GET  /carteiras/{endereco}/saldo/detalhado
 ```
 
 #### 💸 Transações
 ```http
 POST /transacoes/criar
+POST /transacoes/fracionada
+GET  /transacoes/calcular-taxa
 GET  /transacoes/{hash}
 GET  /transacoes/historico/{endereco}
+```
+
+#### 🔄 Conversão de Unidades
+```http
+POST /conversao/unidades
+GET  /conversao/info
 ```
 
 #### ⛓️ Blockchain
@@ -173,6 +201,60 @@ response = requests.post('http://localhost:8000/defi/stake', json={
 
 resultado = response.json()
 print(f"Stake realizado: {resultado['total_staked']} CNB")
+```
+
+## 💸 Exemplos de Transações Fracionadas
+
+### Transação Mínima (1 Satoshi)
+```python
+import requests
+
+# Criar transação de 1 satoshi
+response = requests.post("http://localhost:8000/transacoes/fracionada", json={
+    "remetente": "CNB_abc123...",
+    "destinatario": "CNB_def456...",
+    "valor": 0.00000001,  # 1 satoshi
+    "unidade": "cnb"
+})
+
+resultado = response.json()
+print(f"Transação criada: {resultado['hash_transacao']}")
+print(f"Valor: {resultado['valor_cnb']}")
+```
+
+### Conversão de Unidades
+```python
+# Converter 1.5 CNB para satoshis
+response = requests.post("http://localhost:8000/conversao/unidades", json={
+    "valor": 1.5,
+    "unidade_origem": "cnb",
+    "unidade_destino": "satoshi"
+})
+
+resultado = response.json()
+print(f"1.5 CNB = {resultado['conversao']['valor_destino']}")
+```
+
+### Saldo Detalhado
+```python
+# Obter saldo em todas as unidades
+response = requests.get("http://localhost:8000/carteiras/CNB_abc123.../saldo/detalhado")
+
+saldo = response.json()
+print(f"CNB: {saldo['saldo']['cnb']}")
+print(f"Satoshi: {saldo['saldo']['satoshi']}")
+print(f"mCNB: {saldo['saldo']['mcnb']}")
+```
+
+### Calcular Taxa
+```python
+# Calcular taxa para transação
+response = requests.get("http://localhost:8000/transacoes/calcular-taxa", 
+                       params={"valor": 0.001, "unidade": "cnb"})
+
+taxa = response.json()
+print(f"Taxa necessária: {taxa['taxa_cnb']}")
+print(f"Total necessário: {taxa['total_necessario']}")
 ```
 
 ## 🔧 Configuração

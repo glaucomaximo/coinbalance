@@ -15,7 +15,7 @@ class ConfigCoinbalance:
     # Identidade da plataforma
     nome: str = "Coinbalance"
     descricao: str = "A Economia da Consciência"
-    versao: str = "1.0.0"
+    versao: str = "2.1.0"
     moeda: str = "CNB"
     sigla: str = "CNB"
     
@@ -38,6 +38,14 @@ class ConfigCoinbalance:
     recompensa_bloco_inicial: float = 50.0
     taxa_transacao_base: float = 0.001
     taxa_queima: float = 0.1  # 10% das taxas são queimadas
+    
+    # Configurações de transações fracionadas
+    precisao_decimal: int = 8  # 8 casas decimais
+    valor_minimo: float = 0.00000001  # 1 satoshi
+    valor_maximo: float = 100_000_000  # 100M CNB
+    taxa_minima: float = 0.00000001  # 1 satoshi
+    conversao_cnb_satoshi: int = 100_000_000  # 1 CNB = 100M sat
+    conversao_cnb_mcnb: int = 1_000_000  # 1 CNB = 1M mCNB
     
     # Configurações de DeFi
     staking_apy: float = 0.12  # 12% APY

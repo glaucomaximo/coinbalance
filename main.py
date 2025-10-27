@@ -3,6 +3,7 @@
 Coinbalance - A Economia da Consciência
 Ponto de entrada principal da aplicação
 Framework proprietário para investimento consciente
+Suporte completo a transações fracionadas com precisão decimal
 """
 
 import os
@@ -18,7 +19,7 @@ def main():
     """Função principal para inicializar a Coinbalance"""
     
     parser = argparse.ArgumentParser(
-        description="Coinbalance - A Economia da Consciência",
+        description="Coinbalance - A Economia da Consciência (v2.1.0)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Exemplos de uso:
@@ -26,6 +27,14 @@ Exemplos de uso:
   python main.py --production       # Iniciar em modo produção
   python main.py --port 9000        # Usar porta personalizada
   python main.py --workers 4        # Usar múltiplos workers
+
+Funcionalidades:
+  💰 Transações fracionadas com precisão decimal (8 casas)
+  🔄 Múltiplas unidades: CNB, Satoshi, mCNB
+  💸 Microtransações de 1 satoshi (0.00000001 CNB)
+  🧠 Framework Coinbalance com IA simbólica
+  🏦 DeFi consciente com staking e empréstimos
+  🏛️ Governança descentralizada
         """
     )
     
