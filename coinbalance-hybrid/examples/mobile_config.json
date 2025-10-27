@@ -1,0 +1,152 @@
+{
+  "coinbalance_mobile": {
+    "version": "1.0.0",
+    "platform": "Coinbalance",
+    "currency": "CNB",
+    "description": "A Economia da Consciência - Mobile"
+  },
+  "mobile": {
+    "enabled": true,
+    "responsive": true,
+    "touch_optimized": true,
+    "offline_support": true,
+    "pwa_enabled": true,
+    "notifications": true
+  },
+  "ui": {
+    "theme": "coinbalance",
+    "colors": {
+      "primary": "#FFD700",
+      "secondary": "#4169E1",
+      "accent": "#32CD32",
+      "background": "#FFFFFF",
+      "surface": "#F8F9FA",
+      "text": "#333333",
+      "text_secondary": "#666666"
+    },
+    "fonts": {
+      "primary": "Inter",
+      "secondary": "Source Sans Pro",
+      "monospace": "JetBrains Mono"
+    },
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px"
+    },
+    "border_radius": {
+      "sm": "8px",
+      "md": "12px",
+      "lg": "16px",
+      "xl": "20px"
+    }
+  },
+  "features": {
+    "wallet": {
+      "enabled": true,
+      "create_wallet": true,
+      "import_wallet": true,
+      "export_wallet": true,
+      "send_cnb": true,
+      "receive_cnb": true,
+      "transaction_history": true,
+      "qr_code": true
+    },
+    "staking": {
+      "enabled": true,
+      "stake_cnb": true,
+      "unstake_cnb": true,
+      "view_rewards": true,
+      "claim_rewards": true,
+      "staking_history": true
+    },
+    "investments": {
+      "enabled": true,
+      "view_projects": true,
+      "analyze_project": true,
+      "make_investment": true,
+      "track_investment": true,
+      "ai_recommendations": true
+    },
+    "governance": {
+      "enabled": true,
+      "view_proposals": true,
+      "vote_proposal": true,
+      "create_proposal": true,
+      "delegate_votes": true
+    },
+    "notifications": {
+      "enabled": true,
+      "transaction_alerts": true,
+      "staking_rewards": true,
+      "price_alerts": true,
+      "governance_updates": true,
+      "push_notifications": true
+    },
+    "offline_mode": {
+      "enabled": true,
+      "view_balance": true,
+      "view_transactions": true,
+      "view_staking": true,
+      "sync_when_online": true
+    }
+  },
+  "api": {
+    "base_url": "http://localhost:8000",
+    "timeout": 30000,
+    "retry_attempts": 3,
+    "endpoints": {
+      "wallet": "/carteiras",
+      "transactions": "/transacoes",
+      "staking": "/defi/stake",
+      "investments": "/investimentos",
+      "governance": "/governance",
+      "blockchain": "/blockchain"
+    }
+  },
+  "security": {
+    "encryption": true,
+    "biometric_auth": true,
+    "pin_auth": true,
+    "auto_lock": true,
+    "session_timeout": 300000,
+    "secure_storage": true
+  },
+  "performance": {
+    "cache_enabled": true,
+    "cache_ttl": 300000,
+    "lazy_loading": true,
+    "image_optimization": true,
+    "bundle_optimization": true
+  },
+  "analytics": {
+    "enabled": true,
+    "track_events": true,
+    "user_behavior": true,
+    "performance_metrics": true,
+    "error_tracking": true
+  },
+  "accessibility": {
+    "screen_reader": true,
+    "high_contrast": true,
+    "large_text": true,
+    "voice_commands": true,
+    "gesture_navigation": true
+  },
+  "localization": {
+    "default_language": "pt-BR",
+    "supported_languages": ["pt-BR", "en-US", "es-ES"],
+    "rtl_support": false,
+    "currency_format": "BRL",
+    "date_format": "DD/MM/YYYY"
+  },
+  "development": {
+    "debug_mode": false,
+    "hot_reload": true,
+    "dev_tools": false,
+    "mock_data": false,
+    "test_mode": false
+  }
+}

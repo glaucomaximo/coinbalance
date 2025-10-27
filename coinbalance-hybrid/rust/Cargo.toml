@@ -1,0 +1,38 @@
+[package]
+name = "coinbalance-core"
+version = "1.0.0"
+edition = "2021"
+description = "Coinbalance - A Economia da Consciência - Core Rust Components"
+authors = ["Coinbalance Team <dev@coinbalance.com.br>"]
+license = "MIT"
+repository = "https://github.com/glaucomaximo/coinbalance"
+
+[lib]
+name = "coinbalance_core"
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+# Serialização
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Criptografia básica
+sha2 = "0.10"
+hex = "0.4"
+
+# Utilitários
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+anyhow = "1.0"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
