@@ -1,0 +1,3 @@
+"""
+Queries para transações
+"""

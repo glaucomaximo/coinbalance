@@ -1,14 +1,38 @@
 fastapi==0.104.1
 uvicorn==0.24.0
 pydantic==2.5.0
+pydantic-settings==2.11.0
 cryptography==41.0.7
 requests==2.31.0
 python-multipart==0.0.6
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
+
+# Testing dependencies
 pytest==7.4.3
 pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+pytest-cov==4.1.0
+pytest-xdist==3.5.0
+httpx==0.25.2
+factory-boy==3.3.0
+faker==20.1.0
+
+# Development tools
 black==23.11.0
 flake8==6.1.0
 mypy==1.7.1
+isort==5.13.2
+pre-commit==3.6.0
+
+# Data science (for analytics and performance tests)
+numpy==1.24.3
+scikit-learn==1.3.0
+pandas==2.0.3
+matplotlib==3.8.2
+psutil==5.9.6
+
+# Additional utilities
+rich==13.7.0
+typer==0.9.0

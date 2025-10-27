@@ -1,30 +1,55 @@
 #!/usr/bin/env python3
 """
-CryptoChain - Blockchain Moderna com DeFi
-Ponto de entrada principal da aplicação
+🪙 CoinBalance - A Economia da Consciência
+Versão 2.1.0 DDD - Arquitetura de Classe Mundial
+
+Entry point principal da aplicação CoinBalance com arquitetura DDD.
 """
 
-import os
 import sys
+import os
 import argparse
 import uvicorn
 from pathlib import Path
 
-# Adicionar diretório atual ao path
-sys.path.append(str(Path(__file__).parent))
-
 def main():
-    """Função principal para inicializar a CryptoChain"""
-    
+    """
+    Função principal para inicializar a aplicação CoinBalance.
+    """
     parser = argparse.ArgumentParser(
-        description="CoinBalance - Blockchain Moderna com DeFi",
+        description="🪙 CoinBalance v2.1.0 DDD - A Economia da Consciência",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+╔═══════════════════════════════════════════════════════════════╗
+║            🏗️  NOVA ARQUITETURA DDD 2.1.0                    ║
+╠═══════════════════════════════════════════════════════════════╣
+║  ✅ Domain-Driven Design (DDD)                                ║
+║  ✅ Clean Architecture (Uncle Bob)                            ║
+║  ✅ Hexagonal Architecture (Ports & Adapters)                 ║
+║  ✅ CQRS (Command Query Responsibility Segregation)           ║
+║  ✅ SOLID Principles                                          ║
+║  ✅ 12-Factor App                                             ║
+║  ✅ Event-Driven Architecture                                 ║
+╚═══════════════════════════════════════════════════════════════╝
+
 Exemplos de uso:
-  python main.py                    # Iniciar em modo desenvolvimento
-  python main.py --production       # Iniciar em modo produção
-  python main.py --port 9000        # Usar porta personalizada
-  python main.py --workers 4        # Usar múltiplos workers
+  python main.py                      # Modo desenvolvimento
+  python main.py --production         # Modo produção
+  python main.py --port 9000          # Porta customizada
+  python main.py --workers 4          # Múltiplos workers
+
+Funcionalidades:
+  💰 Transações fracionadas (precisão 8 casas decimais)
+  🔄 Múltiplas unidades: CNB, Satoshi, mCNB
+  💸 Microtransações (1 satoshi = 0.00000001 CNB)
+  🧠 Framework Coinbalance com IA
+  🏦 DeFi consciente (staking, lending)
+  🏛️  Governança descentralizada
+
+Documentação:
+  📖 docs/RESUMO_REFATORACAO_DDD.md
+  🔍 docs/ANALISE_E_CORRECAO_ARQUITETURA.md
+  🚀 docs/PROXIMOS_PASSOS.md
         """
     )
     
@@ -67,12 +92,6 @@ Exemplos de uso:
         help='Nível de log (padrão: info)'
     )
     
-    parser.add_argument(
-        '--config',
-        default='config.yaml',
-        help='Arquivo de configuração (padrão: config.yaml)'
-    )
-    
     args = parser.parse_args()
     
     # Configurar variáveis de ambiente
@@ -83,24 +102,36 @@ Exemplos de uso:
         reload = False
         workers = args.workers
         log_level = 'warning'
+        env = 'production'
     else:
         reload = args.reload or True
         workers = 1
         log_level = args.log_level
+        env = 'development'
     
-    print("⚖️ Iniciando CoinBalance Blockchain...")
-    print(f"📍 Host: {args.host}")
-    print(f"🔌 Porta: {args.port}")
-    print(f"👥 Workers: {workers}")
-    print(f"🔄 Reload: {reload}")
-    print(f"📊 Log Level: {log_level}")
-    print(f"⚙️  Config: {args.config}")
-    print("-" * 50)
+    print(f"""
+===============================================================
+       CoinBalance - A Economia da Consciencia
+              Versao 2.1.0 DDD - Arquitetura
+===============================================================
+  Host: {args.host}
+  Porta: {args.port}
+  Workers: {workers}
+  Reload: {reload}
+  Log Level: {log_level}
+  Environment: {env}
+===============================================================
+  Architecture: DDD + Clean + Hexagonal + CQRS
+  Framework: Coinbalance
+  Moeda: CNB (Coinbalance)
+  Docs: docs/RESUMO_REFATORACAO_DDD.md
+===============================================================
+    """)
     
     try:
         # Inicializar aplicação
         uvicorn.run(
-            "api_moderna:app",
+            "src.presentation.api.app:app",
             host=args.host,
             port=args.port,
             workers=workers,
@@ -109,10 +140,11 @@ Exemplos de uso:
             access_log=True
         )
     except KeyboardInterrupt:
-        print("\n🛑 CryptoChain interrompida pelo usuário")
+        print("\n🛑 CoinBalance interrompida pelo usuário")
     except Exception as e:
-        print(f"❌ Erro ao iniciar CryptoChain: {e}")
+        print(f"❌ Erro ao iniciar CoinBalance: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
