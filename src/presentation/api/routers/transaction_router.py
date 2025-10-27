@@ -13,8 +13,11 @@ from src.presentation.schemas.transaction_schema import (
     TransactionListResponse,
     TransactionStatsResponse,
 )
-from src.application.transaction.commands.create_transfer import CreateTransferCommand
-from src.application.transaction.commands.create_transfer_handler import CreateTransferHandlerImpl
+from src.application.transaction.commands.create_transfer_command import (
+    CreateTransferCommand,
+    CreateTransferCommandHandler,
+    CreateTransferResult
+)
 from src.application.transaction.queries.get_transaction import (
     GetTransactionQuery,
     GetTransactionsByAddressQuery,
@@ -41,32 +44,31 @@ router = APIRouter(
 
 
 # Dependency para o handler de criação de transferência
-async def get_create_transfer_handler() -> CreateTransferHandlerImpl:
-    """
-    Dependency para obter o handler de criação de transferência.
-    
-    Em uma implementação real, isso seria injetado via container DI.
-    """
-    from src.infrastructure.persistence.repositories.transaction.transaction_repository_impl import SQLiteTransactionRepository
-    from src.infrastructure.persistence.repositories.wallet.wallet_repository_impl import SQLiteWalletRepository
-    
-    transaction_repository = SQLiteTransactionRepository()
-    wallet_repository = SQLiteWalletRepository()
-    
-    return CreateTransferHandlerImpl(transaction_repository, wallet_repository)
+# async def get_create_transfer_handler() -> CreateTransferHandlerImpl:
+#     """
+#     Dependency para obter o handler de criação de transferência.
+#     
+#     Em uma implementação real, isso seria injetado via container DI.
+#     """
+#     from src.infrastructure.persistence.repositories.transaction.transaction_repository_impl import SQLiteTransactionRepository
+#     from src.infrastructure.persistence.repositories.wallet.wallet_repository_impl import SQLiteWalletRepository
+#     
+#     transaction_repository = SQLiteTransactionRepository()
+#     wallet_repository = SQLiteWalletRepository()
+#     
+#     return CreateTransferHandlerImpl(transaction_repository, wallet_repository)
 
 
 @router.post(
     "/transferencia",
-    response_model=TransactionResponse,
+    response_model=dict,
     status_code=status.HTTP_201_CREATED,
     summary="Criar Transferência",
     description="Cria uma nova transação de transferência entre carteiras"
 )
 async def create_transfer(
-    request: CreateTransferRequest,
-    handler: CreateTransferHandlerImpl = Depends(get_create_transfer_handler)
-) -> TransactionResponse:
+    request: CreateTransferRequest
+) -> dict:
     """
     Cria uma nova transferência entre carteiras.
     

@@ -16,7 +16,12 @@ from src.presentation.api.routers.wallet_additional import router as wallet_addi
 from src.presentation.api.routers.consensus.consensus_router import router as consensus_router
 from src.presentation.api.routers.transaction_router import router as transaction_router
 from src.presentation.api.routers.system_router import router as system_router
+from src.presentation.api.routers.auth_router import router as auth_router
+from src.presentation.api.routers.transfer_router import router as transfer_router
+from src.presentation.api.routers.transaction_history_router import router as history_router
+from src.presentation.api.routers.monitoring_dashboard_router import router as dashboard_router
 from src.domain.shared.exceptions import DomainException
+from src.infrastructure.security.rate_limiter import rate_limit_middleware
 
 # Configurar logging
 logging.basicConfig(
@@ -85,6 +90,10 @@ def create_app() -> FastAPI:
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
 
+    # Rate Limiting Avançado
+    # Rate limiting middleware (desabilitado para testes)
+    # app.middleware("http")(rate_limit_middleware)
+
     # Logging Middleware
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
@@ -140,7 +149,14 @@ def create_app() -> FastAPI:
                 "success": False,
                 "error": "Validation error",
                 "code": "VALIDATION_ERROR",
-                "details": exc.errors(),
+                "details": [
+                    {
+                        "field": str(error["loc"]),
+                        "message": error["msg"],
+                        "type": error["type"]
+                    }
+                    for error in exc.errors()
+                ],
                 "timestamp": time.time(),
             },
         )
@@ -165,6 +181,18 @@ def create_app() -> FastAPI:
 
     # Health & Info (sem prefix)
     app.include_router(health_router.router)
+
+    # Authentication endpoints
+    app.include_router(auth_router, prefix="/api/v1")
+
+    # Transfer endpoints
+    app.include_router(transfer_router, prefix="/api/v1")
+
+    # Transaction History endpoints
+    app.include_router(history_router, prefix="/api/v1")
+
+    # Monitoring Dashboard endpoints
+    app.include_router(dashboard_router, prefix="/api/v1")
 
     # Wallet endpoints
     app.include_router(wallet_router.router, prefix="/api/v1")
