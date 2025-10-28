@@ -438,9 +438,35 @@ class AdvancedNFTMarketplace:
         """Processa aluguel de NFT"""
         logger.info(f"🏠 Alugando NFT {nft.id} para {renter} por {duration_days} dias")
         
-        # Em um sistema real, isso seria mais complexo
-        # Por agora, apenas simular
-        pass
+        try:
+            # Verificar se o NFT está disponível para aluguel
+            if not nft.is_rentable:
+                raise ValueError("NFT não está disponível para aluguel")
+            
+            # Criar contrato de aluguel
+            rental_contract = {
+                "nft_id": nft.id,
+                "owner": owner,
+                "renter": renter,
+                "rental_price": float(rental_price),
+                "duration_days": duration_days,
+                "start_time": time.time(),
+                "end_time": time.time() + (duration_days * 24 * 3600),
+                "status": "active"
+            }
+            
+            # Registrar contrato
+            self.rental_contracts[f"{nft.id}_{renter}"] = rental_contract
+            
+            # Atualizar status do NFT
+            nft.current_renter = renter
+            nft.rental_end_time = rental_contract["end_time"]
+            
+            logger.info(f"✅ Contrato de aluguel criado para NFT {nft.id}")
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar aluguel: {e}")
+            raise
     
     async def _monitor_auctions(self):
         """Monitora leilões ativos"""

@@ -103,6 +103,10 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.development
+.env.test
+.env.production
 .venv
 env/
 venv/
@@ -128,42 +132,70 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# CoinBalance specific
 # Database files
 *.db
-*.sqlite
-*.sqlite3
-coinbalance.db
+*.db-shm
+*.db-wal
+auth.db
+blockchain.db
 
 # Logs
-*.log
 logs/
+*.log
 
-# IDE
+# Data directories
+data/
+backups/
+models/
+
+# Configuration files with secrets
+production.env
+.env.production
+.env.local
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# OS
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Temporary files
 *.tmp
 *.temp
-
-# Config files with sensitive data
-config.yaml
-.env.local
-.env.production
-
-# Test files
-test_results/
-coverage/
+temp/
+tmp/
 
 # Docker
 .dockerignore
-docker-compose.override.yml
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fractal state files
+fractal_state.json
+
+# Test reports
+integration_test_report.json
+test_reports/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
 
 # Backup files
 *.bak

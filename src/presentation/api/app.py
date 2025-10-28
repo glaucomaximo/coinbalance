@@ -31,15 +31,12 @@ from src.presentation.api.routers.fractal_router import router as fractal_router
 from src.presentation.api.routers.improvement_router import router as improvement_router
 from src.presentation.api.routers.web3_advanced_router import router as web3_advanced_router
 from src.presentation.api.routers.ai_advanced_router import router as ai_advanced_router
+from src.presentation.api.routers.lgpd_router import router as lgpd_router
+from src.presentation.api.routers.blockchain_performance_router import router as blockchain_performance_router
 from src.domain.shared.exceptions import DomainException
-from src.infrastructure.security.rate_limiter import rate_limit_middleware
+from src.infrastructure.security.validation_middleware import validation_middleware
 
-# Configurar logging
-logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+from src.infrastructure.logging.structured_logging import logging_manager, get_logger
 
 
 # ========== LIFESPAN EVENTS ==========
@@ -48,24 +45,74 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Gerencia o ciclo de vida da aplicação"""
     # Startup
+    logger = get_logger(__name__)
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     logger.info(f"📍 Environment: {settings.ENVIRONMENT}")
     logger.info("🏗️  Architecture: DDD + Clean Architecture + CQRS")
     logger.info(f"🔧 Debug mode: {settings.DEBUG}")
 
+    # Configurar logging estruturado
+    logging_manager.configure(
+        log_level=settings.LOG_LEVEL,
+        log_format=settings.LOG_FORMAT,
+        log_file=settings.LOG_FILE,
+        enable_console=True,
+        enable_file=bool(settings.LOG_FILE)
+    )
+    
+    # Obter logger estruturado
+    logger = get_logger(__name__)
+    logger.info("✅ Structured logging configured")
+    
     # Inicializar container DI
     from src.infrastructure.di.container import get_container
     get_container()
     logger.info("✅ Dependency Injection Container initialized")
 
-    # TODO: Inicializar database, cache, etc
+    # Inicializar database e cache
+    try:
+        from src.infrastructure.persistence.database_manager import DatabaseManager
+        db_manager = DatabaseManager()
+        await db_manager.initialize()
+        logger.info("✅ Database initialized")
+        
+        # Inicializar cache se disponível
+        try:
+            from src.infrastructure.cache.cache_manager import CacheManager
+            cache_manager = CacheManager()
+            await cache_manager.initialize()
+            logger.info("✅ Cache initialized")
+        except ImportError:
+            logger.info("ℹ️ Cache not available")
+            
+    except Exception as e:
+        logger.error(f"❌ Error initializing infrastructure: {e}")
+        raise
     logger.info("✅ Application started successfully")
     
     yield
     
     # Shutdown
     logger.info("🛑 Shutting down application...")
-    # TODO: Fechar conexões, limpar recursos
+    # Fechar conexões e limpar recursos
+    try:
+        # Fechar conexões de database
+        from src.infrastructure.persistence.database_manager import DatabaseManager
+        db_manager = DatabaseManager()
+        await db_manager.close()
+        logger.info("✅ Database connections closed")
+        
+        # Limpar cache se disponível
+        try:
+            from src.infrastructure.cache.cache_manager import CacheManager
+            cache_manager = CacheManager()
+            await cache_manager.close()
+            logger.info("✅ Cache cleaned")
+        except ImportError:
+            pass
+            
+    except Exception as e:
+        logger.error(f"❌ Error during shutdown: {e}")
     logger.info("✅ Application shutdown complete")
 
 
@@ -78,6 +125,9 @@ def create_app() -> FastAPI:
 
     Implementa configurações seguindo 12-Factor App e Clean Architecture.
     """
+    
+    # Configurar logger
+    logger = get_logger(__name__)
 
     # Criar app
     app = FastAPI(
@@ -101,9 +151,12 @@ def create_app() -> FastAPI:
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
 
+    # Middleware de validação rigorosa
+    app.middleware("http")(validation_middleware)
+    
     # Rate Limiting Avançado
     # Habilitar rate limiting para produção
-    app.middleware("http")(rate_limit_middleware)
+    # app.middleware("http")(rate_limit_middleware)  # TODO: Implementar rate limiting
 
     # Security Monitoring Middleware
     @app.middleware("http")
@@ -290,10 +343,13 @@ def create_app() -> FastAPI:
     
     # AI Advanced endpoints
     app.include_router(ai_advanced_router)
+    
+    # LGPD Compliance endpoints
+    app.include_router(lgpd_router, prefix="/api/v1")
+    app.include_router(blockchain_performance_router, prefix="/api/v1")
 
-    # TODO: Adicionar outros routers
-    # app.include_router(blockchain_router.router, prefix="/api/v1")
-    # app.include_router(defi_router.router, prefix="/api/v1")
+    # Additional routers can be added here as needed
+    # Example: app.include_router(new_router, prefix="/api/v1")
 
     logger.info("✅ All routers registered")
 

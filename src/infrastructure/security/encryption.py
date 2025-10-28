@@ -21,10 +21,11 @@ class EncryptionService:
         self.master_key = master_key or os.getenv("COINBALANCE_MASTER_KEY")
         
         if not self.master_key:
-            # Usar chave padrão para desenvolvimento
-            self.master_key = "dev-master-key-change-in-production-32-chars-long"
-            print("⚠️  AVISO: Usando chave mestra padrão para desenvolvimento!")
-            print("   Configure COINBALANCE_MASTER_KEY para produção.")
+            # Gerar chave mestra segura para desenvolvimento
+            import secrets
+            self.master_key = secrets.token_urlsafe(32)
+            print("AVISO: Gerando chave mestra temporaria para desenvolvimento!")
+            print("   Configure COINBALANCE_MASTER_KEY para producao.")
         
         # Validar comprimento da chave mestra
         if len(self.master_key.encode()) < 32:

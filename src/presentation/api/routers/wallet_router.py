@@ -4,12 +4,16 @@ Router para endpoints de Wallet
 
 from fastapi import APIRouter, HTTPException, status
 
-from src.presentation.schemas.wallet_schema import (
+from src.presentation.api.models.validation_models import (
     CreateWalletRequest,
     CreateWalletResponse,
-    GetWalletResponse,
-    WalletListResponse,
-    WalletOperationRequest,
+    WalletAddressRequest,
+    CreditRequest,
+    DebitRequest,
+    TransferRequest,
+    WalletResponse,
+    ErrorResponse,
+    PaginationRequest
 )
 from src.presentation.api.dependencies import (
     CreateWalletHandlerDep,
@@ -88,11 +92,11 @@ async def create_wallet(
 
 @router.get(
     "/{address}",
-    response_model=GetWalletResponse,
+    response_model=WalletResponse,
     summary="Obter Carteira por Endereço",
     description="Busca uma carteira pelo seu endereço único",
 )
-async def get_wallet(address: str, handler: GetWalletHandlerDep) -> GetWalletResponse:
+async def get_wallet(address: str, handler: GetWalletHandlerDep) -> WalletResponse:
     """
     Obtém informações detalhadas de uma carteira.
 

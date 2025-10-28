@@ -514,8 +514,23 @@ class AdvancedDeFiProtocols:
     
     async def _check_liquidation_positions(self):
         """Verifica posições para liquidação"""
-        # Implementar lógica de liquidação
-        pass
+        try:
+            for pool_id, pool in self.lending_pools.items():
+                for position_id, position in pool.positions.items():
+                    # Calcular health factor
+                    collateral_value = position.collateral_amount * Decimal('1.0')  # Simplificado
+                    debt_value = position.borrowed_amount * Decimal('1.0')  # Simplificado
+                    
+                    if debt_value > 0:
+                        health_factor = collateral_value / debt_value
+                        
+                        # Se health factor < 1.1, marcar para liquidação
+                        if health_factor < Decimal('1.1'):
+                            logger.warning(f"Posição {position_id} em risco de liquidação (health: {health_factor})")
+                            # Aqui seria implementada a lógica de liquidação real
+                            
+        except Exception as e:
+            logger.error(f"Erro ao verificar liquidações: {e}")
     
     async def _update_pool_apr(self):
         """Atualiza APR dos pools"""

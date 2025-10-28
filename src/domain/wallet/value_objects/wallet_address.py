@@ -45,8 +45,22 @@ class WalletAddress:
         """Gera endereço a partir de chave pública"""
         # Hash SHA-256 da chave pública
         hash_obj = hashlib.sha256(public_key.encode())
-        address = hash_obj.hexdigest()[:40]  # Pegar primeiros 40 caracteres
-        return cls(address)
+        hash_hex = hash_obj.hexdigest()
+        
+        # Converter para base58-like format (usando caracteres válidos)
+        base58_chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+        
+        # Usar o hash para gerar um endereço base58-like
+        address = ""
+        for i in range(0, len(hash_hex), 2):
+            byte_val = int(hash_hex[i:i+2], 16)
+            address += base58_chars[byte_val % len(base58_chars)]
+        
+        # Garantir que tenha pelo menos 26 caracteres
+        while len(address) < 26:
+            address += base58_chars[hash_obj.digest()[len(address) % 32] % len(base58_chars)]
+        
+        return cls(address[:40])  # Limitar a 40 caracteres
 
     @classmethod
     def create(cls, value: str) -> "WalletAddress":

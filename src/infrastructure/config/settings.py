@@ -50,13 +50,15 @@ class Settings(BaseSettings):
     DATABASE_MAX_OVERFLOW: int = 20
 
     # ========== SECURITY ==========
-    SECRET_KEY: str = "dev-secret-key-change-in-production-32-chars"
+    SECRET_KEY: Optional[str] = None  # Deve ser definido via env
+    JWT_SECRET_KEY: Optional[str] = None  # Chave específica para JWT
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Crypto
-    ENCRYPTION_KEY: Optional[str] = "dev-encryption-key-32-chars-long"
+    ENCRYPTION_KEY: Optional[str] = None  # Deve ser definido via env
+    COINBALANCE_MASTER_KEY: Optional[str] = None  # Chave mestra específica
     PASSWORD_MIN_LENGTH: int = 8
     PASSWORD_REQUIRE_UPPERCASE: bool = True
     PASSWORD_REQUIRE_LOWERCASE: bool = True
@@ -191,8 +193,17 @@ class Settings(BaseSettings):
 
         # Validar configurações críticas em produção
         if self.is_production:
-            if self.SECRET_KEY == "dev-secret-key-change-in-production":
-                raise ValueError("SECRET_KEY must be changed in production!")
+            if not self.SECRET_KEY or self.SECRET_KEY == "dev-secret-key-change-in-production":
+                raise ValueError("SECRET_KEY must be set in production!")
+            
+            if not self.JWT_SECRET_KEY:
+                raise ValueError("JWT_SECRET_KEY must be set in production!")
+            
+            if not self.ENCRYPTION_KEY:
+                raise ValueError("ENCRYPTION_KEY must be set in production!")
+            
+            if not self.COINBALANCE_MASTER_KEY:
+                raise ValueError("COINBALANCE_MASTER_KEY must be set in production!")
 
             if self.DEBUG:
                 raise ValueError("DEBUG must be False in production!")

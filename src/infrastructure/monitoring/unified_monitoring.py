@@ -555,8 +555,34 @@ class UnifiedConsciousMonitoringSystem:
     
     def _update_system_health(self):
         """Atualiza saúde geral do sistema"""
-        # Esta função pode ser expandida para atualizar métricas globais
-        pass
+        try:
+            # Calcular métricas globais
+            total_alerts = len(self.active_alerts)
+            critical_alerts = len([a for a in self.active_alerts if a.get('severity') == 'critical'])
+            
+            # Calcular score de saúde (0-100)
+            health_score = 100
+            if critical_alerts > 0:
+                health_score -= (critical_alerts * 20)  # -20 por alerta crítico
+            if total_alerts > 5:
+                health_score -= ((total_alerts - 5) * 5)  # -5 por alerta adicional
+            
+            health_score = max(0, health_score)
+            
+            # Atualizar métricas globais
+            self.global_metrics.update({
+                "health_score": health_score,
+                "total_alerts": total_alerts,
+                "critical_alerts": critical_alerts,
+                "last_health_update": time.time()
+            })
+            
+            # Log se saúde baixa
+            if health_score < 70:
+                logger.warning(f"⚠️ Saúde do sistema baixa: {health_score}%")
+                
+        except Exception as e:
+            logger.error(f"Erro ao atualizar saúde do sistema: {e}")
     
     def get_unified_dashboard(self) -> Dict[str, Any]:
         """Retorna dashboard unificado com todos os dados"""

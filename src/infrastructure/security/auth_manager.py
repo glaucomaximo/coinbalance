@@ -112,9 +112,10 @@ class AuthManager:
         """Carrega configurações de autenticação."""
         jwt_secret = os.getenv('JWT_SECRET_KEY')
         if not jwt_secret:
-            # Gerar chave padrão para desenvolvimento
-            jwt_secret = "coinbalance-dev-secret-key-2024"
-            logger.warning("⚠️ Usando chave JWT padrão para desenvolvimento!")
+            # Gerar chave segura para desenvolvimento
+            import secrets
+            jwt_secret = secrets.token_urlsafe(32)
+            logger.warning("⚠️ Gerando chave JWT temporária para desenvolvimento!")
             logger.warning("   Configure JWT_SECRET_KEY para produção.")
         
         return AuthConfig(
@@ -699,9 +700,25 @@ class AuthManager:
             
     def log_audit(self, user_id: str, action: str, resource: str, details: Dict[str, Any],
                   ip_address: str = "127.0.0.1", user_agent: str = "", success: bool = True):
-        """Registra log de auditoria."""
+        """
+        Registra log de auditoria com análise de conformidade.
+        
+        EVOLUÇÃO: Adiciona verificação de conformidade e análise de risco.
+        """
         try:
             log_id = secrets.token_urlsafe(16)
+            
+            # EVOLUÇÃO: Análise de conformidade
+            compliance_violations = self._check_compliance_violations(action, details, user_id)
+            risk_score = self._calculate_risk_score(action, details, success)
+            
+            # Adicionar informações de conformidade aos detalhes
+            enhanced_details = {
+                **details,
+                "compliance_violations": compliance_violations,
+                "risk_score": risk_score,
+                "compliance_checked": True
+            }
             
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -716,7 +733,7 @@ class AuthManager:
                 user_id,
                 action,
                 resource,
-                json.dumps(details),
+                json.dumps(enhanced_details),
                 ip_address,
                 user_agent,
                 success
@@ -725,8 +742,569 @@ class AuthManager:
             conn.commit()
             conn.close()
             
+            # EVOLUÇÃO: Alertar sobre violações críticas
+            if compliance_violations:
+                self._handle_compliance_violations(log_id, compliance_violations, user_id)
+            
+            # EVOLUÇÃO: Alertar sobre alto risco
+            if risk_score > 0.8:
+                self._handle_high_risk_event(log_id, risk_score, action, user_id)
+            
         except Exception as e:
             logger.error(f"Erro ao registrar log de auditoria: {e}")
+    
+    def _check_compliance_violations(self, action: str, details: Dict[str, Any], user_id: str) -> List[str]:
+        """
+        Verifica violações de conformidade incluindo LGPD.
+        
+        EVOLUÇÃO: Implementação real de verificação de conformidade com LGPD.
+        """
+        violations = []
+        
+        try:
+            # Verificar AML/KYC para transações grandes
+            if action == "transaction" and details.get("amount", 0) > 10000:
+                if not details.get("kyc_verified", False):
+                    violations.append("AML_KYC: Transação acima de $10,000 sem verificação KYC")
+            
+            # Verificar GDPR para acesso a dados pessoais
+            if action == "access_personal_data" and not details.get("gdpr_consent", False):
+                violations.append("GDPR: Acesso a dados pessoais sem consentimento")
+            
+            # EVOLUÇÃO: Verificar LGPD para dados pessoais brasileiros
+            violations.extend(self._check_lgpd_compliance(action, details, user_id))
+            
+            # Verificar SOX para ações administrativas com impacto financeiro
+            if action in ["admin_action", "financial_operation"] and details.get("financial_impact", False):
+                if not details.get("sox_approved", False):
+                    violations.append("SOX: Ação com impacto financeiro sem aprovação")
+            
+            # Verificar controle de acesso para ações administrativas
+            if action == "admin_action" and not details.get("admin_authorized", False):
+                violations.append("ACCESS_CONTROL: Ação administrativa não autorizada")
+            
+        except Exception as e:
+            logger.error(f"Erro na verificação de conformidade: {e}")
+        
+        return violations
+    
+    def _check_lgpd_compliance(self, action: str, details: Dict[str, Any], user_id: str) -> List[str]:
+        """
+        Verifica conformidade específica com a LGPD (Lei Geral de Proteção de Dados).
+        
+        EVOLUÇÃO: Implementação específica para LGPD brasileira.
+        """
+        violations = []
+        
+        try:
+            # Verificar se há dados pessoais brasileiros
+            has_brazilian_data = details.get("country", "").upper() == "BR" or details.get("locale", "").upper() == "PT-BR"
+            
+            if has_brazilian_data or self._is_brazilian_user(user_id):
+                
+                # 1. Verificar base legal para tratamento de dados
+                if action in ["collect_personal_data", "process_personal_data", "store_personal_data"]:
+                    legal_basis = details.get("legal_basis")
+                    valid_bases = ["consent", "contract", "legal_obligation", "legitimate_interest", "public_interest", "health_protection"]
+                    
+                    if not legal_basis or legal_basis not in valid_bases:
+                        violations.append("LGPD: Base legal inválida ou ausente para tratamento de dados pessoais")
+                
+                # 2. Verificar consentimento específico e inequívoco
+                if action == "collect_personal_data" and details.get("legal_basis") == "consent":
+                    if not details.get("lgpd_consent", False):
+                        violations.append("LGPD: Consentimento específico e inequívoco não obtido")
+                    
+                    # Verificar se consentimento foi livre (não condicionado)
+                    if details.get("consent_conditioned", False):
+                        violations.append("LGPD: Consentimento condicionado não é válido")
+                
+                # 3. Verificar finalidade específica e informada
+                if action in ["collect_personal_data", "process_personal_data"]:
+                    purpose = details.get("data_purpose")
+                    if not purpose or len(purpose.strip()) < 10:
+                        violations.append("LGPD: Finalidade do tratamento não especificada adequadamente")
+                
+                # 4. Verificar dados sensíveis (art. 5º, II)
+                if details.get("sensitive_data", False):
+                    if not details.get("sensitive_data_consent", False):
+                        violations.append("LGPD: Consentimento específico ausente para dados sensíveis")
+                    
+                    # Verificar se há necessidade específica para dados sensíveis
+                    if not details.get("sensitive_data_necessity", False):
+                        violations.append("LGPD: Necessidade específica não justificada para dados sensíveis")
+                
+                # 5. Verificar dados de menores de idade (art. 14)
+                if details.get("minor_data", False):
+                    if not details.get("parental_consent", False):
+                        violations.append("LGPD: Consentimento dos pais/responsáveis ausente para dados de menores")
+                
+                # 6. Verificar princípio da minimização (art. 6º, III)
+                if action == "collect_personal_data":
+                    data_types = details.get("data_types", [])
+                    if len(data_types) > 5:  # Limite arbitrário para exemplo
+                        violations.append("LGPD: Possível violação do princípio da minimização - muitos tipos de dados coletados")
+                
+                # 7. Verificar prazo de retenção (art. 16)
+                if action == "store_personal_data":
+                    retention_period = details.get("retention_period_days")
+                    if not retention_period or retention_period > 2555:  # ~7 anos
+                        violations.append("LGPD: Prazo de retenção não especificado ou excessivo")
+                
+                # 8. Verificar segurança dos dados (art. 46)
+                if action in ["store_personal_data", "process_personal_data"]:
+                    security_measures = details.get("security_measures", [])
+                    required_measures = ["encryption", "access_control", "audit_log"]
+                    
+                    missing_measures = [measure for measure in required_measures if measure not in security_measures]
+                    if missing_measures:
+                        violations.append(f"LGPD: Medidas de segurança ausentes: {', '.join(missing_measures)}")
+                
+                # 9. Verificar transferência internacional (art. 33)
+                if details.get("international_transfer", False):
+                    if not details.get("adequacy_decision", False) and not details.get("appropriate_guarantees", False):
+                        violations.append("LGPD: Transferência internacional sem adequação ou garantias apropriadas")
+                
+                # 10. Verificar registro de atividades (art. 50)
+                if action in ["collect_personal_data", "process_personal_data", "delete_personal_data"]:
+                    if not details.get("activity_logged", False):
+                        violations.append("LGPD: Atividade de tratamento não registrada conforme art. 50")
+            
+        except Exception as e:
+            logger.error(f"Erro na verificação de conformidade LGPD: {e}")
+        
+        return violations
+    
+    def _is_brazilian_user(self, user_id: str) -> bool:
+        """
+        Verifica se o usuário é brasileiro baseado em dados do sistema.
+        
+        EVOLUÇÃO: Detecção de usuários brasileiros para aplicação da LGPD.
+        """
+        try:
+            # Em uma implementação real, isso consultaria o banco de dados
+            # Por enquanto, simular baseado em padrões comuns de ID brasileiro
+            
+            # Verificar se há dados do usuário no banco
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT country, locale FROM users WHERE id = ?
+            """, (user_id,))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            if result:
+                country, locale = result
+                return (country and country.upper() == "BR") or (locale and "BR" in locale.upper())
+            
+            # Fallback: verificar padrões comuns de usuários brasileiros
+            # (CPF, telefone brasileiro, etc.)
+            return False
+            
+        except Exception as e:
+            logger.error(f"Erro ao verificar nacionalidade do usuário: {e}")
+            return False
+    
+    def _calculate_risk_score(self, action: str, details: Dict[str, Any], success: bool) -> float:
+        """
+        Calcula score de risco do evento.
+        
+        EVOLUÇÃO: Implementação real de análise de risco.
+        """
+        try:
+            risk_score = 0.0
+            
+            # Base score baseado no sucesso
+            if not success:
+                risk_score += 0.3
+            
+            # Ajustar baseado na ação
+            high_risk_actions = ["admin_action", "financial_operation", "security_change", "user_creation"]
+            if action in high_risk_actions:
+                risk_score += 0.2
+            
+            # Ajustar baseado nos detalhes
+            if details.get("amount", 0) > 50000:
+                risk_score += 0.2
+            
+            if details.get("sensitive_data", False):
+                risk_score += 0.1
+            
+            if details.get("external_access", False):
+                risk_score += 0.1
+            
+            # Limitar entre 0 e 1
+            return min(1.0, max(0.0, risk_score))
+            
+        except Exception as e:
+            logger.error(f"Erro no cálculo de risco: {e}")
+            return 0.5
+    
+    def _handle_compliance_violations(self, log_id: str, violations: List[str], user_id: str):
+        """Trata violações de conformidade."""
+        try:
+            logger.warning(f"Violações de conformidade detectadas no log {log_id}: {violations}")
+            
+            # Em produção, aqui seria enviado alerta para equipe de conformidade
+            # e/ou sistema de monitoramento
+            
+        except Exception as e:
+            logger.error(f"Erro ao tratar violações de conformidade: {e}")
+    
+    def _handle_high_risk_event(self, log_id: str, risk_score: float, action: str, user_id: str):
+        """Trata eventos de alto risco."""
+        try:
+            logger.critical(f"Evento de alto risco detectado: Log {log_id}, Score {risk_score}, Ação {action}")
+            
+            # Em produção, aqui seria enviado alerta imediato para equipe de segurança
+            
+        except Exception as e:
+            logger.error(f"Erro ao tratar evento de alto risco: {e}")
+    
+    def handle_lgpd_data_subject_request(self, user_id: str, request_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Processa solicitações de titulares de dados conforme LGPD.
+        
+        EVOLUÇÃO: Implementação dos direitos dos titulares da LGPD.
+        """
+        try:
+            # Verificar se o usuário é brasileiro
+            if not self._is_brazilian_user(user_id):
+                return {"error": "LGPD aplicável apenas a usuários brasileiros"}
+            
+            request_id = secrets.token_urlsafe(16)
+            
+            # Registrar solicitação
+            self.log_audit(
+                user_id=user_id,
+                action=f"lgpd_{request_type}_request",
+                resource="personal_data",
+                details={
+                    **details,
+                    "request_id": request_id,
+                    "lgpd_compliant": True,
+                    "request_timestamp": time.time()
+                },
+                success=True
+            )
+            
+            # Processar solicitação baseada no tipo
+            if request_type == "access":
+                return self._process_lgpd_access_request(user_id, request_id, details)
+            elif request_type == "rectification":
+                return self._process_lgpd_rectification_request(user_id, request_id, details)
+            elif request_type == "deletion":
+                return self._process_lgpd_deletion_request(user_id, request_id, details)
+            elif request_type == "portability":
+                return self._process_lgpd_portability_request(user_id, request_id, details)
+            elif request_type == "opposition":
+                return self._process_lgpd_opposition_request(user_id, request_id, details)
+            else:
+                return {"error": f"Tipo de solicitação LGPD não suportado: {request_type}"}
+                
+        except Exception as e:
+            logger.error(f"Erro ao processar solicitação LGPD: {e}")
+            return {"error": str(e)}
+    
+    def _process_lgpd_access_request(self, user_id: str, request_id: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """Processa solicitação de acesso aos dados (art. 9º da LGPD)"""
+        try:
+            # Em implementação real, consultaria todos os dados do usuário
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT id, username, email, created_at, last_login, country, locale
+                FROM users WHERE id = ?
+            """, (user_id,))
+            
+            user_data = cursor.fetchone()
+            conn.close()
+            
+            if not user_data:
+                return {"error": "Usuário não encontrado"}
+            
+            # Preparar dados para retorno (sem informações sensíveis)
+            response_data = {
+                "user_id": user_data[0],
+                "username": user_data[1],
+                "email": user_data[2],
+                "created_at": user_data[3],
+                "last_login": user_data[4],
+                "country": user_data[5],
+                "locale": user_data[6],
+                "data_categories": ["identification", "contact", "usage"],
+                "processing_purposes": ["authentication", "service_provision", "security"],
+                "retention_period": "5 years",
+                "data_sharing": "No third-party sharing"
+            }
+            
+            # Log da resposta
+            self.log_audit(
+                user_id=user_id,
+                action="lgpd_access_response",
+                resource="personal_data",
+                details={
+                    "request_id": request_id,
+                    "data_provided": True,
+                    "lgpd_compliant": True
+                },
+                success=True
+            )
+            
+            return {
+                "success": True,
+                "request_id": request_id,
+                "data": response_data,
+                "message": "Dados pessoais fornecidos conforme art. 9º da LGPD"
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no processamento de acesso LGPD: {e}")
+            return {"error": str(e)}
+    
+    def _process_lgpd_rectification_request(self, user_id: str, request_id: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """Processa solicitação de retificação dos dados (art. 9º da LGPD)"""
+        try:
+            # Verificar dados a serem corrigidos
+            fields_to_update = details.get("fields_to_update", {})
+            
+            if not fields_to_update:
+                return {"error": "Nenhum campo especificado para correção"}
+            
+            # Validar campos permitidos
+            allowed_fields = ["username", "email", "country", "locale"]
+            invalid_fields = [field for field in fields_to_update.keys() if field not in allowed_fields]
+            
+            if invalid_fields:
+                return {"error": f"Campos não permitidos para correção: {invalid_fields}"}
+            
+            # Atualizar dados no banco
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            for field, new_value in fields_to_update.items():
+                cursor.execute(f"""
+                    UPDATE users SET {field} = ? WHERE id = ?
+                """, (new_value, user_id))
+            
+            conn.commit()
+            conn.close()
+            
+            # Log da correção
+            self.log_audit(
+                user_id=user_id,
+                action="lgpd_rectification_completed",
+                resource="personal_data",
+                details={
+                    "request_id": request_id,
+                    "fields_updated": list(fields_to_update.keys()),
+                    "lgpd_compliant": True
+                },
+                success=True
+            )
+            
+            return {
+                "success": True,
+                "request_id": request_id,
+                "updated_fields": list(fields_to_update.keys()),
+                "message": "Dados corrigidos conforme art. 9º da LGPD"
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no processamento de retificação LGPD: {e}")
+            return {"error": str(e)}
+    
+    def _process_lgpd_deletion_request(self, user_id: str, request_id: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """Processa solicitação de exclusão dos dados (art. 16 da LGPD)"""
+        try:
+            # Verificar se há impedimentos legais para exclusão
+            legal_obligations = details.get("legal_obligations", [])
+            
+            if legal_obligations:
+                return {
+                    "success": False,
+                    "request_id": request_id,
+                    "reason": "Impedimentos legais para exclusão",
+                    "obligations": legal_obligations,
+                    "message": "Exclusão parcial aplicada conforme art. 16 da LGPD"
+                }
+            
+            # Anonimizar dados pessoais (não excluir completamente por questões de auditoria)
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Anonimizar dados pessoais mantendo ID para auditoria
+            cursor.execute("""
+                UPDATE users SET 
+                    username = 'ANONYMIZED_' || id,
+                    email = 'anonymized_' || id || '@deleted.local',
+                    country = NULL,
+                    locale = NULL
+                WHERE id = ?
+            """, (user_id,))
+            
+            conn.commit()
+            conn.close()
+            
+            # Log da exclusão
+            self.log_audit(
+                user_id=user_id,
+                action="lgpd_deletion_completed",
+                resource="personal_data",
+                details={
+                    "request_id": request_id,
+                    "anonymization_applied": True,
+                    "lgpd_compliant": True
+                },
+                success=True
+            )
+            
+            return {
+                "success": True,
+                "request_id": request_id,
+                "anonymization_applied": True,
+                "message": "Dados anonimizados conforme art. 16 da LGPD"
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no processamento de exclusão LGPD: {e}")
+            return {"error": str(e)}
+    
+    def _process_lgpd_portability_request(self, user_id: str, request_id: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """Processa solicitação de portabilidade dos dados (art. 18 da LGPD)"""
+        try:
+            # Obter dados do usuário em formato estruturado
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT id, username, email, created_at, last_login, country, locale
+                FROM users WHERE id = ?
+            """, (user_id,))
+            
+            user_data = cursor.fetchone()
+            conn.close()
+            
+            if not user_data:
+                return {"error": "Usuário não encontrado"}
+            
+            # Preparar dados em formato portável (JSON estruturado)
+            portable_data = {
+                "user_profile": {
+                    "id": user_data[0],
+                    "username": user_data[1],
+                    "email": user_data[2],
+                    "created_at": user_data[3],
+                    "last_login": user_data[4],
+                    "country": user_data[5],
+                    "locale": user_data[6]
+                },
+                "data_categories": ["identification", "contact", "usage"],
+                "export_format": "JSON",
+                "export_timestamp": time.time(),
+                "lgpd_compliant": True
+            }
+            
+            # Log da portabilidade
+            self.log_audit(
+                user_id=user_id,
+                action="lgpd_portability_completed",
+                resource="personal_data",
+                details={
+                    "request_id": request_id,
+                    "data_exported": True,
+                    "format": "JSON",
+                    "lgpd_compliant": True
+                },
+                success=True
+            )
+            
+            return {
+                "success": True,
+                "request_id": request_id,
+                "portable_data": portable_data,
+                "message": "Dados exportados conforme art. 18 da LGPD"
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no processamento de portabilidade LGPD: {e}")
+            return {"error": str(e)}
+    
+    def _process_lgpd_opposition_request(self, user_id: str, request_id: str, details: Dict[str, Any]) -> Dict[str, Any]:
+        """Processa solicitação de oposição ao tratamento (art. 18 da LGPD)"""
+        try:
+            # Verificar base legal do tratamento
+            legal_basis = details.get("legal_basis")
+            
+            if legal_basis in ["legal_obligation", "public_interest"]:
+                return {
+                    "success": False,
+                    "request_id": request_id,
+                    "reason": "Oposição não aplicável devido à base legal",
+                    "legal_basis": legal_basis,
+                    "message": "Tratamento mantido conforme art. 18 da LGPD"
+                }
+            
+            # Registrar oposição no sistema
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Criar tabela de oposições se não existir
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS lgpd_oppositions (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT,
+                    legal_basis TEXT,
+                    opposition_reason TEXT,
+                    created_at REAL,
+                    status TEXT DEFAULT 'active'
+                )
+            """)
+            
+            # Registrar oposição
+            cursor.execute("""
+                INSERT INTO lgpd_oppositions 
+                (id, user_id, legal_basis, opposition_reason, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                request_id,
+                user_id,
+                legal_basis,
+                details.get("opposition_reason", "User request"),
+                time.time()
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            # Log da oposição
+            self.log_audit(
+                user_id=user_id,
+                action="lgpd_opposition_registered",
+                resource="personal_data",
+                details={
+                    "request_id": request_id,
+                    "legal_basis": legal_basis,
+                    "opposition_reason": details.get("opposition_reason"),
+                    "lgpd_compliant": True
+                },
+                success=True
+            )
+            
+            return {
+                "success": True,
+                "request_id": request_id,
+                "opposition_registered": True,
+                "message": "Oposição registrada conforme art. 18 da LGPD"
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no processamento de oposição LGPD: {e}")
+            return {"error": str(e)}
             
     def create_super_admin(self) -> bool:
         """Cria super admin padrão."""
@@ -737,11 +1315,11 @@ class AuthManager:
                 logger.info("Super admin já existe")
                 return True
                 
-            # Criar super admin
+            # Criar super admin com senha forte
             user = self.create_user(
                 username="admin",
                 email="admin@coinbalance.com",
-                password="admin123",
+                password=secrets.token_urlsafe(16),  # Senha forte gerada
                 role=UserRole.SUPER_ADMIN,
                 creator_id="system"
             )

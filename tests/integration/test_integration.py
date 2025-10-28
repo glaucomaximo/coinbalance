@@ -16,7 +16,7 @@ import requests
 from dataclasses import dataclass
 
 @dataclass
-class TestResult:
+class IntegrationTestResult:
     """Resultado de um teste"""
     name: str
     success: bool
@@ -30,11 +30,11 @@ class CoinBalanceIntegrationTests:
     
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url
-        self.results: List[TestResult] = []
+        self.results: List[IntegrationTestResult] = []
         self.session = requests.Session()
         
     def test_endpoint(self, name: str, method: str, endpoint: str, 
-                     expected_status: int = 200, **kwargs) -> TestResult:
+                     expected_status: int = 200, **kwargs) -> IntegrationTestResult:
         """Testa um endpoint específico"""
         url = f"{self.base_url}{endpoint}"
         start_time = time.time()
@@ -45,7 +45,7 @@ class CoinBalanceIntegrationTests:
             
             success = response.status_code == expected_status
             
-            result = TestResult(
+            result = IntegrationTestResult(
                 name=name,
                 success=success,
                 response_time=response_time,
@@ -58,7 +58,7 @@ class CoinBalanceIntegrationTests:
                 
         except Exception as e:
             response_time = time.time() - start_time
-            result = TestResult(
+            result = IntegrationTestResult(
                 name=name,
                 success=False,
                 response_time=response_time,

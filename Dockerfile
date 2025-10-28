@@ -1,5 +1,5 @@
 # Dockerfile para Coinbalance - A Economia da Consciência
-FROM python:3.14-slim
+FROM python:3.11-slim
 
 # Definir variáveis de ambiente
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -45,4 +45,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 # Comando para iniciar a aplicação
-CMD ["uvicorn", "api_moderna:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "main.py"]

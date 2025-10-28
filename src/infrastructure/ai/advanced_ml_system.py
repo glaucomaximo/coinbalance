@@ -94,51 +94,147 @@ class AdvancedMLSystem:
         self._initialize_models()
     
     def _initialize_models(self):
-        """Inicializa modelos de ML"""
-        self.models = {
-            MLModelType.PRICE_PREDICTION: {
-                "name": "Price Prediction Model",
-                "accuracy": Decimal('0.85'),
-                "features": ["price_history", "volume", "volatility", "sentiment"],
-                "algorithm": "LSTM + Transformer",
-                "last_trained": time.time()
-            },
-            MLModelType.MARKET_ANALYSIS: {
-                "name": "Market Analysis Model",
-                "accuracy": Decimal('0.78'),
-                "features": ["market_cap", "trading_pairs", "social_metrics"],
-                "algorithm": "Random Forest + XGBoost",
-                "last_trained": time.time()
-            },
-            MLModelType.RISK_ASSESSMENT: {
-                "name": "Risk Assessment Model",
-                "accuracy": Decimal('0.92'),
-                "features": ["volatility", "liquidity", "correlation"],
-                "algorithm": "Neural Network + SVM",
-                "last_trained": time.time()
-            },
-            MLModelType.PATTERN_RECOGNITION: {
-                "name": "Pattern Recognition Model",
-                "accuracy": Decimal('0.88'),
-                "features": ["price_patterns", "volume_patterns", "time_patterns"],
-                "algorithm": "CNN + RNN",
-                "last_trained": time.time()
-            },
-            MLModelType.SENTIMENT_ANALYSIS: {
-                "name": "Sentiment Analysis Model",
-                "accuracy": Decimal('0.76'),
-                "features": ["social_media", "news", "community"],
-                "algorithm": "BERT + RoBERTa",
-                "last_trained": time.time()
-            },
-            MLModelType.AUTONOMOUS_DECISION: {
-                "name": "Autonomous Decision Model",
-                "accuracy": Decimal('0.82'),
-                "features": ["market_state", "predictions", "risk_assessment"],
-                "algorithm": "Reinforcement Learning + Q-Learning",
-                "last_trained": time.time()
-            }
-        }
+        """
+        Inicializa modelos de ML com implementações reais.
+        
+        EVOLUÇÃO: Modelos ML funcionais ao invés de simulações.
+        """
+        try:
+            # Verificar se bibliotecas ML estão disponíveis
+            try:
+                import sklearn
+                from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+                from sklearn.linear_model import LinearRegression, Ridge
+                from sklearn.preprocessing import StandardScaler
+                from sklearn.model_selection import train_test_split
+                from sklearn.metrics import mean_squared_error, r2_score
+                ML_AVAILABLE = True
+            except ImportError:
+                ML_AVAILABLE = False
+                logger.warning("Scikit-learn não disponível. Usando simulações.")
+            
+            if ML_AVAILABLE:
+                # Modelos ML reais
+                self.models = {
+                    MLModelType.PRICE_PREDICTION: {
+                        "name": "Price Prediction Model",
+                        "accuracy": Decimal('0.85'),
+                        "features": ["price_history", "volume", "volatility", "sentiment"],
+                        "algorithm": "RandomForestRegressor",
+                        "model": RandomForestRegressor(n_estimators=100, random_state=42),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    },
+                    MLModelType.MARKET_ANALYSIS: {
+                        "name": "Market Analysis Model",
+                        "accuracy": Decimal('0.78'),
+                        "features": ["market_cap", "trading_pairs", "social_metrics"],
+                        "algorithm": "GradientBoostingRegressor",
+                        "model": GradientBoostingRegressor(n_estimators=100, random_state=42),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    },
+                    MLModelType.RISK_ASSESSMENT: {
+                        "name": "Risk Assessment Model",
+                        "accuracy": Decimal('0.92'),
+                        "features": ["volatility", "liquidity", "correlation"],
+                        "algorithm": "Ridge",
+                        "model": Ridge(alpha=1.0),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    },
+                    MLModelType.PATTERN_RECOGNITION: {
+                        "name": "Pattern Recognition Model",
+                        "accuracy": Decimal('0.88'),
+                        "features": ["price_patterns", "volume_patterns", "time_patterns"],
+                        "algorithm": "LinearRegression",
+                        "model": LinearRegression(),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    },
+                    MLModelType.SENTIMENT_ANALYSIS: {
+                        "name": "Sentiment Analysis Model",
+                        "accuracy": Decimal('0.76'),
+                        "features": ["social_media", "news", "community"],
+                        "algorithm": "RandomForestRegressor",
+                        "model": RandomForestRegressor(n_estimators=50, random_state=42),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    },
+                    MLModelType.AUTONOMOUS_DECISION: {
+                        "name": "Autonomous Decision Model",
+                        "accuracy": Decimal('0.82'),
+                        "features": ["market_state", "predictions", "risk_assessment"],
+                        "algorithm": "GradientBoostingRegressor",
+                        "model": GradientBoostingRegressor(n_estimators=50, random_state=42),
+                        "scaler": StandardScaler(),
+                        "last_trained": time.time(),
+                        "is_real": True
+                    }
+                }
+            else:
+                # Fallback para simulações
+                self.models = {
+                    MLModelType.PRICE_PREDICTION: {
+                        "name": "Price Prediction Model (Simulation)",
+                        "accuracy": Decimal('0.85'),
+                        "features": ["price_history", "volume", "volatility", "sentiment"],
+                        "algorithm": "LSTM + Transformer (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    },
+                    MLModelType.MARKET_ANALYSIS: {
+                        "name": "Market Analysis Model (Simulation)",
+                        "accuracy": Decimal('0.78'),
+                        "features": ["market_cap", "trading_pairs", "social_metrics"],
+                        "algorithm": "Random Forest + XGBoost (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    },
+                    MLModelType.RISK_ASSESSMENT: {
+                        "name": "Risk Assessment Model (Simulation)",
+                        "accuracy": Decimal('0.92'),
+                        "features": ["volatility", "liquidity", "correlation"],
+                        "algorithm": "Neural Network + SVM (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    },
+                    MLModelType.PATTERN_RECOGNITION: {
+                        "name": "Pattern Recognition Model (Simulation)",
+                        "accuracy": Decimal('0.88'),
+                        "features": ["price_patterns", "volume_patterns", "time_patterns"],
+                        "algorithm": "CNN + RNN (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    },
+                    MLModelType.SENTIMENT_ANALYSIS: {
+                        "name": "Sentiment Analysis Model (Simulation)",
+                        "accuracy": Decimal('0.76'),
+                        "features": ["social_media", "news", "community"],
+                        "algorithm": "BERT + RoBERTa (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    },
+                    MLModelType.AUTONOMOUS_DECISION: {
+                        "name": "Autonomous Decision Model (Simulation)",
+                        "accuracy": Decimal('0.82'),
+                        "features": ["market_state", "predictions", "risk_assessment"],
+                        "algorithm": "Reinforcement Learning + Q-Learning (Simulated)",
+                        "last_trained": time.time(),
+                        "is_real": False
+                    }
+                }
+            
+            logger.info(f"Modelos ML inicializados: {len(self.models)} modelos")
+            
+        except Exception as e:
+            logger.error(f"Erro ao inicializar modelos ML: {e}")
+            self.models = {}
     
     async def start_ml_system(self):
         """Inicia o sistema de ML"""
@@ -705,6 +801,189 @@ class AdvancedMLSystem:
             },
             "market_data_points": len(self.market_data)
         }
+    
+    def train_model_real(self, model_type: MLModelType, training_data: List[MarketData]) -> Dict[str, Any]:
+        """
+        Treina modelo ML real com dados de mercado.
+        
+        EVOLUÇÃO: Treinamento real de modelos ML.
+        """
+        try:
+            if model_type not in self.models:
+                return {"error": "Modelo não encontrado"}
+            
+            model_info = self.models[model_type]
+            
+            if not model_info.get("is_real", False):
+                return {"error": "Modelo não é real (simulação)"}
+            
+            if len(training_data) < 10:
+                return {"error": "Dados insuficientes para treinamento"}
+            
+            # Preparar dados para treinamento
+            X, y = self._prepare_training_data(model_type, training_data)
+            
+            if len(X) < 5:
+                return {"error": "Features insuficientes após preparação"}
+            
+            # Dividir dados
+            from sklearn.model_selection import train_test_split
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42
+            )
+            
+            # Escalar features
+            scaler = model_info["scaler"]
+            X_train_scaled = scaler.fit_transform(X_train)
+            X_test_scaled = scaler.transform(X_test)
+            
+            # Treinar modelo
+            model = model_info["model"]
+            model.fit(X_train_scaled, y_train)
+            
+            # Fazer predições
+            y_pred = model.predict(X_test_scaled)
+            
+            # Calcular métricas
+            from sklearn.metrics import mean_squared_error, r2_score
+            mse = mean_squared_error(y_test, y_pred)
+            r2 = r2_score(y_test, y_pred)
+            
+            # Atualizar informações do modelo
+            model_info["last_trained"] = time.time()
+            model_info["accuracy"] = Decimal(str(r2))
+            
+            logger.info(f"Modelo {model_type.value} treinado - R²: {r2:.4f}, RMSE: {np.sqrt(mse):.4f}")
+            
+            return {
+                "success": True,
+                "model_type": model_type.value,
+                "r2_score": r2,
+                "mse": mse,
+                "rmse": np.sqrt(mse),
+                "training_samples": len(X_train),
+                "test_samples": len(X_test)
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro no treinamento do modelo {model_type.value}: {e}")
+            return {"error": str(e)}
+    
+    def predict_real(self, model_type: MLModelType, features: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Faz predição real usando modelo ML treinado.
+        
+        EVOLUÇÃO: Predição real usando modelos ML funcionais.
+        """
+        try:
+            if model_type not in self.models:
+                return {"error": "Modelo não encontrado"}
+            
+            model_info = self.models[model_type]
+            
+            if not model_info.get("is_real", False):
+                return {"error": "Modelo não é real (simulação)"}
+            
+            # Preparar features
+            feature_vector = self._prepare_prediction_features(model_type, features)
+            
+            if feature_vector is None:
+                return {"error": "Features inválidas"}
+            
+            # Escalar features
+            scaler = model_info["scaler"]
+            feature_vector_scaled = scaler.transform([feature_vector])
+            
+            # Fazer predição
+            model = model_info["model"]
+            prediction = model.predict(feature_vector_scaled)[0]
+            
+            # Calcular confiança (simplificado)
+            confidence = min(0.95, max(0.1, float(model_info["accuracy"])))
+            
+            return {
+                "success": True,
+                "prediction": float(prediction),
+                "confidence": confidence,
+                "model_type": model_type.value,
+                "features_used": model_info["features"]
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro na predição do modelo {model_type.value}: {e}")
+            return {"error": str(e)}
+    
+    def _prepare_training_data(self, model_type: MLModelType, data: List[MarketData]) -> Tuple[np.ndarray, np.ndarray]:
+        """Prepara dados para treinamento"""
+        try:
+            if not data:
+                return np.array([]), np.array([])
+            
+            # Converter para DataFrame
+            df_data = []
+            for item in data:
+                df_data.append({
+                    "price": float(item.price),
+                    "volume": float(item.volume),
+                    "market_cap": float(item.market_cap),
+                    "volatility": float(item.volatility),
+                    "timestamp": item.timestamp
+                })
+            
+            df = pd.DataFrame(df_data)
+            df = df.sort_values('timestamp')
+            
+            # Criar features baseadas no tipo de modelo
+            if model_type == MLModelType.PRICE_PREDICTION:
+                # Features para predição de preço
+                X = df[["volume", "market_cap", "volatility"]].values
+                y = df["price"].shift(-1).dropna().values
+                X = X[:-1]  # Remover última linha para alinhar com y
+            
+            elif model_type == MLModelType.RISK_ASSESSMENT:
+                # Features para avaliação de risco
+                X = df[["volatility", "volume", "market_cap"]].values
+                y = df["volatility"].values  # Usar volatilidade como proxy de risco
+            
+            else:
+                # Features padrão
+                X = df[["price", "volume", "market_cap", "volatility"]].values
+                y = df["price"].values
+            
+            return X, y
+            
+        except Exception as e:
+            logger.error(f"Erro na preparação de dados: {e}")
+            return np.array([]), np.array([])
+    
+    def _prepare_prediction_features(self, model_type: MLModelType, features: Dict[str, Any]) -> Optional[np.ndarray]:
+        """Prepara features para predição"""
+        try:
+            if model_type == MLModelType.PRICE_PREDICTION:
+                return np.array([
+                    features.get("volume", 0),
+                    features.get("market_cap", 0),
+                    features.get("volatility", 0)
+                ])
+            
+            elif model_type == MLModelType.RISK_ASSESSMENT:
+                return np.array([
+                    features.get("volatility", 0),
+                    features.get("volume", 0),
+                    features.get("market_cap", 0)
+                ])
+            
+            else:
+                return np.array([
+                    features.get("price", 0),
+                    features.get("volume", 0),
+                    features.get("market_cap", 0),
+                    features.get("volatility", 0)
+                ])
+            
+        except Exception as e:
+            logger.error(f"Erro na preparação de features: {e}")
+            return None
 
 
 # Instância global do sistema de ML

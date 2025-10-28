@@ -44,6 +44,11 @@ class HashValue:
     @classmethod
     def create(cls, value: str) -> "HashValue":
         """Factory method para criar HashValue"""
+        # Se o valor não é um hash SHA-256 válido, gerar um hash SHA-256 real
+        if not cls.is_valid_sha256(value):
+            import hashlib
+            hash_obj = hashlib.sha256(value.encode())
+            value = hash_obj.hexdigest()
         return cls(value.lower())
 
     @classmethod

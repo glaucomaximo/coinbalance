@@ -30,14 +30,14 @@ class TransactionAmount:
     
     def to_cnb(self) -> Decimal:
         """Retorna valor em CNB"""
-        return self.value.value
+        return self.value.to_cnb()
     
     def to_satoshi(self) -> int:
         """Retorna valor em satoshis"""
-        return int(self.value.value * Decimal("100000000"))
+        return self.value.to_satoshi()
     
     def __str__(self) -> str:
-        return f"{self.value.value} CNB"
+        return f"{self.value.to_cnb()} CNB"
 
 
 @dataclass(frozen=True)
@@ -52,23 +52,23 @@ class TransactionFee:
     
     def __post_init__(self):
         """Validação da taxa"""
-        if self.value.value < 0:
+        if self.value.to_cnb() < 0:
             raise ValueError("Transaction fee cannot be negative")
         
-        if self.value.value > Decimal("1000"):  # Max fee
+        if self.value.to_cnb() > Decimal("1000"):  # Max fee
             raise ValueError("Transaction fee too high")
     
     def to_cnb(self) -> Decimal:
         """Retorna taxa em CNB"""
-        return self.value.value
+        return self.value.to_cnb()
     
     def to_satoshi(self) -> int:
         """Retorna taxa em satoshis"""
-        return int(self.value.value * Decimal("100000000"))
+        return self.value.to_satoshi()
     
     def is_zero(self) -> bool:
         """Verifica se a taxa é zero"""
-        return self.value.value == Decimal("0")
+        return self.value.is_zero()
     
     def __str__(self) -> str:
-        return f"{self.value.value} CNB"
+        return f"{self.value.to_cnb()} CNB"

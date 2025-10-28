@@ -10,6 +10,7 @@ from src.domain.blockchain.services.mining_service import MiningService
 from src.domain.transaction.entities.transaction import Transaction, TransactionId, TransactionAmount, TransactionFee, TransactionType, TransactionStatus
 from src.domain.shared.value_objects.wallet_address import WalletAddress
 from src.domain.shared.value_objects.timestamp import Timestamp
+from src.domain.shared.value_objects.money import Money
 
 
 class TestBlockchain:
@@ -43,8 +44,8 @@ class TestBlockchain:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
-            amount=TransactionAmount(Decimal("100")),
-            fee=TransactionFee(Decimal("1")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("100"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("1"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()
@@ -71,8 +72,8 @@ class TestBlockchain:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
-            amount=TransactionAmount(Decimal("50")),
-            fee=TransactionFee(Decimal("0.5")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("50"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("0.5"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()
@@ -88,10 +89,21 @@ class TestBlockchain:
         initial_difficulty = blockchain.difficulty
         
         # Simular mineração rápida (diferença de tempo pequena)
+        tx = Transaction(
+            id=TransactionId.generate(),
+            from_address=None,
+            to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
+            amount=TransactionAmount(Money.from_cnb(Decimal("10"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("0.1"))),
+            transaction_type=TransactionType.TRANSFER,
+            status=TransactionStatus.PENDING,
+            created_at=Timestamp.now()
+        )
+        
         blockchain.blocks.append(Block.create_block(
             height=1,
             previous_hash=blockchain.blocks[0].hash,
-            transactions=[],
+            transactions=[tx],
             difficulty=initial_difficulty,
             miner_address="test_miner"
         ))
@@ -159,8 +171,8 @@ class TestBlock:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
-            amount=TransactionAmount(Decimal("100")),
-            fee=TransactionFee(Decimal("1")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("100"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("1"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()
@@ -199,8 +211,8 @@ class TestBlock:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"),
-            amount=TransactionAmount(Decimal("100")),
-            fee=TransactionFee(Decimal("1")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("100"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("1"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()
@@ -241,8 +253,8 @@ class TestMiningService:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
-            amount=TransactionAmount(Decimal("100")),
-            fee=TransactionFee(Decimal("1")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("100"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("1"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()
@@ -267,8 +279,8 @@ class TestMiningService:
             id=TransactionId.generate(),
             from_address=None,
             to_address=WalletAddress("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"),
-            amount=TransactionAmount(Decimal("100")),
-            fee=TransactionFee(Decimal("1")),
+            amount=TransactionAmount(Money.from_cnb(Decimal("100"))),
+            fee=TransactionFee(Money.from_cnb(Decimal("1"))),
             transaction_type=TransactionType.TRANSFER,
             status=TransactionStatus.PENDING,
             created_at=Timestamp.now()

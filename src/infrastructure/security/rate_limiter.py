@@ -106,10 +106,10 @@ class AdvancedRateLimiter:
         self._configs = {
             # Autenticação - mais restritivo
             "/api/v1/auth/login": RateLimitConfig(
-                requests_per_minute=5,
-                requests_per_hour=20,
-                requests_per_day=100,
-                burst_limit=3,
+                requests_per_minute=3,
+                requests_per_hour=10,
+                requests_per_day=50,
+                burst_limit=2,
                 scope=RateLimitScope.IP
             ),
             "/api/v1/auth/refresh": RateLimitConfig(
@@ -131,10 +131,10 @@ class AdvancedRateLimiter:
             
             # Transferências - mais restritivo
             "/api/v1/transferencias/": RateLimitConfig(
-                requests_per_minute=10,
-                requests_per_hour=50,
-                requests_per_day=200,
-                burst_limit=5,
+                requests_per_minute=5,
+                requests_per_hour=20,
+                requests_per_day=100,
+                burst_limit=3,
                 scope=RateLimitScope.USER
             ),
             

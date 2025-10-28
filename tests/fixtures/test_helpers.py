@@ -14,7 +14,7 @@ from src.domain.shared.value_objects.money import Money
 
 
 @dataclass
-class TestWalletData:
+class WalletTestData:
     """Dados de teste para carteira"""
     name: str
     password: str = "test123"
