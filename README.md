@@ -237,6 +237,9 @@ coinbalance/
 - 📋 [**Levantamento de Requisitos Reverso**](docs/LEVANTAMENTO_REQUISITOS_REVERSO.md) - 62 requisitos documentados (39 funcionais + 23 não-funcionais)
 - 📘 [**Modelo de Requisitos Atualizado**](docs/MODELO_REQUISITOS_ATUALIZADO.md) - Especificação formal de requisitos (SRS) completa
 
+### **💼 Apresentação Comercial (NOVO - 28/10/2025)**
+- 🎯 [**Pitch Deck Executivo**](docs/APRESENTACAO_COMERCIAL_COINBALANCE.md) - Apresentação comercial completa com 14 slides (problema, solução, mercado, modelo de negócio, investimento)
+
 ### **Relatórios Técnicos Atualizados**
 - 📊 [**Relatório Final de Revisão Completa**](docs/reports/RELATORIO_FINAL_REVISAO_COMPLETA_DOCUMENTACAO_ATUALIZADA.md) - Revisão técnica completa e manutenções propostas
 - 📊 [**Relatório Técnico Atualizado**](docs/reports/RELATORIO_TECNICO_ATUALIZADO.md) - Status atual do sistema
