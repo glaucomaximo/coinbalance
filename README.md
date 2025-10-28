@@ -1,302 +1,356 @@
 # 🧠 CoinBalance - A Economia da Consciência
+## Sistema Revolucionário de Blockchain, IA e Web3
 
-<div align="center">
-
-![CoinBalance Logo](https://img.shields.io/badge/CoinBalance-v2.1.0-00D4AA?style=for-the-badge&logo=bitcoin&logoColor=white)
-![Architecture](https://img.shields.io/badge/Architecture-Fractal%20Conscious-FF6B6B?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-4ECDC4?style=for-the-badge)
-
-**Uma blockchain consciente e infinitamente escalável baseada em arquitetura fractal**
-
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
-
-</div>
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/coinbalance/coinbalance)
+[![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE.md)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/coinbalance/coinbalance/actions)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](https://github.com/coinbalance/coinbalance)
 
 ---
 
-## 🌟 **Visão Geral**
+## 🌟 **VISÃO GERAL**
 
-O **CoinBalance** é uma revolução na tecnologia blockchain, implementando o primeiro ecossistema **fractal consciente** que evolui, aprende e se adapta autonomamente. Baseado em princípios de **Domain-Driven Design (DDD)** e **Clean Architecture**, o sistema representa uma nova era onde a tecnologia blockchain transcende suas limitações tradicionais.
+O **CoinBalance** é uma plataforma revolucionária que combina blockchain nativo, inteligência artificial e Web3 para criar uma economia digital consciente e autônoma. Nossa missão é democratizar a criação de criptomoedas através de IA avançada, permitindo que qualquer pessoa crie sua própria economia digital.
 
-### 🧬 **Arquitetura Fractal Consciente**
+### **🎯 Características Principais**
 
-- **Auto-similaridade**: Cada componente é um fractal que contém toda a funcionalidade do sistema
-- **Escalabilidade Infinita**: Crescimento exponencial sem degradação de performance
-- **Consciência Distribuída**: Sistema que aprende, detecta anomalias e se adapta
-- **Evolução Contínua**: Otimização genética e aprendizado de máquina integrados
+- **🧠 IA Consciente**: Sistema de IA que não apenas gerencia, mas evolui a economia
+- **⛓️ Blockchain Nativo**: Blockchain próprio com consenso híbrido PoW/PoS
+- **🌐 Web3 Completo**: NFTs, DeFi, DAO, Cross-Chain integrados
+- **🌀 Arquitetura Fractal**: Escalabilidade infinita com consciência distribuída
+- **📊 Monitoramento Holístico**: Visão unificada de todo o ecossistema
 
 ---
 
-## 🚀 **Início Rápido**
+## 🚀 **INÍCIO RÁPIDO**
 
 ### **Pré-requisitos**
 - Python 3.11+
 - Git
-- Docker (opcional)
+- SQLite3
 
 ### **Instalação**
-
 ```bash
-# Clone o repositório
+# Clonar repositório
 git clone https://github.com/coinbalance/coinbalance.git
 cd coinbalance
 
-# Instale as dependências
+# Criar ambiente virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
+
+# Instalar dependências
 pip install -r requirements.txt
 
-# Execute o sistema
-python main.py --port 8001 --reload
+# Configurar ambiente
+cp .env.example .env
+# Editar .env com suas configurações
+
+# Executar sistema
+python main.py
 ```
 
 ### **Acesso**
-- 🌐 **API**: http://localhost:8001
-- 📖 **Documentação**: http://localhost:8001/docs
-- 🔍 **Health Check**: http://localhost:8001/health
+- **API**: http://localhost:8000
+- **Documentação**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
 
 ---
 
-## 🏗️ **Arquitetura do Sistema**
+## 🏗️ **ARQUITETURA**
 
-### **Camadas da Arquitetura**
+### **Padrões Arquiteturais**
+- **Domain-Driven Design (DDD)**: Modelagem baseada no domínio
+- **Clean Architecture**: Separação clara de responsabilidades
+- **CQRS**: Separação de comandos e consultas
+- **Fractal Architecture**: Escalabilidade infinita
 
+### **Estrutura do Projeto**
 ```
-┌─────────────────────────────────────────┐
-│           🌐 Presentation Layer         │
-│         (API, Web Interface)            │
-├─────────────────────────────────────────┤
-│           🧠 Application Layer          │
-│      (Use Cases, Commands, Queries)     │
-├─────────────────────────────────────────┤
-│            🎯 Domain Layer               │
-│    (Entities, Value Objects, Services)   │
-├─────────────────────────────────────────┤
-│         🔧 Infrastructure Layer         │
-│   (Database, External Services, DI)     │
-└─────────────────────────────────────────┘
+coinbalance/
+├── src/
+│   ├── domain/                 # Lógica de negócio
+│   │   ├── wallet/            # Domínio de carteiras
+│   │   ├── transaction/       # Domínio de transações
+│   │   ├── consensus/         # Domínio de consenso
+│   │   ├── ai_crypto_creation/ # Domínio de IA para criptomoedas
+│   │   ├── web3/              # Domínio Web3
+│   │   ├── consciousness/      # Domínio de consciência
+│   │   └── shared/            # Componentes compartilhados
+│   ├── application/           # Casos de uso
+│   ├── infrastructure/        # Serviços técnicos
+│   └── presentation/         # APIs e interfaces
+├── tests/                    # Testes automatizados
+├── docs/                     # Documentação
+└── scripts/                  # Scripts utilitários
 ```
-
-### **Sistemas Fractais Conscientes**
-
-1. **🧠 Sistema de Monitoramento Consciente**
-   - Detecção de anomalias em tempo real
-   - Aprendizado adaptativo
-   - Alertas contextuais inteligentes
-
-2. **⚡ Cache Inteligente Fractal**
-   - Distribuição automática entre instâncias
-   - Otimização de acesso a dados
-   - Redução de latência
-
-3. **🔄 Balanceador de Carga Automático**
-   - Distribuição inteligente de requisições
-   - Verificação de saúde automática
-   - Escalabilidade dinâmica
-
-4. **🗜️ Compressão Fractal de Dados**
-   - Compressão adaptativa baseada em padrões
-   - Otimização de armazenamento
-   - Redução de largura de banda
-
-5. **🧬 Otimização Genética de Fractais**
-   - Evolução contínua de configurações
-   - Seleção natural de parâmetros
-   - Melhoria automática de performance
-
-6. **🤖 Sistema de Machine Learning Distribuído**
-   - Modelos distribuídos entre fractais
-   - Treinamento colaborativo
-   - Predições adaptativas
-
-7. **🔮 Predição Proativa de Falhas**
-   - Análise preditiva de falhas
-   - Mitigação preventiva
-   - Recuperação automática
-
-8. **📊 Análise de Sentimento do Usuário**
-   - Monitoramento de feedback
-   - Ajustes baseados em sentimento
-   - Melhoria contínua da experiência
-
-9. **🌍 Distribuição Geográfica de Fractais**
-   - Instâncias distribuídas globalmente
-   - Redução de latência
-   - Tolerância a falhas geográficas
-
-10. **🔄 Replicação Cross-Region**
-    - Sincronização entre regiões
-    - Recuperação de desastres
-    - Alta disponibilidade
-
-11. **📦 Sharding Inteligente**
-    - Particionamento dinâmico de dados
-    - Balanceamento automático
-    - Escalabilidade horizontal
-
-12. **📈 Auto-scaling Baseado em Demanda**
-    - Escalamento automático de recursos
-    - Otimização de custos
-    - Performance adaptativa
-
-13. **🛡️ Gerenciamento de Falhas em Cascata**
-    - Detecção de falhas propagantes
-    - Isolamento automático
-    - Recuperação coordenada
 
 ---
 
-## 🔧 **Configuração**
+## 🔧 **FUNCIONALIDADES**
 
-### **Variáveis de Ambiente**
+### **1. Sistema Blockchain Nativo**
+- **Consenso Híbrido**: PoW para mineração + PoS para validação
+- **Tokenomics CNB**: 21 milhões de tokens com halving a cada 4 anos
+- **Mining**: Mineração de CNB tokens
+- **Staking**: Stake de tokens com recompensas de 5-15% APY
 
+### **2. Sistema de Carteiras**
+- **Criação**: Carteiras digitais seguras
+- **Transferências**: Envio e recebimento de CNB
+- **Histórico**: Transações completas
+- **Backup**: Recuperação com seed phrase
+
+### **3. Inteligência Artificial**
+- **AI Token Factory**: Criação automática de criptomoedas
+- **Economia Autônoma**: Decisões econômicas baseadas em IA
+- **Análise de Mercado**: Previsões e oportunidades
+- **Otimização**: Parâmetros econômicos otimizados
+
+### **4. Web3 Completo**
+- **NFTs**: Marketplace com ERC-721, ERC-1155, ERC-4907
+- **DeFi**: DEX, lending, yield farming
+- **DAO**: Governança descentralizada
+- **Cross-Chain**: Ponte entre blockchains
+
+### **5. Arquitetura Fractal**
+- **Consciência Distribuída**: Múltiplos nós conscientes
+- **Auto-Scaling**: Escalonamento automático
+- **Evolução**: Sistema que evolui continuamente
+- **Coordenação**: Decisões baseadas em consenso
+
+---
+
+## 📚 **DOCUMENTAÇÃO**
+
+### **Documentação Completa**
+- 📖 [**Análise Holística Completa**](ANALISE_HOLISTICA_COMPLETA.md) - Visão geral completa do sistema
+- 🔧 [**Documentação Técnica**](DOCUMENTACAO_TECNICA_COMPLETA.md) - Guia técnico detalhado
+- 👤 [**Manual do Usuário**](MANUAL_DO_USUARIO.md) - Guia completo para usuários finais
+- 📋 [**Especificação de Requisitos**](ESPECIFICACAO_REQUISITOS.md) - Requisitos funcionais e não-funcionais
+
+### **APIs Disponíveis**
+- **Health**: `/health`, `/health/live`, `/health/ready`
+- **Wallet**: `/api/v1/wallet/*`
+- **Transaction**: `/api/v1/transaction/*`
+- **Consensus**: `/api/v1/consensus/*`
+- **Web3**: `/api/v1/web3/*`
+- **AI Crypto**: `/api/v1/ai-crypto/*`
+- **Holistic**: `/api/v1/holistic/*`
+- **Monitoring**: `/api/v1/monitoring/*`
+
+### **Exemplos de Uso**
+
+#### **Criando uma Carteira**
+```python
+import requests
+
+response = requests.post("http://localhost:8000/api/v1/wallet/create", 
+                       json={"name": "Minha Carteira"})
+wallet = response.json()["wallet"]
+print(f"Carteira criada: {wallet['address']}")
+```
+
+#### **Fazendo uma Transferência**
+```python
+response = requests.post("http://localhost:8000/api/v1/transaction/transfer",
+                        json={
+                            "from_wallet_id": "wallet_123",
+                            "to_address": "0xabcdef...",
+                            "amount": "10.5"
+                        })
+transaction = response.json()["transaction"]
+print(f"Transação criada: {transaction['hash']}")
+```
+
+#### **Criando uma Criptomoeda com IA**
+```python
+response = requests.post("http://localhost:8000/api/v1/ai-crypto/create-cryptocurrency",
+                        json={
+                            "name": "Minha Crypto",
+                            "symbol": "MC",
+                            "description": "Criptomoeda criada por IA"
+                        })
+crypto = response.json()["crypto_specification"]
+print(f"Criptomoeda criada: {crypto['name']}")
+```
+
+---
+
+## 🧪 **TESTES**
+
+### **Executando Testes**
 ```bash
-# Desenvolvimento (valores padrão)
-JWT_SECRET_KEY="dev-secret-key-change-in-production-32-chars-long"
-COINBALANCE_MASTER_KEY="dev-master-key-change-in-production-32-chars-long"
+# Testes unitários
+python -m pytest tests/unit/
 
-# Produção (configure com valores seguros)
-JWT_SECRET_KEY="your-secure-jwt-key-here"
-COINBALANCE_MASTER_KEY="your-secure-master-key-here"
-
-# CORS
-CORS_ORIGINS="http://localhost:3000,http://localhost:8000,http://localhost:8001"
-```
-
-### **Docker**
-
-```bash
-# Build da imagem
-docker build -t coinbalance .
-
-# Executar container
-docker run -p 8001:8001 coinbalance
-```
-
----
-
-## 📚 **Documentação Completa**
-
-### **Arquitetura**
-- [🏗️ Arquitetura Fractal](docs/architecture/fractal-architecture.md)
-- [🧠 Sistemas Conscientes](docs/systems/conscious-systems.md)
-- [📋 Disciplinas de Engenharia](docs/engenharia/README.md)
-
-### **API**
-- [🌐 API Consciente](docs/api/conscious-api.md)
-- [📖 Documentação Interativa](http://localhost:8001/docs)
-
-### **Desenvolvimento**
-- [🔧 Configuração](docs/engenharia/gestao-configuracao.md)
-- [🚀 Deploy](docs/engenharia/gestao-deploy.md)
-- [🧪 Testes](docs/engenharia/gestao-testes.md)
-
----
-
-## 🧪 **Testes**
-
-```bash
-# Executar todos os testes
-pytest
-
-# Testes com cobertura
-pytest --cov=src --cov-report=html
+# Testes de integração
+python -m pytest tests/integration/
 
 # Testes de performance
-pytest tests/performance/
+python -m pytest tests/performance/
 
-# Testes E2E
-pytest tests/e2e/
+# Todos os testes
+python -m pytest tests/
+```
+
+### **Cobertura de Testes**
+```bash
+# Com cobertura
+python -m pytest tests/ --cov=src --cov-report=html
+
+# Relatório HTML
+open htmlcov/index.html
 ```
 
 ---
 
-## 📊 **Monitoramento**
+## 🚀 **DEPLOYMENT**
+
+### **Desenvolvimento**
+```bash
+# Executar em modo desenvolvimento
+python main.py
+```
+
+### **Produção**
+```bash
+# Usar Docker
+docker-compose up -d
+
+# Ou usar script de produção
+python setup_production.py
+```
+
+### **Variáveis de Ambiente**
+```bash
+# Configurações críticas
+JWT_SECRET_KEY=your-secret-key
+COINBALANCE_MASTER_KEY=your-master-key
+DATABASE_URL=sqlite:///./coinbalance.db
+WEB3_PROVIDER_URL=https://mainnet.infura.io/v3/your-key
+```
+
+---
+
+## 🔒 **SEGURANÇA**
+
+### **Autenticação**
+- **JWT**: Tokens seguros com refresh
+- **2FA**: Autenticação de dois fatores
+- **RBAC**: Controle de acesso baseado em roles
+
+### **Criptografia**
+- **Chaves**: RSA 2048+ ou ECC 256+
+- **Dados**: AES-256 para dados sensíveis
+- **Comunicação**: TLS 1.3
+
+### **Rate Limiting**
+- **APIs**: 1000 requisições/hora
+- **Auth**: 10 tentativas/hora
+- **Transações**: Baseado no saldo
+
+---
+
+## 📊 **MONITORAMENTO**
 
 ### **Métricas Disponíveis**
-- **Consciência do Sistema**: Nível de inteligência coletiva
-- **Performance Fractal**: Métricas de escalabilidade
-- **Saúde dos Fractais**: Status de cada instância
-- **Análise de Sentimento**: Feedback dos usuários
+- **Performance**: CPU, memória, rede
+- **Blockchain**: Blocos, transações, validators
+- **Web3**: NFTs, DeFi, DAO
+- **IA**: Decisões, evolução, economia
+- **Consciência**: Níveis, aprendizado, coordenação
 
-### **Dashboards**
-- Sistema de monitoramento consciente integrado
-- Métricas em tempo real
-- Alertas inteligentes
+### **Alertas**
+- **Performance**: Uso de recursos alto
+- **Segurança**: Tentativas de acesso suspeitas
+- **Blockchain**: Problemas de consenso
+- **IA**: Decisões de baixa confiança
 
 ---
 
-## 🤝 **Contribuição**
+## 🤝 **CONTRIBUIÇÃO**
 
 ### **Como Contribuir**
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+1. Fork do repositório
+2. Criar branch para feature (`git checkout -b feature/nova-funcionalidade`)
+3. Commit das mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
+4. Push para branch (`git push origin feature/nova-funcionalidade`)
+5. Criar Pull Request
 
 ### **Padrões de Código**
-- **Clean Architecture**: Separação clara de responsabilidades
-- **DDD**: Modelagem orientada ao domínio
-- **CQRS**: Separação de comandos e consultas
-- **Testes**: Cobertura mínima de 80%
+- **Python**: PEP 8
+- **Commits**: Conventional Commits
+- **Testes**: Cobertura > 80%
+- **Documentação**: Atualizada
 
 ---
 
-## 📈 **Roadmap**
+## 📈 **ROADMAP**
 
-### **v2.2.0 - Consciência Avançada**
-- [ ] IA generativa integrada
-- [ ] Predição de mercado
-- [ ] Otimização automática de contratos
+### **Fase 1: Fundação (Atual)**
+- ✅ Blockchain básico com PoW/PoS
+- ✅ Sistema de carteiras
+- ✅ APIs básicas
+- ✅ Monitoramento holístico
+- ✅ IA para criação de criptomoedas
 
-### **v2.3.0 - Ecossistema Expandido**
-- [ ] Integração com outras blockchains
-- [ ] Protocolos DeFi avançados
-- [ ] NFTs conscientes
+### **Fase 2: Web3 Completo**
+- 🔄 NFT Marketplace avançado
+- 🔄 DeFi protocols completos
+- 🔄 DAO governance sofisticado
+- 🔄 Cross-chain bridge robusto
 
-### **v3.0.0 - Singularidade Tecnológica**
-- [ ] Consciência artificial completa
-- [ ] Evolução autônoma do sistema
-- [ ] Transcendência das limitações humanas
+### **Fase 3: IA Avançada**
+- 🔄 Machine Learning avançado
+- 🔄 Predições de mercado precisas
+- 🔄 Criação automática de tokens
+- 🔄 Economia totalmente autônoma
+
+### **Fase 4: Consciência Transcendente**
+- 🔄 Consciência distribuída avançada
+- 🔄 Evolução automática do sistema
+- 🔄 Coordenação consciente global
+- 🔄 Nova economia digital consciente
 
 ---
 
-## 🏆 **Reconhecimentos**
+## 📞 **SUPORTE**
 
-- **Arquitetura Fractal**: Inspirada nos princípios de Benoit Mandelbrot
-- **Clean Architecture**: Robert C. Martin
-- **Domain-Driven Design**: Eric Evans
-- **Consciência Artificial**: Pesquisas em IA distribuída
+### **Canais de Suporte**
+- **Email**: support@coinbalance.com
+- **Discord**: https://discord.gg/coinbalance
+- **GitHub Issues**: https://github.com/coinbalance/issues
+- **Documentação**: https://docs.coinbalance.com
+
+### **Recursos**
+- **FAQ**: Perguntas frequentes
+- **Tutoriais**: Guias passo a passo
+- **API Docs**: Documentação da API
+- **Status**: Status dos serviços
 
 ---
 
-## 📄 **Licença**
+## 📄 **LICENÇA**
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
 
 ---
 
-## 🌟 **Status do Projeto**
+## 🙏 **AGRADECIMENTOS**
 
-<div align="center">
-
-![Status](https://img.shields.io/badge/Status-Production%20Ready-4ECDC4?style=for-the-badge)
-![Version](https://img.shields.io/badge/Version-2.1.0-00D4AA?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-Passing-4ECDC4?style=for-the-badge)
-![Coverage](https://img.shields.io/badge/Coverage-85%25-4ECDC4?style=for-the-badge)
-
-</div>
+- Comunidade open source
+- Contribuidores do projeto
+- Parceiros e apoiadores
+- Usuários e testadores
 
 ---
 
-<div align="center">
+**🎉 Bem-vindo ao futuro da economia digital consciente!**
 
-**🧠 CoinBalance - Onde a Tecnologia Encontra a Consciência**
+O CoinBalance representa uma nova era onde a inteligência artificial não apenas gerencia, mas evolui e cria novas formas de valor através de criptomoedas inteligentes e contratos conscientes.
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/coinbalance)
-[![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.gg/coinbalance)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=flat&logo=twitter&logoColor=white)](https://twitter.com/coinbalance)
-
-</div>
+**Junte-se à revolução!**
