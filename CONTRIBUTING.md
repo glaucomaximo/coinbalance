@@ -229,6 +229,166 @@ wip
 
 ---
 
+## 🤖 **CONTRIBUIÇÕES PARA IA AVANÇADA**
+
+### **Áreas de Contribuição**
+
+#### **Machine Learning**
+- **Novos Modelos**: Implementar novos algoritmos de ML
+- **Otimização**: Melhorar performance dos modelos existentes
+- **Precisão**: Aumentar precisão das predições
+- **Dados**: Melhorar coleta e qualidade dos dados
+
+#### **Economia Autônoma**
+- **Indicadores**: Adicionar novos indicadores econômicos
+- **Políticas**: Implementar novas políticas econômicas
+- **Decisões**: Melhorar algoritmo de decisões
+- **Fases**: Otimizar transições entre fases econômicas
+
+#### **Predições de Mercado**
+- **Timeframes**: Adicionar novos timeframes
+- **Indicadores**: Implementar novos indicadores técnicos
+- **Padrões**: Detectar novos padrões de mercado
+- **Validação**: Melhorar sistema de validação
+
+#### **Criação de Tokens**
+- **Tipos**: Adicionar novos tipos de tokens
+- **Templates**: Criar novos templates inteligentes
+- **Oportunidades**: Melhorar detecção de oportunidades
+- **Otimização**: Implementar novas estratégias de otimização
+
+### **Diretrizes Específicas**
+
+#### **Para Modelos de ML**
+```python
+# Estrutura esperada para novos modelos
+class NovoModeloML:
+    def __init__(self):
+        self.name = "Novo Modelo"
+        self.model_type = MLModelType.NOVO_MODELO
+        self.accuracy = 0.0
+    
+    async def train(self, data: List[MarketData]) -> float:
+        # Implementar treinamento
+        pass
+    
+    async def predict(self, data: MarketData) -> Prediction:
+        # Implementar predição
+        pass
+```
+
+#### **Para Indicadores Econômicos**
+```python
+# Estrutura esperada para novos indicadores
+class NovoIndicador(EconomicIndicator):
+    def __init__(self):
+        self.name = "Novo Indicador"
+        self.weight = 0.1
+        self.target_value = 0.0
+    
+    async def calculate(self, data: Dict[str, Any]) -> EconomicIndicatorData:
+        # Implementar cálculo
+        pass
+```
+
+#### **Para Tipos de Tokens**
+```python
+# Estrutura esperada para novos tipos de tokens
+class NovoTipoToken(TokenType):
+    def __init__(self):
+        self.name = "novo_tipo"
+        self.display_name = "Novo Tipo"
+        self.features = ["feature1", "feature2"]
+        self.standards = [TokenStandard.ERC20]
+```
+
+### **Testes para IA**
+
+#### **Testes de ML**
+```python
+# Exemplo de teste para modelo de ML
+async def test_novo_modelo_ml():
+    modelo = NovoModeloML()
+    dados_teste = [MarketData(...) for _ in range(100)]
+    
+    precisao = await modelo.train(dados_teste)
+    assert precisao > 0.8
+    
+    predicao = await modelo.predict(dados_teste[0])
+    assert predicao.confidence > 0.7
+```
+
+#### **Testes de Economia**
+```python
+# Exemplo de teste para economia autônoma
+async def test_novo_indicador():
+    indicador = NovoIndicador()
+    dados = {"valor": 100.0, "timestamp": time.time()}
+    
+    resultado = await indicador.calculate(dados)
+    assert resultado.value == 100.0
+    assert resultado.trend in ["increasing", "decreasing", "stable"]
+```
+
+### **Documentação para IA**
+
+#### **Documentar Modelos**
+```markdown
+## Novo Modelo ML
+
+### Descrição
+Breve descrição do modelo e seu propósito.
+
+### Algoritmo
+Explicação do algoritmo utilizado.
+
+### Parâmetros
+- `param1`: Descrição do parâmetro
+- `param2`: Descrição do parâmetro
+
+### Performance
+- Precisão esperada: > 80%
+- Tempo de treinamento: < 5 minutos
+- Tempo de predição: < 1 segundo
+
+### Exemplo de Uso
+```python
+# Código de exemplo
+```
+
+### Referências
+Links para papers ou documentação relevante.
+```
+
+#### **Documentar APIs**
+```markdown
+## Endpoint: POST /api/v1/ai-advanced/novo-endpoint
+
+### Descrição
+Breve descrição do endpoint.
+
+### Parâmetros
+- `param1` (string): Descrição
+- `param2` (number): Descrição
+
+### Resposta
+```json
+{
+  "status": "success",
+  "data": {...}
+}
+```
+
+### Exemplo
+```bash
+curl -X POST "http://localhost:8000/api/v1/ai-advanced/novo-endpoint" \
+  -H "Content-Type: application/json" \
+  -d '{"param1": "valor", "param2": 123}'
+```
+```
+
+---
+
 ## 🧪 **TESTES**
 
 ### **Estrutura de Testes**
