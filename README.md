@@ -30,11 +30,16 @@ O **CoinBalance** é uma **blockchain enterprise completa** que combina blockcha
 
 ## 🚀 **INÍCIO RÁPIDO**
 
-### **Pré-requisitos**
+### **Pré-requisitos Backend**
 - Python 3.11+
 - Docker & Docker Compose (recomendado)
 - Git
 - PostgreSQL (produção) ou SQLite3 (desenvolvimento)
+
+### **Pré-requisitos Frontend**
+- Node.js 18+
+- npm 9+ ou yarn
+- Git
 
 ### **Instalação Rápida (Docker)**
 ```bash
@@ -77,11 +82,27 @@ cp .env.example .env
 python main.py
 ```
 
+### **Instalação do Frontend (Next.js)**
+```bash
+# Ir para diretório frontend
+cd frontend
+
+# Instalar dependências
+npm install
+
+# Configurar ambiente
+cp .env.example .env.local
+
+# Executar servidor de desenvolvimento
+npm run dev
+```
+
 ### **Acesso**
-- **API**: http://localhost:8000
-- **Documentação**: http://localhost:8000/docs
+- **Frontend**: http://localhost:3000 🌐 **NOVO!**
+- **API Backend**: http://localhost:8000
+- **Documentação API**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/api/v1/health
-- **Grafana**: http://localhost:3000 (monitoramento)
+- **Grafana**: http://localhost:3000 (monitoramento - porta alternativa em dev)
 - **Prometheus**: http://localhost:9090 (métricas)
 
 ---
@@ -99,7 +120,18 @@ python main.py
 ### **Estrutura do Projeto Enterprise Reorganizada**
 ```
 coinbalance/
-├── src/                          # Código fonte principal
+├── frontend/                     # 🌐 Frontend Next.js (NOVO!)
+│   ├── src/                      # Código fonte React/TypeScript
+│   │   ├── app/                 # Pages (App Router)
+│   │   ├── components/          # Componentes React
+│   │   ├── lib/                 # Utilitários e API client
+│   │   ├── services/            # Serviços de integração
+│   │   └── types/               # TypeScript types
+│   ├── package.json             # Dependências npm
+│   ├── tsconfig.json            # Config TypeScript
+│   └── tailwind.config.ts       # Config Tailwind CSS
+│
+├── src/                          # Código fonte backend
 │   ├── domain/                    # Camada de Domínio (DDD)
 │   │   ├── blockchain/           # Entidades e regras de negócio da blockchain
 │   │   │   ├── entities/         # Block, Blockchain, Transaction
@@ -232,7 +264,27 @@ coinbalance/
 - 📋 [**Especificação de Requisitos**](docs/ESPECIFICACAO_REQUISITOS.md) - Requisitos funcionais e não-funcionais
 - 🔧 [**Instalação**](docs/INSTALLATION.md) - Guia de instalação detalhado
 
-### **📘 Engenharia de Requisitos (NOVO - 28/10/2025)**
+### **🌐 Frontend e Integração (NOVO - 28/10/2025)**
+- 🎨 [**Manual de Integração Front-End v2.0**](docs/MANUAL_INTEGRACAO_FRONTEND.md) - **3.122 linhas** - Guia completo
+  - Visão do produto e arquitetura
+  - Design System e componentes UI
+  - Roadmap de implementação (19 semanas)
+  - Exemplos práticos e SDK
+- 📚 [**Documentação Frontend Completa**](docs/frontend/README.md) - **7 guias** com 4.472 linhas
+  - Quick Start (15 minutos)
+  - Componentes UI (20+)
+  - Exemplos Completos (5 páginas)
+  - Guia de Testes
+  - Guia de Deploy
+  - Troubleshooting
+- 💻 [**Projeto Frontend Codificado**](frontend/) - **NOVO!** - Implementação real
+  - Next.js 14 + TypeScript 5
+  - Tailwind CSS 3 configurado
+  - Componentes UI implementados
+  - Serviços e integração API
+  - 1.300+ linhas de código
+
+### **📘 Engenharia de Requisitos**
 - 📦 [**Relatório de Componentes e Dependências**](docs/RELATORIO_COMPONENTES_E_DEPENDENCIAS.md) - Análise completa de componentes, dependências e arquitetura
 - 📋 [**Levantamento de Requisitos Reverso**](docs/LEVANTAMENTO_REQUISITOS_REVERSO.md) - 62 requisitos documentados (39 funcionais + 23 não-funcionais)
 - 📘 [**Modelo de Requisitos Atualizado**](docs/MODELO_REQUISITOS_ATUALIZADO.md) - Especificação formal de requisitos (SRS) completa
