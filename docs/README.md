@@ -15,6 +15,17 @@ Esta documentação técnica fornece informações completas sobre o sistema Coi
 - 📋 [**Especificação de Requisitos**](ESPECIFICACAO_REQUISITOS.md) - Requisitos funcionais e não-funcionais
 - 🔧 [**Instalação**](INSTALLATION.md) - Guia de instalação detalhado
 
+### **Integração e Desenvolvimento**
+- 🌐 [**Manual de Integração Front-End**](MANUAL_INTEGRACAO_FRONTEND.md) - **NOVO v2.0!** Manual completo com 3100+ linhas
+  - ✨ Visão completa do projeto CoinBalance
+  - 🎨 Design System e UI/UX responsivo e imersivo
+  - 📱 Guia completo de desenvolvimento frontend
+  - 🗺️ Roadmap de implementação (19 semanas)
+  - 💻 Stack: React/Next.js, TypeScript, Tailwind CSS
+  - 🚀 Exemplos práticos de integração com a API
+  - 📊 KPIs e métricas de sucesso
+- 📡 [**Documentação da API**](api/README.md) - Endpoints e referência completa da API REST
+
 ### **Relatórios Técnicos**
 - 📊 [**Relatório Técnico Atualizado**](reports/RELATORIO_TECNICO_ATUALIZADO.md) - Status atual do sistema
 - 📊 [**Relatório de Manutenção Perfeita**](reports/RELATORIO_MANUTENCAO_PERFEITA.md) - Resultados da manutenção
