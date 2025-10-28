@@ -28,6 +28,7 @@ from src.presentation.api.routers.blockchain_router import router as blockchain_
 from src.presentation.api.routers.consciousness_economy_router import router as consciousness_economy_router
 from src.presentation.api.routers.monitoring_router import router as monitoring_router
 from src.presentation.api.routers.fractal_router import router as fractal_router
+from src.presentation.api.routers.improvement_router import router as improvement_router
 from src.domain.shared.exceptions import DomainException
 from src.infrastructure.security.rate_limiter import rate_limit_middleware
 
@@ -278,6 +279,9 @@ def create_app() -> FastAPI:
     
     # Holistic Integration endpoints
     app.include_router(holistic_router, prefix="/api/v1")
+    
+    # Improvement endpoints
+    app.include_router(improvement_router)
 
     # TODO: Adicionar outros routers
     # app.include_router(blockchain_router.router, prefix="/api/v1")
