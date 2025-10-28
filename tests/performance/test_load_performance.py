@@ -9,7 +9,7 @@ e geração de relatórios detalhados.
 """
 
 import asyncio
-import aiohttp
+import httpx
 import time
 import statistics
 import json

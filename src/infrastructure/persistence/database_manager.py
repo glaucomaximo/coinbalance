@@ -23,7 +23,14 @@ class DatabaseManager:
     def __init__(self, db_path: Optional[str] = None):
         self.db_path = db_path or "blockchain.db"
         self._local = threading.local()
-        self._init_database()
+        self._initialized = False
+
+    async def initialize(self):
+        """Inicializa o banco de dados de forma assíncrona"""
+        if not self._initialized:
+            self._init_database()
+            self._initialized = True
+        return self
 
     def _init_database(self):
         """Inicializa o banco de dados e cria tabelas necessárias"""

@@ -46,10 +46,10 @@ async def lifespan(app: FastAPI):
     """Gerencia o ciclo de vida da aplicação"""
     # Startup
     logger = get_logger(__name__)
-    logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info(f"📍 Environment: {settings.ENVIRONMENT}")
-    logger.info("🏗️  Architecture: DDD + Clean Architecture + CQRS")
-    logger.info(f"🔧 Debug mode: {settings.DEBUG}")
+    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
+    logger.info(f"Environment: {settings.ENVIRONMENT}")
+    logger.info("Architecture: DDD + Clean Architecture + CQRS")
+    logger.info(f"Debug mode: {settings.DEBUG}")
 
     # Configurar logging estruturado
     logging_manager.configure(
@@ -62,38 +62,38 @@ async def lifespan(app: FastAPI):
     
     # Obter logger estruturado
     logger = get_logger(__name__)
-    logger.info("✅ Structured logging configured")
+    logger.info("Structured logging configured")
     
     # Inicializar container DI
     from src.infrastructure.di.container import get_container
     get_container()
-    logger.info("✅ Dependency Injection Container initialized")
+    logger.info("Dependency Injection Container initialized")
 
     # Inicializar database e cache
     try:
         from src.infrastructure.persistence.database_manager import DatabaseManager
         db_manager = DatabaseManager()
         await db_manager.initialize()
-        logger.info("✅ Database initialized")
+        logger.info("Database initialized")
         
         # Inicializar cache se disponível
         try:
             from src.infrastructure.cache.cache_manager import CacheManager
             cache_manager = CacheManager()
             await cache_manager.initialize()
-            logger.info("✅ Cache initialized")
+            logger.info("Cache initialized")
         except ImportError:
-            logger.info("ℹ️ Cache not available")
+            logger.info("Cache not available")
             
     except Exception as e:
-        logger.error(f"❌ Error initializing infrastructure: {e}")
+        logger.error(f"Error initializing infrastructure: {e}")
         raise
-    logger.info("✅ Application started successfully")
+    logger.info("Application started successfully")
     
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down application...")
+    logger.info("Shutting down application...")
     # Fechar conexões e limpar recursos
     try:
         # Fechar conexões de database
