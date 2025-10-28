@@ -29,6 +29,7 @@ from src.presentation.api.routers.consciousness_economy_router import router as 
 from src.presentation.api.routers.monitoring_router import router as monitoring_router
 from src.presentation.api.routers.fractal_router import router as fractal_router
 from src.presentation.api.routers.improvement_router import router as improvement_router
+from src.presentation.api.routers.web3_advanced_router import router as web3_advanced_router
 from src.domain.shared.exceptions import DomainException
 from src.infrastructure.security.rate_limiter import rate_limit_middleware
 
@@ -282,6 +283,9 @@ def create_app() -> FastAPI:
     
     # Improvement endpoints
     app.include_router(improvement_router)
+    
+    # Web3 Advanced endpoints
+    app.include_router(web3_advanced_router)
 
     # TODO: Adicionar outros routers
     # app.include_router(blockchain_router.router, prefix="/api/v1")
