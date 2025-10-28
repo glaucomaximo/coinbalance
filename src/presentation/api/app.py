@@ -14,6 +14,8 @@ from src.infrastructure.config.settings import settings
 from src.infrastructure.monitoring.security_monitor import security_monitor
 from src.presentation.api.routers import wallet_router, health_router
 from src.presentation.api.routers.wallet_additional import router as wallet_additional_router
+from src.presentation.api.routers.web3_router import router as web3_router
+from src.presentation.api.routers.holistic_router import router as holistic_router
 from src.presentation.api.routers.consensus.consensus_router import router as consensus_router
 from src.presentation.api.routers.transaction_router import router as transaction_router
 from src.presentation.api.routers.system_router import router as system_router
@@ -272,6 +274,10 @@ def create_app() -> FastAPI:
 
     # System endpoints (faucet, minting, etc.)
     app.include_router(system_router, prefix="/api/v1")
+    app.include_router(web3_router, prefix="/api/v1")
+    
+    # Holistic Integration endpoints
+    app.include_router(holistic_router, prefix="/api/v1")
 
     # TODO: Adicionar outros routers
     # app.include_router(blockchain_router.router, prefix="/api/v1")

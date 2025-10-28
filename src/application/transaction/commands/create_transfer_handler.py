@@ -3,6 +3,8 @@ Handler para comando de criação de transferência
 """
 
 from typing import Protocol
+import time
+import logging
 
 from ..commands.create_transfer import CreateTransferCommand
 from src.domain.transaction.entities.transaction import Transaction
@@ -10,6 +12,8 @@ from src.domain.transaction.repositories.transaction_repository import Transacti
 from src.domain.wallet.repositories.wallet_repository import WalletRepository
 from src.domain.shared.exceptions import DomainException, InsufficientFundsError
 from src.application.common.interfaces.use_case import UseCase
+
+logger = logging.getLogger(__name__)
 
 
 class CreateTransferHandler(UseCase[CreateTransferCommand, Transaction]):
@@ -33,7 +37,7 @@ class CreateTransferHandler(UseCase[CreateTransferCommand, Transaction]):
         ...
 
 
-class CreateTransferHandlerImpl:
+class CreateTransferHandlerImpl(CreateTransferHandler):
     """
     Implementação do handler para criação de transferência.
     """
@@ -60,22 +64,44 @@ class CreateTransferHandlerImpl:
             DomainException: Se houver erro no domínio
         """
         try:
+            logger.info(f"Iniciando transferência de {command.from_address} para {command.to_address}")
+            
+            # Validar endereços
+            if command.from_address == command.to_address:
+                raise DomainException("Endereço de origem e destino não podem ser iguais")
+            
             # Verificar se a carteira de origem existe
             from_wallet = await self.wallet_repository.find_by_address(command.from_address)
             if not from_wallet:
-                raise DomainException(f"Wallet {command.from_address} not found")
+                raise DomainException(f"Carteira de origem {command.from_address} não encontrada")
             
             # Verificar se a carteira de destino existe
             to_wallet = await self.wallet_repository.find_by_address(command.to_address)
             if not to_wallet:
-                raise DomainException(f"Wallet {command.to_address} not found")
+                raise DomainException(f"Carteira de destino {command.to_address} não encontrada")
+            
+            # Verificar se carteiras estão ativas
+            if not from_wallet.is_active:
+                raise DomainException("Carteira de origem está inativa")
+            
+            if not to_wallet.is_active:
+                raise DomainException("Carteira de destino está inativa")
+            
+            # Validar valores
+            if command.amount <= 0:
+                raise DomainException("Valor da transferência deve ser maior que zero")
+            
+            if command.fee < 0:
+                raise DomainException("Taxa não pode ser negativa")
             
             # Verificar saldo suficiente
             total_amount = command.amount + command.fee
             if from_wallet.balance.value < total_amount:
                 raise InsufficientFundsError(
-                    f"Insufficient funds. Required: {total_amount}, Available: {from_wallet.balance.value}"
+                    f"Saldo insuficiente. Necessário: {total_amount}, Disponível: {from_wallet.balance.value}"
                 )
+            
+            logger.info(f"Saldo suficiente. Criando transação...")
             
             # Criar transação
             transaction = Transaction.create_transfer(
@@ -84,8 +110,10 @@ class CreateTransferHandlerImpl:
                 amount=command.amount,
                 fee=command.fee,
                 memo=command.memo,
-                metadata=command.metadata
+                metadata=command.metadata or {}
             )
+            
+            logger.info(f"Transação criada com ID: {transaction.id}")
             
             # Salvar transação
             await self.transaction_repository.save(transaction)
@@ -93,12 +121,14 @@ class CreateTransferHandlerImpl:
             # Processar eventos de domínio
             await self._process_domain_events(transaction)
             
+            logger.info(f"Transferência criada com sucesso: {transaction.id}")
             return transaction
             
+        except (DomainException, InsufficientFundsError):
+            raise
         except Exception as e:
-            if isinstance(e, DomainException):
-                raise
-            raise DomainException(f"Error creating transfer: {str(e)}")
+            logger.error(f"Erro ao criar transferência: {e}")
+            raise DomainException(f"Erro ao criar transferência: {str(e)}")
     
     async def _process_domain_events(self, transaction: Transaction) -> None:
         """
@@ -107,11 +137,16 @@ class CreateTransferHandlerImpl:
         Args:
             transaction: Transação com eventos pendentes
         """
-        events = transaction.get_events()
-        
-        for event in events:
-            # Aqui seria implementado o dispatcher de eventos
-            # Por enquanto, apenas limpar os eventos
-            pass
-        
-        transaction.clear_events()
+        try:
+            events = transaction.get_events()
+            
+            for event in events:
+                logger.info(f"Processando evento de domínio: {event.__class__.__name__}")
+                # Aqui seria implementado o dispatcher de eventos
+                # Por enquanto, apenas logar o evento
+                
+            transaction.clear_events()
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar eventos de domínio: {e}")
+            # Não re-raise para não interromper o fluxo principal

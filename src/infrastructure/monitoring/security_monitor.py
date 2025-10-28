@@ -25,6 +25,9 @@ from datetime import datetime, timedelta
 import hashlib
 import ipaddress
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ThreatLevel(Enum):
@@ -183,6 +186,13 @@ class ConsciousSecurityMonitor:
         self.incident_retention_days = 30
         self.pattern_learning_window_hours = 24
         self.behavioral_analysis_window_hours = 168  # 1 semana
+        
+        # Estado do monitoramento
+        self.monitoring_active = True
+        self.anomaly_detection_enabled = True
+        self.threat_intelligence_enabled = True
+        self.last_scan = time.time()
+        self.threat_patterns = []
         
         # Thresholds de detecção
         self.detection_thresholds = {
@@ -380,12 +390,23 @@ class ConsciousSecurityMonitor:
         # Calcula intervalo médio entre eventos
         intervals = []
         for i in range(1, len(recent_patterns)):
-            interval = recent_patterns[i]["timestamp"] - recent_patterns[i-1]["timestamp"]
+            # Garantir que timestamps são float
+            timestamp1 = recent_patterns[i]["timestamp"]
+            timestamp2 = recent_patterns[i-1]["timestamp"]
+            if isinstance(timestamp1, str):
+                timestamp1 = float(timestamp1)
+            if isinstance(timestamp2, str):
+                timestamp2 = float(timestamp2)
+            interval = timestamp1 - timestamp2
             intervals.append(interval)
         
         if intervals:
             avg_interval = sum(intervals) / len(intervals)
-            current_interval = time.time() - recent_patterns[-1]["timestamp"]
+            # Garantir que timestamp é float
+            last_timestamp = recent_patterns[-1]["timestamp"]
+            if isinstance(last_timestamp, str):
+                last_timestamp = float(last_timestamp)
+            current_interval = time.time() - last_timestamp
             
             # Anomalia se intervalo atual é muito diferente da média
             if avg_interval > 0:
@@ -442,6 +463,108 @@ class ConsciousSecurityMonitor:
         
         return threat_patterns
     
+    def get_security_status(self) -> Dict[str, Any]:
+        """
+        Retorna status geral de segurança do sistema.
+        
+        Returns:
+            Dicionário com informações de segurança
+        """
+        try:
+            # Calcular métricas de segurança
+            total_events = len(self.incidents)
+            active_threats = len([incident for incident in self.incidents 
+                                if incident.threat_level in [ThreatLevel.HIGH, ThreatLevel.CRITICAL]])
+            
+            # Calcular score de segurança (0-100)
+            if total_events == 0:
+                security_score = 100.0
+            else:
+                threat_ratio = active_threats / total_events
+                security_score = max(0.0, 100.0 - (threat_ratio * 100))
+            
+            # Determinar nível de ameaça geral
+            if security_score >= 90:
+                threat_level = "low"
+            elif security_score >= 70:
+                threat_level = "medium"
+            elif security_score >= 50:
+                threat_level = "high"
+            else:
+                threat_level = "critical"
+            
+            # Obter estatísticas por tipo de ameaça
+            threat_stats = defaultdict(int)
+            for incident in self.incidents:
+                threat_stats[incident.threat_level.value] += 1
+            
+            # Obter estatísticas por tipo de ataque
+            attack_stats = defaultdict(int)
+            for incident in self.incidents:
+                attack_stats[incident.incident_type.value] += 1
+            
+            # Calcular tendências
+            recent_events = []
+            for incident in self.incidents:
+                # Garantir que timestamp é float
+                incident_timestamp = incident.timestamp
+                if isinstance(incident_timestamp, str):
+                    incident_timestamp = float(incident_timestamp)
+                if time.time() - incident_timestamp < 3600:  # Última hora
+                    recent_events.append(incident)
+            recent_threats = len([incident for incident in recent_events 
+                                if incident.threat_level in [ThreatLevel.HIGH, ThreatLevel.CRITICAL]])
+            
+            return {
+                "security_score": round(security_score, 2),
+                "threat_level": threat_level,
+                "active_threats": active_threats,
+                "total_events": total_events,
+                "recent_threats_1h": recent_threats,
+                "threat_statistics": dict(threat_stats),
+                "attack_statistics": dict(attack_stats),
+                "monitoring_active": self.monitoring_active,
+                "anomaly_detection_enabled": self.anomaly_detection_enabled,
+                "threat_intelligence_enabled": self.threat_intelligence_enabled,
+                "last_scan": self.last_scan,
+                "patterns_detected": len(self.threat_patterns),
+                "recommendations": self._generate_security_recommendations(security_score, threat_level),
+                "timestamp": time.time()
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter status de segurança: {e}")
+            return {
+                "security_score": 0.0,
+                "threat_level": "critical",
+                "error": str(e),
+                "timestamp": time.time()
+            }
+    
+    def _generate_security_recommendations(self, security_score: float, threat_level: str) -> List[str]:
+        """Gera recomendações de segurança baseadas no status atual"""
+        recommendations = []
+        
+        if security_score < 70:
+            recommendations.append("Implementar monitoramento de segurança mais rigoroso")
+            recommendations.append("Revisar políticas de acesso e autenticação")
+        
+        if threat_level in ["high", "critical"]:
+            recommendations.append("Ativar alertas de segurança em tempo real")
+            recommendations.append("Implementar bloqueio automático de IPs suspeitos")
+        
+        if len(self.incidents) > 1000:
+            recommendations.append("Arquivar eventos de segurança antigos")
+            recommendations.append("Otimizar armazenamento de logs de segurança")
+        
+        if not self.anomaly_detection_enabled:
+            recommendations.append("Ativar detecção de anomalias comportamentais")
+        
+        if not self.threat_intelligence_enabled:
+            recommendations.append("Integrar inteligência de ameaças externas")
+        
+        return recommendations
+    
     def _check_brute_force_pattern(self, source_ip: str, timestamp: float) -> Optional[Dict[str, Any]]:
         """Verifica padrão de força bruta"""
         profile = self.behavioral_profiles.get(source_ip, {})
@@ -452,8 +575,12 @@ class ConsciousSecurityMonitor:
         activity_patterns = profile.get("activity_patterns", [])
         
         for pattern in activity_patterns:
+            # Garantir que timestamp é float
+            pattern_timestamp = pattern["timestamp"]
+            if isinstance(pattern_timestamp, str):
+                pattern_timestamp = float(pattern_timestamp)
             if (pattern["event_type"] == SecurityEvent.LOGIN_FAILURE.value and
-                timestamp - pattern["timestamp"] < 600):  # 10 minutos
+                timestamp - pattern_timestamp < 600):  # 10 minutos
                 recent_failures += 1
         
         # Detecta força bruta se há muitas falhas
@@ -550,9 +677,15 @@ class ConsciousSecurityMonitor:
                         timestamp: float) -> Optional[SecurityIncident]:
         """Cria incidente de segurança"""
         # Verifica se já existe incidente similar recente
-        recent_incidents = [i for i in self.incidents 
-                           if i.source_ip == source_ip and 
-                           timestamp - i.timestamp < 3600]  # 1 hora
+        recent_incidents = []
+        for i in self.incidents:
+            if i.source_ip == source_ip:
+                # Garantir que timestamp é float
+                incident_timestamp = i.timestamp
+                if isinstance(incident_timestamp, str):
+                    incident_timestamp = float(incident_timestamp)
+                if timestamp - incident_timestamp < 3600:  # 1 hora
+                    recent_incidents.append(i)
         
         if recent_incidents:
             # Atualiza incidente existente
@@ -728,6 +861,57 @@ class ConsciousSecurityMonitor:
             incident.apply_mitigation(mitigation)
         
         return mitigations
+    
+    def get_active_alerts(self) -> List[Dict[str, Any]]:
+        """
+        Retorna todos os alertas ativos do sistema de segurança.
+        
+        Returns:
+            Lista de alertas ativos com informações detalhadas
+        """
+        try:
+            current_time = time.time()
+            
+            # Filtra incidentes ativos
+            active_incidents = [incident for incident in self.incidents if incident.status == "active"]
+            
+            active_alerts = []
+            for incident in active_incidents:
+                # Verifica se está dentro do período de retenção
+                if current_time - incident.timestamp < self.incident_retention_days * 24 * 3600:
+                    # Determina severidade baseada no nível de ameaça
+                    severity_map = {
+                        ThreatLevel.LOW: "info",
+                        ThreatLevel.MEDIUM: "warning", 
+                        ThreatLevel.HIGH: "error",
+                        ThreatLevel.CRITICAL: "critical",
+                        ThreatLevel.TRANSCENDENT: "transcendent"
+                    }
+                    
+                    active_alerts.append({
+                        "id": incident.id,
+                        "type": "security",
+                        "severity": severity_map.get(incident.threat_level, "warning"),
+                        "title": f"Incidente de Segurança: {incident.incident_type.value}",
+                        "description": incident.description,
+                        "affected_components": [incident.source_ip],
+                        "timestamp": incident.timestamp,
+                        "confidence": float(incident.confidence),
+                        "evidence": incident.evidence,
+                        "mitigation_applied": incident.mitigation_applied,
+                        "threat_level": incident.threat_level.value,
+                        "incident_type": incident.incident_type.value
+                    })
+            
+            # Ordena por severidade e timestamp
+            severity_order = {"critical": 4, "error": 3, "warning": 2, "info": 1, "transcendent": 5}
+            active_alerts.sort(key=lambda x: (severity_order.get(x["severity"], 0), -x["timestamp"]), reverse=True)
+            
+            return active_alerts
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter alertas ativos de segurança: {e}")
+            return []
 
 
 # Instância global do monitor de segurança consciente

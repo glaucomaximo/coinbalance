@@ -371,9 +371,15 @@ class UnifiedConsciousMonitoringSystem:
     def _create_correlated_alert(self, rule: Dict[str, Any], timestamp: float):
         """Cria alerta correlacionado"""
         # Verifica se já existe alerta similar recente
-        recent_correlated = [a for a in self.unified_alerts 
-                           if a.correlation_data.get("rule_id") == rule["id"] and
-                           timestamp - a.timestamp < self.alert_correlation_window]
+        recent_correlated = []
+        for a in self.unified_alerts:
+            if a.correlation_data.get("rule_id") == rule["id"]:
+                # Garantir que timestamp é float
+                alert_timestamp = a.timestamp
+                if isinstance(alert_timestamp, str):
+                    alert_timestamp = float(alert_timestamp)
+                if timestamp - alert_timestamp < self.alert_correlation_window:
+                    recent_correlated.append(a)
         
         if recent_correlated:
             return  # Já existe alerta similar
@@ -641,6 +647,82 @@ class UnifiedConsciousMonitoringSystem:
             "performance_score": performance_score,
             "timestamp": time.time()
         }
+    
+    def get_active_alerts(self) -> List[Dict[str, Any]]:
+        """
+        Retorna todos os alertas ativos do sistema unificado.
+        
+        Returns:
+            Lista de alertas ativos com informações detalhadas
+        """
+        try:
+            active_alerts = []
+            
+            # Obter alertas do monitor consciente
+            conscious_alerts = self.conscious_monitor.get_active_alerts()
+            for alert in conscious_alerts:
+                active_alerts.append({
+                    "id": alert.get("id", f"conscious_{int(time.time())}"),
+                    "type": "conscious",
+                    "severity": alert.get("severity", "info"),
+                    "title": alert.get("title", "Conscious Alert"),
+                    "description": alert.get("description", ""),
+                    "affected_components": alert.get("affected_components", []),
+                    "timestamp": alert.get("timestamp", time.time()),
+                    "source": "conscious_monitor"
+                })
+            
+            # Obter alertas do monitor de segurança
+            security_alerts = self.security_monitor.get_active_alerts()
+            for alert in security_alerts:
+                active_alerts.append({
+                    "id": alert.get("id", f"security_{int(time.time())}"),
+                    "type": "security",
+                    "severity": alert.get("severity", "warning"),
+                    "title": alert.get("title", "Security Alert"),
+                    "description": alert.get("description", ""),
+                    "affected_components": alert.get("affected_components", []),
+                    "timestamp": alert.get("timestamp", time.time()),
+                    "source": "security_monitor"
+                })
+            
+            # Obter alertas do monitor de performance
+            performance_alerts = self.performance_monitor.get_active_alerts()
+            for alert in performance_alerts:
+                active_alerts.append({
+                    "id": alert.get("id", f"performance_{int(time.time())}"),
+                    "type": "performance",
+                    "severity": alert.get("severity", "info"),
+                    "title": alert.get("title", "Performance Alert"),
+                    "description": alert.get("description", ""),
+                    "affected_components": alert.get("affected_components", []),
+                    "timestamp": alert.get("timestamp", time.time()),
+                    "source": "performance_monitor"
+                })
+            
+            # Adicionar alertas unificados
+            for alert in self.unified_alerts:
+                active_alerts.append({
+                    "id": alert.alert_id,
+                    "type": "unified",
+                    "severity": alert.severity.value,
+                    "title": alert.title,
+                    "description": alert.description,
+                    "affected_components": alert.affected_components,
+                    "timestamp": alert.timestamp,
+                    "source": "unified_monitor",
+                    "correlation_data": alert.correlation_data
+                })
+            
+            # Ordenar por severidade e timestamp
+            severity_order = {"critical": 4, "error": 3, "warning": 2, "info": 1}
+            active_alerts.sort(key=lambda x: (severity_order.get(x["severity"], 0), -x["timestamp"]), reverse=True)
+            
+            return active_alerts
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter alertas ativos: {e}")
+            return []
     
     def resolve_alert(self, alert_id: str) -> bool:
         """Resolve um alerta unificado"""

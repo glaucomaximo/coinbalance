@@ -616,6 +616,47 @@ class ConsciousMonitoringSystem:
             "monitoring_level": self.monitoring_level.value,
             "last_updated": time.time()
         }
+    
+    def get_active_alerts(self) -> List[Dict[str, Any]]:
+        """
+        Retorna todos os alertas ativos do sistema.
+        
+        Returns:
+            Lista de alertas ativos com informações detalhadas
+        """
+        try:
+            current_time = time.time()
+            
+            # Filtra alertas ativos (não resolvidos e dentro do período de retenção)
+            active_alerts = []
+            
+            for alert in self.alerts:
+                # Verifica se alerta está ativo
+                if alert.status == "active":
+                    # Verifica se está dentro do período de retenção
+                    if current_time - alert.timestamp < self.metric_retention_hours * 3600:
+                        active_alerts.append({
+                            "id": alert.id,
+                            "metric_id": alert.metric_id,
+                            "severity": alert.severity.value,
+                            "title": alert.message,
+                            "description": f"Alerta de {alert.metric_id}: {alert.message}",
+                            "affected_components": [alert.metric_id],
+                            "timestamp": alert.timestamp,
+                            "confidence": float(alert.confidence),
+                            "recommendations": alert.recommendations,
+                            "context": alert.context
+                        })
+            
+            # Ordena por severidade e timestamp
+            severity_order = {"critical": 4, "error": 3, "warning": 2, "info": 1, "transcendent": 5}
+            active_alerts.sort(key=lambda x: (severity_order.get(x["severity"], 0), -x["timestamp"]), reverse=True)
+            
+            return active_alerts
+            
+        except Exception as e:
+            # Se houver erro, retorna lista vazia
+            return []
 
 
 # Instância global do sistema de monitoramento consciente

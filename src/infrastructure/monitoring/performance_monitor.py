@@ -23,6 +23,9 @@ import threading
 from collections import defaultdict, deque
 import statistics
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PerformanceMetric(Enum):
@@ -109,6 +112,12 @@ class ConsciousPerformanceMonitor:
         self.optimization_rules: List[OptimizationRule] = []
         self.optimization_history: List[Dict[str, Any]] = []
         self._lock = threading.RLock()
+        
+        # Atributos faltantes
+        self.performance_history: List[PerformanceDataPoint] = []
+        self.performance_alerts: List[PerformanceAlert] = []
+        self.auto_optimization_enabled = True
+        self.monitoring_active = True
         
         # Configurações
         self.collection_interval = 5  # segundos
@@ -614,6 +623,198 @@ class ConsciousPerformanceMonitor:
                 return "stable"
         
         return "stable"
+    
+    def get_performance_status(self) -> Dict[str, Any]:
+        """
+        Retorna status geral de performance do sistema.
+        
+        Returns:
+            Dicionário com informações de performance
+        """
+        try:
+            # Obter métricas atuais
+            current_metrics = self.get_current_metrics()
+            
+            # Calcular score de performance (0-100)
+            cpu_score = max(0, 100 - (current_metrics.get("cpu_usage", 0) * 100))
+            memory_score = max(0, 100 - (current_metrics.get("memory_usage", 0) * 100))
+            response_score = max(0, 100 - (current_metrics.get("avg_response_time", 0) / 10))
+            
+            overall_score = (cpu_score + memory_score + response_score) / 3
+            
+            # Determinar status de performance
+            if overall_score >= 90:
+                performance_status = "excellent"
+            elif overall_score >= 75:
+                performance_status = "good"
+            elif overall_score >= 50:
+                performance_status = "fair"
+            elif overall_score >= 25:
+                performance_status = "poor"
+            else:
+                performance_status = "critical"
+            
+            # Calcular tendências
+            recent_data = [point for point in self.performance_history 
+                          if time.time() - point.timestamp < 3600]  # Última hora
+            
+            cpu_trend = self._calculate_trend([p.cpu_usage for p in recent_data])
+            memory_trend = self._calculate_trend([p.memory_usage for p in recent_data])
+            response_trend = self._calculate_trend([p.avg_response_time for p in recent_data])
+            
+            # Obter estatísticas de otimização
+            total_optimizations = len(self.optimization_history)
+            successful_optimizations = len([opt for opt in self.optimization_history if opt.get("success", False)])
+            optimization_success_rate = (successful_optimizations / total_optimizations * 100) if total_optimizations > 0 else 0
+            
+            # Obter alertas ativos
+            active_alerts = [alert for alert in self.performance_alerts 
+                           if alert.severity in [AlertSeverity.WARNING, AlertSeverity.ERROR, AlertSeverity.CRITICAL]]
+            
+            return {
+                "performance_score": round(overall_score, 2),
+                "performance_status": performance_status,
+                "cpu_usage": current_metrics.get("cpu_usage", 0),
+                "memory_usage": current_metrics.get("memory_usage", 0),
+                "avg_response_time": current_metrics.get("avg_response_time", 0),
+                "throughput": current_metrics.get("throughput", 0),
+                "error_rate": current_metrics.get("error_rate", 0),
+                "active_connections": current_metrics.get("active_connections", 0),
+                "trends": {
+                    "cpu_trend": cpu_trend,
+                    "memory_trend": memory_trend,
+                    "response_trend": response_trend
+                },
+                "optimization_stats": {
+                    "total_optimizations": total_optimizations,
+                    "successful_optimizations": successful_optimizations,
+                    "success_rate": round(optimization_success_rate, 2),
+                    "active_rules": len([rule for rule in self.optimization_rules if rule.enabled])
+                },
+                "active_alerts": len(active_alerts),
+                "monitoring_active": self.monitoring_active,
+                "auto_optimization_enabled": self.auto_optimization_enabled,
+                "last_optimization": self.optimization_history[-1]["timestamp"] if self.optimization_history else None,
+                "recommendations": self._generate_performance_recommendations(overall_score, performance_status),
+                "timestamp": time.time()
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter status de performance: {e}")
+            return {
+                "performance_score": 0.0,
+                "performance_status": "critical",
+                "error": str(e),
+                "timestamp": time.time()
+            }
+    
+    def _generate_performance_recommendations(self, performance_score: float, performance_status: str) -> List[str]:
+        """Gera recomendações de performance baseadas no status atual"""
+        recommendations = []
+        
+        if performance_score < 70:
+            recommendations.append("Considerar escalonamento horizontal de recursos")
+            recommendations.append("Otimizar consultas de banco de dados")
+        
+        if performance_status in ["poor", "critical"]:
+            recommendations.append("Ativar otimizações automáticas agressivas")
+            recommendations.append("Implementar cache distribuído")
+        
+        if not self.auto_optimization_enabled:
+            recommendations.append("Ativar otimizações automáticas de performance")
+        
+        if len(self.performance_history) > 10000:
+            recommendations.append("Arquivar dados históricos de performance antigos")
+        
+        return recommendations
+    
+    def get_current_metrics(self) -> Dict[str, Any]:
+        """
+        Retorna métricas atuais do sistema.
+        
+        Returns:
+            Dicionário com métricas atuais
+        """
+        try:
+            # Obter métricas do sistema
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory = psutil.virtual_memory()
+            disk = psutil.disk_usage('/')
+            
+            # Calcular métricas de rede
+            network_io = psutil.net_io_counters()
+            
+            return {
+                "cpu_usage": cpu_percent / 100.0,  # Normalizar para 0-1
+                "memory_usage": memory.percent / 100.0,  # Normalizar para 0-1
+                "disk_usage": disk.percent / 100.0,  # Normalizar para 0-1
+                "avg_response_time": 100.0,  # Simulado
+                "throughput": 1000.0,  # Simulado
+                "error_rate": 0.01,  # Simulado
+                "active_connections": 50,  # Simulado
+                "network_bytes_sent": network_io.bytes_sent,
+                "network_bytes_recv": network_io.bytes_recv
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter métricas atuais: {e}")
+            return {
+                "cpu_usage": 0.0,
+                "memory_usage": 0.0,
+                "disk_usage": 0.0,
+                "avg_response_time": 0.0,
+                "throughput": 0.0,
+                "error_rate": 0.0,
+                "active_connections": 0
+            }
+    
+    def get_active_alerts(self) -> List[Dict[str, Any]]:
+        """
+        Retorna todos os alertas ativos do sistema de performance.
+        
+        Returns:
+            Lista de alertas ativos com informações detalhadas
+        """
+        try:
+            current_time = time.time()
+            
+            # Filtra alertas ativos
+            active_alerts = []
+            
+            for alert in self.performance_alerts:
+                # Verifica se alerta está ativo e dentro do período de retenção
+                if alert.status == "active" and current_time - alert.timestamp < 24 * 3600:  # 24 horas
+                    # Determina severidade baseada no tipo de alerta
+                    severity_map = {
+                        AlertSeverity.INFO: "info",
+                        AlertSeverity.WARNING: "warning",
+                        AlertSeverity.ERROR: "error", 
+                        AlertSeverity.CRITICAL: "critical"
+                    }
+                    
+                    active_alerts.append({
+                        "id": alert.alert_id,
+                        "type": "performance",
+                        "severity": severity_map.get(alert.severity, "warning"),
+                        "title": f"Alerta de Performance: {alert.metric_name}",
+                        "description": alert.message,
+                        "affected_components": [alert.metric_name],
+                        "timestamp": alert.timestamp,
+                        "metric_name": alert.metric_name,
+                        "current_value": alert.current_value,
+                        "threshold": alert.threshold,
+                        "recommendations": alert.recommendations
+                    })
+            
+            # Ordena por severidade e timestamp
+            severity_order = {"critical": 4, "error": 3, "warning": 2, "info": 1}
+            active_alerts.sort(key=lambda x: (severity_order.get(x["severity"], 0), -x["timestamp"]), reverse=True)
+            
+            return active_alerts
+            
+        except Exception as e:
+            # Se houver erro, retorna lista vazia
+            return []
 
 
 # Instância global do monitor de performance consciente

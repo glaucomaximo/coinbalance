@@ -1,0 +1,58 @@
+# Configurações de Ambiente para CoinBalance
+# ===========================================
+
+# Configurações de Autenticação
+JWT_SECRET_KEY="coinbalance-production-secret-key-2024-secure"
+JWT_EXPIRATION_HOURS=24
+PASSWORD_MIN_LENGTH=8
+MAX_LOGIN_ATTEMPTS=5
+LOCKOUT_DURATION=3600
+
+# Configurações de Rate Limiting
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=3600
+
+# Configurações de Banco de Dados
+DATABASE_URL="sqlite:///./coinbalance.db"
+AUTH_DATABASE_URL="sqlite:///./auth.db"
+
+# Configurações de CORS
+CORS_ORIGINS=["http://localhost:3000", "http://localhost:8000", "http://localhost:8001"]
+CORS_ALLOW_CREDENTIALS=true
+CORS_ALLOW_METHODS=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS=["*"]
+
+# Configurações de Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/coinbalance.log
+
+# Configurações de Aplicação
+APP_NAME="CoinBalance"
+APP_DESCRIPTION="A Economia da Consciência"
+APP_VERSION="2.1.0"
+DEBUG=false
+DOCS_ENABLED=true
+
+# Configurações de Segurança
+SECRET_KEY="coinbalance-secret-key-2024"
+MASTER_KEY="coinbalance-master-key-2024"
+
+# Configurações de Monitoramento
+MONITORING_ENABLED=true
+METRICS_ENABLED=true
+HEALTH_CHECK_ENABLED=true
+
+# Configurações de Fractais
+FRACTAL_CONSIOUSNESS_ENABLED=true
+FRACTAL_SCALING_ENABLED=true
+FRACTAL_ML_ENABLED=true
+
+# Configurações de DeFi
+DEFI_STAKING_ENABLED=true
+DEFI_LENDING_ENABLED=true
+DEFI_GOVERNANCE_ENABLED=true
+
+# Configurações de Economia Consciente
+CONSCIOUSNESS_ECONOMY_ENABLED=true
+IMPACT_PROJECTS_ENABLED=true
+CARBON_OFFSET_ENABLED=true

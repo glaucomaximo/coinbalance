@@ -61,6 +61,22 @@ async def readiness():
 
 
 @router.get(
+    "/health",
+    summary="Health Check Principal",
+    description="Health check principal da aplicação",
+)
+async def health():
+    """Health check principal"""
+    return {
+        "status": "healthy",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT,
+        "timestamp": time.time(),
+    }
+
+
+@router.get(
     "/health/simple",
     summary="Health Check Simples",
     description="Health check simplificado para load balancers",

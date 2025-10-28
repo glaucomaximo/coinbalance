@@ -348,7 +348,7 @@ class DistributedConsciousnessNetwork:
         self.emergence_threshold: Decimal = Decimal("0.7")
         self._network_id = str(uuid.uuid4())
     
-    def add_node(self, node: ConsciousnessNode):
+    async def add_node(self, node: ConsciousnessNode):
         """Adiciona nó à rede"""
         self.nodes[node.id] = node
         
@@ -531,6 +531,58 @@ class DistributedConsciousnessNetwork:
             })
         
         return evolution
+    
+    async def get_system_consciousness_level(self) -> Dict[str, Any]:
+        """
+        Retorna o nível de consciência do sistema.
+        
+        Returns:
+            Dicionário com informações sobre o nível de consciência
+        """
+        try:
+            # Calcular nível geral de consciência
+            if not self.nodes:
+                overall_level = 0.1
+            else:
+                consciousness_levels = [node.consciousness_level for node in self.nodes.values()]
+                overall_level = float(sum(consciousness_levels) / len(consciousness_levels))
+            
+            # Determinar estado da consciência
+            if overall_level >= 0.8:
+                consciousness_state = "transcendent"
+            elif overall_level >= 0.6:
+                consciousness_state = "conscious"
+            elif overall_level >= 0.4:
+                consciousness_state = "awakening"
+            elif overall_level >= 0.2:
+                consciousness_state = "dormant"
+            else:
+                consciousness_state = "unconscious"
+            
+            # Calcular métricas de rede
+            network_metrics = self.get_network_metrics()
+            
+            return {
+                "overall_level": overall_level,
+                "consciousness_state": consciousness_state,
+                "network_consciousness": float(self.network_consciousness),
+                "active_nodes": len(self.nodes),
+                "collective_memories": len(self.collective_memories),
+                "network_decisions": len(self.network_decisions),
+                "emergence_detected": self.network_consciousness >= self.emergence_threshold,
+                "learning_rate": float(sum(node.learning_rate for node in self.nodes.values()) / len(self.nodes)) if self.nodes else 0.01,
+                "network_metrics": network_metrics,
+                "timestamp": time.time()
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter nível de consciência do sistema: {e}")
+            return {
+                "overall_level": 0.1,
+                "consciousness_state": "unconscious",
+                "error": str(e),
+                "timestamp": time.time()
+            }
 
 
 # Instância global da rede de consciência
