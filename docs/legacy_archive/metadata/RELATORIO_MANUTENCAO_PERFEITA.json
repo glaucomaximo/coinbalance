@@ -1,0 +1,17 @@
+{
+  "arquivo": "RELATORIO_MANUTENCAO_PERFEITA.md",
+  "localizacao_original": "docs/reports/RELATORIO_MANUTENCAO_PERFEITA.md",
+  "localizacao_arquivo": "docs/legacy_archive/reports/RELATORIO_MANUTENCAO_PERFEITA.md",
+  "data_original": "2024-10-28",
+  "data_arquivamento": "2025-10-29",
+  "versao": "1.0",
+  "hash_sha256": "9FE9B8303ED21C22CDD5C1F4411007987935568E38F04928F7AC5A185747B57E",
+  "substituido_por": [
+    "docs/reports/RELATORIO_TECNICO_REVISAO_2025_10_29_COMPLETO.md"
+  ],
+  "motivo": "Substituído por relatório técnico completo mais recente",
+  "responsavel": "Engenharia de Documentação Sênior",
+  "categoria": "relatorio_manutencao",
+  "status": "arquivado"
+}
+

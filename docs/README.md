@@ -25,14 +25,57 @@ Esta documentação técnica fornece informações completas sobre o sistema Coi
   - 🚀 Exemplos práticos de integração com a API
   - 📊 KPIs e métricas de sucesso
 - 📡 [**Documentação da API**](api/README.md) - Endpoints e referência completa da API REST
+- 📋 [**Auditoria de Documentação Frontend**](AUDITORIA_DOCUMENTACAO_FRONTEND.md) - **NOVO!** Inventário completo de documentação técnica do frontend para conformidade e auditoria
+- 📋 [**Auditoria de Conformidade de Documentação**](AUDITORIA_CONFORMIDADE_DOCUMENTACAO.md) - **NOVO!** Auditoria completa de 64+ documentos técnicos com verificação de conformidade ISO/IEC e IEEE
+- 📚 [**Glossário de Termos Técnicos**](GLOSSARIO_TERMOS_TECNICOS.md) - **NOVO!** Definições completas de termos técnicos, abreviações e convenções de nomenclatura
+- 📋 [**Controle e Garantia de Qualidade de Documentação**](CONTROLE_GARANTIA_QUALIDADE_DOCUMENTACAO.md) - **NOVO!** Sistema de gestão de documentação conforme padrões internacionais
+- 📋 [**Plano de Eliminação de Documentação Obsoleta**](PLANO_ELIMINACAO_DOCUMENTACAO_OBSOLETA.md) - **NOVO!** Plano de organização e padronização
+- 📋 [**Índice Consolidado de Documentos de Resumo**](INDICE_DOCUMENTOS_RESUMO.md) - **NOVO!** Índice organizado de todos os resumos executivos
+- 📊 [**Relatório de Organização e Padronização**](RELATORIO_ORGANIZACAO_PADRONIZACAO.md) - **NOVO!** Relatório completo da organização conforme padrões internacionais
 
-### **Relatórios Técnicos**
-- 📊 [**Relatório Técnico Atualizado**](reports/RELATORIO_TECNICO_ATUALIZADO.md) - Status atual do sistema
-- 📊 [**Relatório de Manutenção Perfeita**](reports/RELATORIO_MANUTENCAO_PERFEITA.md) - Resultados da manutenção
+### **Relatórios e Resumos**
+- 📊 [**Relatórios Técnicos**](reports/README.md) - Índice completo de relatórios técnicos
+  - Relatórios atuais e históricos organizados
+  - Conformidade com padrões internacionais
+- 📋 [**Índice de Documentos de Resumo**](INDICE_DOCUMENTOS_RESUMO.md) - Índice consolidado de resumos executivos
+
+### **Deploy e Docker**
+
+- 🐳 [**Guia Completo de Docker**](DOCKER_GUIDE.md) - **NOVO!** Guia completo de Docker e Docker Compose
+- 🚀 [**Configuração Docker Completa**](DOCKER_SETUP_COMPLETE.md) - **NOVO!** Resumo das alterações e validação
+- ✅ [**Validação do Funcionamento Pleno**](VALIDACAO_FUNCIONAMENTO_PLENO.md) - **NOVO!** Validação completa e correções aplicadas
+- 📊 [**Relatório de Execução e Testes**](RELATORIO_TESTE_EXECUCAO_COMPLETO.md) - **NOVO!** Execução completa e testes locais
+- ✅ [**Relatório Docker Completo Final**](RELATORIO_DOCKER_COMPLETO_FINAL.md) - **NOVO!** Sistema 100% funcional no Docker com todas as correções
+- 📦 [**Guia de Deploy Otimizado**](GUIA_DEPLOY_OTIMIZADO.md) - Deploy enterprise com Docker
+
+**Status Atual:** ✅ **SISTEMA COMPLETO EXECUTANDO NO DOCKER - TODOS OS SERVIÇOS HEALTHY**
+
+### **Auditoria e Reconstrução Documental**
+
+- 📋 [**Auditoria Documental Completa**](auditoria_documentacao.md) - **NOVO!** Relatório completo de auditoria de 64+ documentos
+- 📜 [**Changelog de Documentação**](changelog_documentacao.md) - **NOVO!** Histórico completo de mudanças documentais
+- 📘 [**Dossiê Técnico v1.0**](dossie_tecnico_v1.md) - **NOVO!** Documentação técnica consolidada através de engenharia reversa
+- 📐 [**Padrões de Documentação**](padroes_documentacao.md) - **NOVO!** Guia de estilo e convenções estabelecidos
+- 📜 [**Legacy Archive**](legacy_archive/README.md) - **NOVO!** Sistema de arquivamento de documentos históricos
+- 📊 [**Relatório Executivo - Auditoria Documental**](RELATORIO_EXECUTIVO_AUDITORIA_DOCUMENTAL.md) - **NOVO!** Sumário executivo completo
+
+### **Documentação de Engenharia (Padrão ISO/IEC/IEEE 15289)**
+
+- 📐 [**Documentação de Engenharia Completa**](eng/DOC-ENG_README.md) - **NOVO!** Sistema legado reestruturado
+  - ✅ **11 documentos técnicos** conforme ISO/IEC/IEEE 15289
+  - ✅ **Todas as 4 fases** de engenharia de documentação completas
+  - ✅ **Inventário técnico** completo
+  - ✅ **Arquitetura documental padrão** definida
+  - ✅ **Arquitetura de sistema** (C4 Model) com diagramas
+  - ✅ **Referência completa de API** (250+ endpoints)
+  - ✅ **Modelo de banco de dados** completo
+  - ✅ **DevOps e infraestrutura** documentados
+  - ✅ **Manual do usuário** completo
+  - ✅ **Sumário executivo** para gestão/diretoria
+  - ✅ **Governança documental** estabelecida
+  - ✅ **Relatório de execução final** completo
 
 ---
-
-## 🏗️ **Arquitetura e Engenharia**
 
 ### **Arquitetura de Software**
 - 🏛️ [**Arquitetura de Software**](engenharia/arquitetura-software.md) - Padrões arquiteturais enterprise

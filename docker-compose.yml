@@ -1,39 +1,61 @@
-version: '3.8'
-
 services:
   # Aplicação principal Coinbalance
   coinbalance:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app
+      - ENVIRONMENT=development
+      - DEBUG=false
       - DATABASE_URL=sqlite:///app/data/blockchain.db
+      - REDIS_URL=redis://redis:6379/0
       - LOG_LEVEL=info
       - MOEDA=CNB
       - PLATAFORMA=Coinbalance
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-jwt-secret-key-change-in-production}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-dev-encryption-key-change-in-production}
+      - COINBALANCE_MASTER_KEY=${COINBALANCE_MASTER_KEY:-dev-master-key-change-in-production}
     volumes:
       - ./data:/app/data
       - ./backups:/app/backups
       - ./logs:/app/logs
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_healthy
+      # postgres é opcional (SQLite é usado por padrão)
     networks:
       - coinbalance-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Redis para cache
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"  # Porta alternativa para evitar conflito
     volumes:
       - redis_data:/data
     networks:
       - coinbalance-network
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # PostgreSQL para persistência
   postgres:
@@ -41,30 +63,42 @@ services:
     environment:
       POSTGRES_DB: coinbalance
       POSTGRES_USER: coinbalance
-      POSTGRES_PASSWORD: coinbalance_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coinbalance_password_change_in_production}
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - coinbalance-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coinbalance"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
-  # Nginx para load balancing
+  # Nginx para load balancing (opcional)
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - coinbalance
+      coinbalance:
+        condition: service_healthy
     networks:
       - coinbalance-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Monitoramento
   prometheus:
@@ -72,17 +106,28 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     networks:
       - coinbalance-network
     restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Grafana para visualização
+  # Grafana para visualização (opcional - porta alternativa se 3000 ocupada)
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "3001:3000"  # Porta alternativa para evitar conflito
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
@@ -90,6 +135,11 @@ services:
     networks:
       - coinbalance-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   redis_data:

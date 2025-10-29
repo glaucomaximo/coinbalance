@@ -1,0 +1,18 @@
+{
+  "arquivo": "RELATORIO_FINAL_REVISAO_COMPLETA_DOCUMENTACAO_ATUALIZADA.md",
+  "localizacao_original": "docs/reports/RELATORIO_FINAL_REVISAO_COMPLETA_DOCUMENTACAO_ATUALIZADA.md",
+  "localizacao_arquivo": "docs/legacy_archive/reports/RELATORIO_FINAL_REVISAO_COMPLETA_DOCUMENTACAO_ATUALIZADA.md",
+  "data_original": "2024-12-19",
+  "data_arquivamento": "2025-10-29",
+  "versao": "1.0",
+  "hash_sha256": "749BD9DE3AC4BEEF282841EB946CEBAB0278D1E42196BFA79F8A79913B1D48B8",
+  "substituido_por": [
+    "docs/reports/RELATORIO_TECNICO_REVISAO_2025_10_29_COMPLETO.md",
+    "docs/AUDITORIA_CONFORMIDADE_DOCUMENTACAO.md"
+  ],
+  "motivo": "Substituído por relatórios técnicos mais recentes e auditoria de conformidade atualizada",
+  "responsavel": "Engenharia de Documentação Sênior",
+  "categoria": "relatorio_final",
+  "status": "arquivado"
+}
+

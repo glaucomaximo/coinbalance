@@ -1,0 +1,49 @@
+# Configuração do Prometheus para CoinBalance
+# ===========================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'coinbalance'
+    environment: 'development'
+
+# Configurações de alertas
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Arquivos de regras de alerta
+rule_files:
+  # - "alert_rules.yml"
+
+# Configurações de scraping
+scrape_configs:
+  # Scraping da aplicação CoinBalance
+  - job_name: 'coinbalance'
+    scrape_interval: 15s
+    metrics_path: '/api/v1/metrics'
+    static_configs:
+      - targets: ['coinbalance:8000']
+        labels:
+          service: 'coinbalance'
+          environment: 'development'
+
+  # Scraping do Prometheus (auto-monitoramento)
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scraping do Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+
+  # Scraping do PostgreSQL (se houver exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+

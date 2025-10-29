@@ -23,6 +23,8 @@ import threading
 from collections import defaultdict
 import asyncio
 
+from src.infrastructure.logging.structured_logging import get_logger
+
 from .conscious_monitoring import (
     ConsciousMonitoringSystem, 
     MonitoringLevel, 
@@ -43,6 +45,8 @@ from .performance_monitor import (
     OptimizationAction,
     performance_monitor
 )
+
+logger = get_logger(__name__)
 
 
 class SystemHealthStatus(Enum):
@@ -114,6 +118,7 @@ class UnifiedConsciousMonitoringSystem:
         self.unified_alerts: List[UnifiedAlert] = []
         self.system_insights: List[SystemInsight] = []
         self.correlation_rules: List[Dict[str, Any]] = []
+        self.global_metrics: Dict[str, Any] = {}  # Métricas globais do sistema
         self._lock = threading.RLock()
         
         # Configurações
@@ -177,7 +182,7 @@ class UnifiedConsciousMonitoringSystem:
                     self._update_system_health()
                     time.sleep(self.insight_generation_interval)
                 except Exception as e:
-                    print(f"Erro na análise contínua: {e}")
+                    logger.error(f"Erro na análise contínua: {e}", exc_info=True)
                     time.sleep(self.insight_generation_interval)
         
         analysis_thread = threading.Thread(target=analyze_system, daemon=True)
@@ -557,8 +562,9 @@ class UnifiedConsciousMonitoringSystem:
         """Atualiza saúde geral do sistema"""
         try:
             # Calcular métricas globais
-            total_alerts = len(self.active_alerts)
-            critical_alerts = len([a for a in self.active_alerts if a.get('severity') == 'critical'])
+            active_alerts = self.get_active_alerts()
+            total_alerts = len(active_alerts)
+            critical_alerts = len([a for a in active_alerts if a.get('severity') == 'critical'])
             
             # Calcular score de saúde (0-100)
             health_score = 100

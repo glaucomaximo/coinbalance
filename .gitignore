@@ -179,11 +179,12 @@ tmp/
 # Docker
 .dockerignore
 
-# Node.js (if any frontend components)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Node.js (mantido para compatibilidade futura se necessário)
+# Nota: Frontend foi migrado para repositório separado em 29/10/2025
+# node_modules/
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
 
 # Fractal state files
 fractal_state.json

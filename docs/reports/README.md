@@ -1,114 +1,143 @@
-# 📊 Relatórios - CoinBalance
+# 📊 Relatórios Técnicos - CoinBalance
 
-## 📋 **Índice de Relatórios**
+## 📋 Índice
 
-Esta seção contém todos os relatórios gerados pelo sistema CoinBalance.
-
----
-
-## 📈 **Relatórios de Qualidade**
-
-### **Relatório de Qualidade Geral**
-- **Arquivo**: [quality-report.md](quality-report.md)
-- **Descrição**: Análise completa da qualidade do código e arquitetura
-- **Última Atualização**: 27 de Outubro de 2024
-- **Status**: ✅ Atualizado
-
-### **Relatório de Testes**
-- **Arquivo**: [test-report.md](test-report.md)
-- **Descrição**: Análise detalhada dos testes e cobertura
-- **Última Atualização**: 27 de Outubro de 2024
-- **Status**: ✅ Atualizado
+Este diretório contém todos os relatórios técnicos do projeto CoinBalance, organizados por tipo e data conforme padrões internacionais.
 
 ---
 
-## 📋 **Artefatos do Software**
+## ✅ Relatórios Atuais (Última Versão)
 
-### **Inventário do Software**
-- **Arquivo**: [../artifacts/software-inventory.md](../artifacts/software-inventory.md)
-- **Descrição**: Inventário completo de componentes e funcionalidades
-- **Última Atualização**: 27 de Outubro de 2024
-- **Status**: ✅ Atualizado
+### **Relatórios de Revisão Técnica**
 
----
+- 📊 [**Relatório Técnico de Revisão Completa 29/10/2025**](RELATORIO_TECNICO_REVISAO_2025_10_29_COMPLETO.md) - **RECOMENDADO**
+  - Revisão técnica completa com diagnóstico geral
+  - Manutenções propostas (corretiva, adaptativa, evolutiva, preventiva)
+  - Alterações aplicadas e documentação atualizada
+  - Conformidade com padrões ISO/IEC e IEEE validada
+  - **Versão:** 1.0 | **Status:** ✅ Atualizado
 
-## 📊 **Métricas Atuais**
+- 📊 [**Relatório Técnico de Revisão 29/10/2025**](RELATORIO_TECNICO_REVISAO_2025_10_29.md)
+  - Análise detalhada de manutenções necessárias
+  - Correções aplicadas e propostas de melhorias
+  - Métricas de qualidade e plano de ação
+  - **Versão:** 1.0 | **Status:** ✅ Atualizado
 
-### **Estatísticas dos Testes**
-- **Total de Testes**: 95
-- **Taxa de Sucesso**: 100%
-- **Tempo de Execução**: 5.90 segundos
-- **Cobertura Estimada**: ~85%
-
-### **Performance da API**
-- **Criação de Carteira**: ~25ms
-- **Busca de Carteira**: ~15ms
-- **Operação de Crédito**: ~12ms
-- **Operação de Débito**: ~12ms
-- **Listagem de Carteiras**: ~20ms
-
-### **Qualidade do Código**
-- **Arquitetura**: DDD + Clean Architecture
-- **Padrões**: CQRS, Repository, DI
-- **Testabilidade**: Alta
-- **Manutenibilidade**: Alta
+- 📊 [**Resumo de Revisão Técnica 29/10/2025**](RESUMO_REVISAO_TECNICA_2025_10_29.md)
+  - Resumo executivo da revisão técnica
+  - **Versão:** 1.0 | **Status:** ✅ Atualizado
 
 ---
 
-## 🔄 **Geração Automática**
+## 📜 Relatórios Históricos
 
-### **Relatórios Gerados Automaticamente**
-- ✅ Relatório de testes (pytest)
-- ✅ Relatório de qualidade (análise manual)
-- ✅ Inventário do software (análise manual)
+Os seguintes relatórios são mantidos como **documentos históricos** para referência e rastreabilidade:
 
-### **Relatórios Planejados**
-- ⏳ Relatório de cobertura (pytest-cov)
-- ⏳ Relatório de segurança (Bandit)
-- ⏳ Relatório de performance (profiling)
-- ⏳ Relatório de dependências (safety)
+> **⚠️ ATENÇÃO:** Para informações atualizadas, consulte os relatórios atuais listados acima.
 
----
+- 📜 [**Relatório Técnico Atualizado (Histórico)**](RELATORIO_TECNICO_ATUALIZADO.md)
+  - **Data Original:** 28/10/2024
+  - **Última Atualização:** 29/10/2025
+  - **Status:** 📜 Documento Histórico
 
-## 📅 **Cronograma de Atualizações**
+- 📜 [**Relatório de Manutenção Perfeita (Histórico)**](RELATORIO_MANUTENCAO_PERFEITA.md)
+  - **Data Original:** 28/10/2024
+  - **Última Atualização:** 29/10/2025
+  - **Status:** 📜 Documento Histórico
 
-### **Atualizações Diárias**
-- Relatório de testes (após cada execução)
-- Logs de execução
+- 📜 [**Relatório Final de Revisão (Histórico)**](RELATORIO_FINAL_REVISAO_COMPLETA_DOCUMENTACAO_ATUALIZADA.md)
+  - **Data Original:** 19/12/2024
+  - **Última Atualização:** 29/10/2025
+  - **Status:** 📜 Documento Histórico
 
-### **Atualizações Semanais**
-- Relatório de qualidade
-- Métricas de performance
-
-### **Atualizações Mensais**
-- Inventário do software
-- Análise arquitetural
+- 📜 [**Relatório Final de Manutenções (Histórico)**](RELATORIO_FINAL_MANUTENCOES_PROMOVIDAS.md)
+  - **Data Original:** 19/12/2024
+  - **Última Atualização:** 29/10/2025
+  - **Status:** 📜 Documento Histórico
 
 ---
 
-## 🎯 **Como Usar**
+## 📋 Categorias de Relatórios
 
-### **Visualizar Relatórios**
-```bash
-# Abrir relatório de qualidade
-cat docs/reports/quality-report.md
+### **1. Relatórios de Revisão Técnica**
+Relatórios completos de revisão técnica do sistema, incluindo diagnóstico, manutenções propostas e implementadas.
 
-# Abrir relatório de testes
-cat docs/reports/test-report.md
+### **2. Relatórios de Manutenção**
+Relatórios detalhados sobre manutenções realizadas no sistema.
 
-# Abrir inventário do software
-cat docs/artifacts/software-inventory.md
-```
-
-### **Gerar Novos Relatórios**
-```bash
-# Executar testes e gerar relatório
-python -m pytest tests/ --tb=short -q --durations=10
-
-# Verificar qualidade do código
-./scripts/quality-check.sh
-```
+### **3. Relatórios de Qualidade**
+Relatórios sobre qualidade de código, testes e conformidade.
 
 ---
 
-*Índice de relatórios atualizado em 27 de Outubro de 2024*
+## 🔄 Política de Versionamento
+
+### **Relatórios Atuais**
+- Mantidos e atualizados regularmente
+- Versão atual: 1.0 (29/10/2025)
+- Status: ✅ Atualizado
+
+### **Relatórios Históricos**
+- Marcados como históricos
+- Mantidos para referência e rastreabilidade
+- Datas originais preservadas
+
+### **Política de Retenção**
+- **Relatórios Atuais**: Mantidos indefinidamente
+- **Relatórios Históricos**: Mantidos por 2 anos após substituição
+- **Relatórios Obsoletos**: Arquivados em `docs/_archived/` após 2 anos
+
+---
+
+## 📊 Métricas de Relatórios
+
+| Categoria | Total | Atuais | Históricos |
+|-----------|-------|--------|------------|
+| **Revisão Técnica** | 3 | 3 | 0 |
+| **Manutenção** | 2 | 0 | 2 |
+| **Qualidade** | 0 | 0 | 0 |
+| **Total** | 5 | 3 | 2 |
+
+---
+
+## 📚 Convenções de Documentação
+
+### **Template Padrão**
+Todos os relatórios seguem o template padrão definido em [Controle e Garantia de Qualidade de Documentação](../CONTROLE_GARANTIA_QUALIDADE_DOCUMENTACAO.md).
+
+### **Versionamento**
+- **Major (X.0)**: Mudanças significativas
+- **Minor (X.Y)**: Novas funcionalidades ou melhorias
+- **Patch (X.Y.Z)**: Correções menores
+
+### **Nomenclatura**
+- Formato: `RELATORIO_[CATEGORIA]_[DATA].md`
+- Data: Formato `YYYY_MM_DD` ou `YYYY_MM`
+- Exemplo: `RELATORIO_TECNICO_REVISAO_2025_10_29.md`
+
+---
+
+## ✅ Checklist de Qualidade
+
+- [x] ✅ Todos os relatórios têm cabeçalho padrão
+- [x] ✅ Versões e datas especificadas
+- [x] ✅ Status claramente definido
+- [x] ✅ Relatórios históricos marcados apropriadamente
+- [x] ✅ Links funcionais verificados
+- [x] ✅ Conformidade com padrões ISO/IEC e IEEE
+- [x] ✅ Índice atualizado
+
+---
+
+## 📖 Referências
+
+- [Controle e Garantia de Qualidade de Documentação](../CONTROLE_GARANTIA_QUALIDADE_DOCUMENTACAO.md)
+- [Auditoria de Conformidade de Documentação](../AUDITORIA_CONFORMIDADE_DOCUMENTACAO.md)
+- [Glossário de Termos Técnicos](../GLOSSARIO_TERMOS_TECNICOS.md)
+
+---
+
+**Última Atualização:** 29 de outubro de 2025  
+**Próxima Revisão:** 29 de janeiro de 2026  
+**Versão:** 2.0  
+**Status:** ✅ **ORGANIZADO E PADRONIZADO**

@@ -1,0 +1,18 @@
+{
+  "arquivo": "RELATORIO_TECNICO_ATUALIZADO.md",
+  "localizacao_original": "docs/reports/RELATORIO_TECNICO_ATUALIZADO.md",
+  "localizacao_arquivo": "docs/legacy_archive/reports/RELATORIO_TECNICO_ATUALIZADO.md",
+  "data_original": "2024-10-28",
+  "data_arquivamento": "2025-10-29",
+  "versao": "1.0",
+  "hash_sha256": "6976ED06EECB1B3E6F0CD418573F194E59145FD418F2C37E180513B0CF3E5E94",
+  "substituido_por": [
+    "docs/reports/RELATORIO_TECNICO_REVISAO_2025_10_29.md",
+    "docs/reports/RELATORIO_TECNICO_REVISAO_2025_10_29_COMPLETO.md"
+  ],
+  "motivo": "Substituído por relatórios técnicos mais recentes e completos",
+  "responsavel": "Engenharia de Documentação Sênior",
+  "categoria": "relatorio_tecnico",
+  "status": "arquivado"
+}
+
