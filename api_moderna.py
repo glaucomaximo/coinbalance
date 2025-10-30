@@ -9,6 +9,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 import uvicorn
+import os
 import time
 import json
 import logging
@@ -16,6 +17,7 @@ import psutil
 
 # Importar módulos do sistema
 from database_manager import DatabaseManager
+from mongo_manager import MongoDatabaseManager
 from wallet_system import Carteira, GerenciadorCarteiras
 from transaction_validator import TransactionValidator
 from smart_contracts import ContractManager
@@ -63,14 +65,21 @@ app.middleware("http")(rate_limit_middleware)
 setup_error_handlers(app)
 
 # Inicializar componentes do sistema
-db_manager = DatabaseManager()
+USE_MONGO = os.getenv("DB_BACKEND", "sqlite").lower() == "mongo"
+if USE_MONGO:
+    db_manager = MongoDatabaseManager(
+        uri=os.getenv("MONGO_URI", "mongodb://localhost:27017"),
+        db_name=os.getenv("MONGO_DB_NAME", "coinbalance"),
+    )
+else:
+    db_manager = DatabaseManager()
 wallet_manager = GerenciadorCarteiras()
 transaction_validator = TransactionValidator(db_manager)
 contract_manager = ContractManager(db_manager)
 security = HTTPBearer()
 
-# Inicializar otimizador de banco
-db_optimizer = DatabaseOptimizer(db_manager)
+# Inicializar otimizador de banco (apenas SQLite)
+db_optimizer = DatabaseOptimizer(db_manager) if not USE_MONGO else None
 
 # Inicializar tempo de início da aplicação
 app.state.start_time = time.time()
@@ -231,24 +240,10 @@ async def obter_blockchain():
 async def obter_transacao_por_hash(hash_transacao: str):
     """Obtém uma transação específica pelo hash."""
     try:
-        with db_manager.lock:
-            import sqlite3
-            conn = sqlite3.connect(db_manager.db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa,
-                       timestamp, status
-                FROM transacoes WHERE hash_transacao = ?
-                """,
-                (hash_transacao,),
-            )
-            row = cursor.fetchone()
-            conn.close()
-            if not row:
-                raise HTTPException(status_code=404, detail="Transação não encontrada")
-            return dict(row)
+        row = db_manager.obter_transacao_por_hash(hash_transacao)
+        if not row:
+            raise HTTPException(status_code=404, detail="Transação não encontrada")
+        return row
     except HTTPException:
         raise
     except Exception as e:
@@ -336,24 +331,8 @@ async def info_staking():
 async def historico_transacoes(endereco: str):
     """Lista transações onde o endereço é remetente ou destinatário."""
     try:
-        with db_manager.lock:
-            import sqlite3
-            conn = sqlite3.connect(db_manager.db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa, timestamp, status
-                FROM transacoes
-                WHERE remetente = ? OR destinatario = ?
-                ORDER BY timestamp DESC
-                LIMIT 100
-                """,
-                (endereco, endereco),
-            )
-            rows = [dict(row) for row in cursor.fetchall()]
-            conn.close()
-            return rows
+        rows = db_manager.obter_historico_transacoes(endereco, limite=100, offset=0)
+        return rows
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -612,6 +591,8 @@ async def database_performance(user: Dict = Depends(get_current_user)):
     try:
         if user.get("role") != "admin":
             raise HTTPException(status_code=403, detail="Acesso negado")
+        if db_optimizer is None:
+            return {"status": "error", "error": "Não suportado com backend MongoDB"}
         performance = db_optimizer.analisar_performance()
         return {
             "status": "success",
@@ -627,6 +608,8 @@ async def cache_statistics(user: Dict = Depends(get_current_user)):
     try:
         if user.get("role") != "admin":
             raise HTTPException(status_code=403, detail="Acesso negado")
+        if db_optimizer is None:
+            return {"status": "error", "error": "Não suportado com backend MongoDB"}
         stats = db_optimizer.obter_estatisticas_cache()
         return {
             "status": "success",
@@ -655,6 +638,8 @@ async def clear_cache(user: Dict = Depends(get_current_user)):
 async def listar_blocos_otimizado(limite: int = 10, offset: int = 0):
     """Lista blocos com otimização de cache"""
     try:
+        if db_optimizer is None:
+            return {"status": "error", "error": "Não suportado com backend MongoDB"}
         blocos = db_optimizer.obter_blocos_otimizado(limite, offset)
         return {
             "status": "success",
@@ -676,6 +661,8 @@ async def listar_transacoes_otimizado(
 ):
     """Lista transações com otimização de cache e filtros"""
     try:
+        if db_optimizer is None:
+            return {"status": "error", "error": "Não suportado com backend MongoDB"}
         transacoes = db_optimizer.obter_transacoes_otimizado(
             remetente, destinatario, limite, offset
         )

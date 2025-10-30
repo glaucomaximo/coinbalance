@@ -270,6 +270,47 @@ class DatabaseManager:
             print(f"Erro ao obter saldo: {e}")
             return 0.0
     
+    # --- Complementos para histórico e busca ---
+    def obter_transacao_por_hash(self, hash_transacao: str) -> Optional[Dict[str, Any]]:
+        try:
+            with self.lock:
+                conn = sqlite3.connect(self.db_path)
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute(
+                    'SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa, timestamp, status FROM transacoes WHERE hash_transacao = ?',
+                    (hash_transacao,)
+                )
+                row = cursor.fetchone()
+                conn.close()
+                return dict(row) if row else None
+        except Exception as e:
+            print(f"Erro ao obter transação: {e}")
+            return None
+
+    def obter_historico_transacoes(self, endereco: str, limite: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+        try:
+            with self.lock:
+                conn = sqlite3.connect(self.db_path)
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute(
+                    '''
+                    SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa, timestamp, status
+                    FROM transacoes
+                    WHERE remetente = ? OR destinatario = ?
+                    ORDER BY timestamp DESC
+                    LIMIT ? OFFSET ?
+                    ''',
+                    (endereco, endereco, limite, offset)
+                )
+                rows = [dict(r) for r in cursor.fetchall()]
+                conn.close()
+                return rows
+        except Exception as e:
+            print(f"Erro ao obter histórico: {e}")
+            return []
+    
     def _gerar_hash_transacao(self, transacao: Dict) -> str:
         """Gera hash único para transação"""
         import hashlib
