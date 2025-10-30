@@ -227,6 +227,33 @@ async def obter_blockchain():
         "hash_ultimo_bloco": blocos[-1].get('hash_atual') if blocos else None
     }
 
+@app.get("/transacoes/{hash_transacao}", summary="Obter transação por hash")
+async def obter_transacao_por_hash(hash_transacao: str):
+    """Obtém uma transação específica pelo hash."""
+    try:
+        with db_manager.lock:
+            import sqlite3
+            conn = sqlite3.connect(db_manager.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa,
+                       timestamp, status
+                FROM transacoes WHERE hash_transacao = ?
+                """,
+                (hash_transacao,),
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if not row:
+                raise HTTPException(status_code=404, detail="Transação não encontrada")
+            return dict(row)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.get("/blockchain/{indice}", response_model=BlocoResponse, summary="Obter Bloco Específico")
 async def obter_bloco(indice: int):
     """Obtém um bloco específico por índice"""
@@ -329,6 +356,15 @@ async def historico_transacoes(endereco: str):
             return rows
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/carteiras/{nome}/saldo", summary="Obter saldo da carteira")
+async def obter_saldo_carteira_por_nome(nome: str):
+    """Retorna o saldo atual da carteira pelo nome registrado."""
+    carteira = wallet_manager.obter_carteira(nome)
+    if not carteira:
+        raise HTTPException(status_code=404, detail="Carteira não encontrada")
+    saldo = db_manager.obter_saldo_carteira(carteira.endereco)
+    return {"endereco": carteira.endereco, "saldo": saldo}
 
 @app.post("/governance/proposta", summary="Criar Proposta de Governança")
 async def criar_proposta(request: PropostaRequest):
