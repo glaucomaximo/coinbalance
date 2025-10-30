@@ -25,6 +25,12 @@ class MongoDatabaseManager:
         self.db.transacoes.create_index([("destinatario", ASCENDING)])
         self.db.carteiras.create_index([("endereco", ASCENDING)], unique=True)
         self.db.usuarios.create_index([("username", ASCENDING)], unique=True)
+        # Governance & DeFi
+        self.db.propostas.create_index([("id", ASCENDING)], unique=True)
+        self.db.propostas.create_index([("status", ASCENDING)])
+        self.db.votos.create_index([("proposta_id", ASCENDING)])
+        self.db.staking.create_index([("endereco", ASCENDING)], unique=True)
+        self.db.lending.create_index([("endereco", ASCENDING)], unique=True)
 
     # --- Blocos ---
     def salvar_bloco(self, bloco: Dict[str, Any]) -> bool:
@@ -74,6 +80,91 @@ class MongoDatabaseManager:
         cur = self.db.transacoes.find({"$or": [{"remetente": endereco}, {"destinatario": endereco}]}, {"_id": 0}) \
             .sort("timestamp", DESCENDING).skip(offset).limit(limite)
         return list(cur)
+
+    # --- Otimizados (aggregations) ---
+    def obter_blocos_otimizado(self, limite: int = 10, offset: int = 0) -> List[Dict[str, Any]]:
+        cur = self.db.blocos.find({}, {"_id": 0, "indice": 1, "timestamp": 1, "hash_anterior": 1, "hash_atual": 1, "prova": 1}) \
+            .sort("indice", DESCENDING).skip(offset).limit(limite)
+        return list(cur)
+
+    def obter_transacoes_otimizado(self, remetente: Optional[str], destinatario: Optional[str], limite: int, offset: int) -> List[Dict[str, Any]]:
+        filt: Dict[str, Any] = {}
+        if remetente:
+            filt["remetente"] = remetente
+        if destinatario:
+            filt["destinatario"] = destinatario
+        cur = self.db.transacoes.find(filt, {"_id": 0, "id": 0}).sort("timestamp", DESCENDING).skip(offset).limit(limite)
+        return list(cur)
+
+    # --- Governance ---
+    def governance_criar_proposta(self, titulo: str, descricao: str, tipo: str, parametros: Dict[str, Any], criador: str) -> Dict[str, Any]:
+        pid = f"PROP_{int(self.db.command('hostInfo')['system']['currentTime'].timestamp())}"
+        doc = {
+            "id": pid,
+            "titulo": titulo,
+            "descricao": descricao,
+            "tipo": tipo,
+            "parametros": parametros,
+            "criador": criador,
+            "timestamp": None,
+            "status": "ativa",
+            "votos_favor": 0.0,
+            "votos_contra": 0.0,
+            "total_votos": 0.0,
+        }
+        self.db.propostas.insert_one(doc)
+        return {"sucesso": True, "proposta_id": pid}
+
+    def governance_votar(self, proposta_id: str, voto: bool, votante: str, peso_voto: float) -> Dict[str, Any]:
+        prop = self.db.propostas.find_one({"id": proposta_id})
+        if not prop or prop.get("status") != "ativa":
+            return {"sucesso": False, "erro": "Proposta não encontrada/ativa"}
+        self.db.votos.insert_one({"proposta_id": proposta_id, "voto": voto, "votante": votante, "peso_voto": peso_voto})
+        inc = {"total_votos": peso_voto}
+        if voto:
+            inc["votos_favor"] = peso_voto
+        else:
+            inc["votos_contra"] = peso_voto
+        self.db.propostas.update_one({"id": proposta_id}, {"$inc": inc})
+        return {"sucesso": True, "voto_registrado": True}
+
+    def governance_listar_ativas(self) -> List[Dict[str, Any]]:
+        return list(self.db.propostas.find({"status": "ativa"}, {"_id": 0}))
+
+    def governance_estatisticas(self) -> Dict[str, Any]:
+        total = self.db.propostas.count_documents({})
+        ativas = self.db.propostas.count_documents({"status": "ativa"})
+        aprovadas = self.db.propostas.count_documents({"status": "aprovada"})
+        return {"total_propostas": total, "propostas_ativas": ativas, "propostas_aprovadas": aprovadas}
+
+    # --- DeFi (staking) ---
+    def staking_stake(self, endereco: str, valor: float) -> Dict[str, Any]:
+        doc = self.db.staking.find_one({"endereco": endereco}) or {"endereco": endereco, "valor": 0.0, "timestamp": 0.0}
+        novo = float(doc.get("valor", 0.0)) + float(valor)
+        self.db.staking.update_one({"endereco": endereco}, {"$set": {"valor": novo, "timestamp": 0.0}}, upsert=True)
+        total_rede = self.db.staking.aggregate([{ "$group": {"_id": None, "total": {"$sum": "$valor"}}}])
+        total_staked_rede = next(total_rede, {}).get("total", 0.0)
+        return {"sucesso": True, "mensagem": f"Stake de {valor} tokens realizado", "total_staked": novo, "total_staked_rede": total_staked_rede}
+
+    def staking_info(self, endereco: str) -> Dict[str, Any]:
+        doc = self.db.staking.find_one({"endereco": endereco}) or {"valor": 0.0}
+        total_rede = self.db.staking.aggregate([{ "$group": {"_id": None, "total": {"$sum": "$valor"}}}])
+        total_staked_rede = next(total_rede, {}).get("total", 0.0)
+        return {"sucesso": True, "stake_atual": float(doc.get("valor", 0.0)), "recompensas_pendentes": 0.0, "apy": 12.0, "total_staked_rede": total_staked_rede}
+
+    # --- DeFi (lending) ---
+    def lending_borrow(self, endereco: str, valor: float, colateral: float) -> Dict[str, Any]:
+        # Simples: aprova se colateral >= 1.5x
+        if float(colateral) < float(valor) * 1.5:
+            return {"sucesso": False, "erro": "Colateral insuficiente"}
+        self.db.lending.update_one({"endereco": endereco}, {"$set": {"valor": float(valor), "colateral": float(colateral), "juros": 0.05, "timestamp": 0.0}}, upsert=True)
+        return {"sucesso": True, "mensagem": f"Empréstimo de {valor} tokens aprovado", "colateral_necessario": colateral, "taxa_juros": 5.0}
+    
+    def lending_info(self, endereco: str) -> Dict[str, Any]:
+        doc = self.db.lending.find_one({"endereco": endereco})
+        if not doc:
+            return {"sucesso": True, "tem_emprestimo": False, "reservas_disponiveis": 0.0}
+        return {"sucesso": True, "tem_emprestimo": True, "valor_emprestado": float(doc.get("valor", 0.0)), "juros_acumulados": 0.0, "valor_total_devido": float(doc.get("valor", 0.0)), "reservas_disponiveis": 0.0}
 
     # --- Carteiras ---
     def atualizar_saldo_carteira(self, endereco: str, novo_saldo: float) -> bool:

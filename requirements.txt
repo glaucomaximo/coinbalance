@@ -13,3 +13,5 @@ black==23.11.0
 flake8==6.1.0
 mypy==1.7.1
 pymongo==4.7.2
+SQLAlchemy==2.0.35
+alembic==1.13.2

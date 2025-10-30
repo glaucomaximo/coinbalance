@@ -270,12 +270,15 @@ async def obter_bloco(indice: int):
 async def fazer_stake(request: StakeRequest, user: Dict = Depends(get_current_user)):
     """Faz stake de tokens em contrato de staking"""
     try:
-        resultado = contract_manager.executar_contrato(
-            request.contrato,
-            "stake",
-            {"valor": request.valor},
-            "USER_ADDRESS"  # Implementar autenticação
-        )
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            resultado = db_manager.staking_stake("USER_ADDRESS", request.valor)
+        else:
+            resultado = contract_manager.executar_contrato(
+                request.contrato,
+                "stake",
+                {"valor": request.valor},
+                "USER_ADDRESS"
+            )
         
         if not resultado['sucesso']:
             raise HTTPException(status_code=400, detail=resultado['erro'])
@@ -289,15 +292,18 @@ async def fazer_stake(request: StakeRequest, user: Dict = Depends(get_current_us
 async def solicitar_emprestimo(request: BorrowRequest, user: Dict = Depends(get_current_user)):
     """Solicita empréstimo no protocolo DeFi"""
     try:
-        resultado = contract_manager.executar_contrato(
-            "LENDING_CONTRACT_001",
-            "borrow",
-            {
-                "valor": request.valor,
-                "colateral": request.colateral
-            },
-            "USER_ADDRESS"  # Implementar autenticação
-        )
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            resultado = db_manager.lending_borrow("USER_ADDRESS", request.valor, request.colateral)
+        else:
+            resultado = contract_manager.executar_contrato(
+                "LENDING_CONTRACT_001",
+                "borrow",
+                {
+                    "valor": request.valor,
+                    "colateral": request.colateral
+                },
+                "USER_ADDRESS"
+            )
         
         if not resultado['sucesso']:
             raise HTTPException(status_code=400, detail=resultado['erro'])
@@ -318,14 +324,16 @@ async def listar_contratos():
 @app.get("/defi/stake/info", summary="Informações de Staking")
 async def info_staking():
     """Obtém informações sobre staking"""
-    resultado = contract_manager.executar_contrato(
-        "STAKING_CONTRACT_001",
-        "get_stake_info",
-        {},
-        "USER_ADDRESS"
-    )
-    
-    return resultado
+    if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+        return db_manager.staking_info("USER_ADDRESS")
+    else:
+        resultado = contract_manager.executar_contrato(
+            "STAKING_CONTRACT_001",
+            "get_stake_info",
+            {},
+            "USER_ADDRESS"
+        )
+        return resultado
 
 @app.get("/transacoes/historico/{endereco}", summary="Histórico de transações por endereço", response_model=List[TransacaoHistoricoItem])
 async def historico_transacoes(endereco: str):
@@ -349,13 +357,16 @@ async def obter_saldo_carteira_por_nome(nome: str):
 async def criar_proposta(request: PropostaRequest):
     """Cria uma proposta de governança."""
     try:
-        result = governance.criar_proposta(
-            titulo=request.titulo,
-            descricao=request.descricao,
-            tipo=request.tipo,
-            parametros=request.parametros,
-            criador=request.criador,
-        )
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            result = db_manager.governance_criar_proposta(request.titulo, request.descricao, request.tipo, request.parametros, request.criador)
+        else:
+            result = governance.criar_proposta(
+                titulo=request.titulo,
+                descricao=request.descricao,
+                tipo=request.tipo,
+                parametros=request.parametros,
+                criador=request.criador,
+            )
         if not result.get("sucesso"):
             raise HTTPException(status_code=400, detail=result.get("erro", "Falha ao criar proposta"))
         return result
@@ -366,12 +377,15 @@ async def criar_proposta(request: PropostaRequest):
 async def votar_proposta(request: VotoRequest):
     """Registra um voto em uma proposta de governança."""
     try:
-        result = governance.votar_proposta(
-            proposta_id=request.proposta_id,
-            voto=request.voto,
-            votante=request.votante,
-            peso_voto=request.peso_voto,
-        )
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            result = db_manager.governance_votar(request.proposta_id, request.voto, request.votante, request.peso_voto)
+        else:
+            result = governance.votar_proposta(
+                proposta_id=request.proposta_id,
+                voto=request.voto,
+                votante=request.votante,
+                peso_voto=request.peso_voto,
+            )
         if not result.get("sucesso"):
             raise HTTPException(status_code=400, detail=result.get("erro", "Falha ao votar"))
         return result
@@ -382,7 +396,11 @@ async def votar_proposta(request: VotoRequest):
 async def listar_propostas():
     """Lista as propostas de governança ativas."""
     try:
-        return {"propostas": governance.obter_propostas_ativas(), "total": len(governance.propostas)}
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            props = db_manager.governance_listar_ativas()
+            return {"propostas": props, "total": len(props)}
+        else:
+            return {"propostas": governance.obter_propostas_ativas(), "total": len(governance.propostas)}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -390,7 +408,10 @@ async def listar_propostas():
 async def estatisticas_governanca():
     """Retorna estatísticas do sistema de governança."""
     try:
-        return governance.obter_estatisticas_governance()
+        if os.getenv("DB_BACKEND", "sqlite").lower() == "mongo":
+            return db_manager.governance_estatisticas()
+        else:
+            return governance.obter_estatisticas_governance()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -639,8 +660,9 @@ async def listar_blocos_otimizado(limite: int = 10, offset: int = 0):
     """Lista blocos com otimização de cache"""
     try:
         if db_optimizer is None:
-            return {"status": "error", "error": "Não suportado com backend MongoDB"}
-        blocos = db_optimizer.obter_blocos_otimizado(limite, offset)
+            blocos = db_manager.obter_blocos_otimizado(limite, offset)
+        else:
+            blocos = db_optimizer.obter_blocos_otimizado(limite, offset)
         return {
             "status": "success",
             "blocos": blocos,
@@ -662,10 +684,11 @@ async def listar_transacoes_otimizado(
     """Lista transações com otimização de cache e filtros"""
     try:
         if db_optimizer is None:
-            return {"status": "error", "error": "Não suportado com backend MongoDB"}
-        transacoes = db_optimizer.obter_transacoes_otimizado(
-            remetente, destinatario, limite, offset
-        )
+            transacoes = db_manager.obter_transacoes_otimizado(remetente, destinatario, limite, offset)
+        else:
+            transacoes = db_optimizer.obter_transacoes_otimizado(
+                remetente, destinatario, limite, offset
+            )
         return {
             "status": "success",
             "transacoes": transacoes,
