@@ -50,6 +50,7 @@ class DatabaseManager:
                     remetente TEXT NOT NULL,
                     destinatario TEXT NOT NULL,
                     valor REAL NOT NULL,
+                    taxa REAL DEFAULT 0.0,
                     assinatura TEXT NOT NULL,
                     chave_publica TEXT NOT NULL,
                     timestamp REAL NOT NULL,
@@ -58,6 +59,15 @@ class DatabaseManager:
                     FOREIGN KEY (bloco_id) REFERENCES blocos (id)
                 )
             ''')
+
+            # Migração leve: garantir coluna 'taxa' em bases existentes
+            cursor.execute("PRAGMA table_info(transacoes)")
+            cols = [row[1] for row in cursor.fetchall()]
+            if 'taxa' not in cols:
+                try:
+                    cursor.execute("ALTER TABLE transacoes ADD COLUMN taxa REAL DEFAULT 0.0")
+                except Exception:
+                    pass
             
             # Tabela de carteiras
             cursor.execute('''
@@ -130,15 +140,16 @@ class DatabaseManager:
                 
                 cursor.execute('''
                     INSERT OR REPLACE INTO transacoes 
-                    (hash_transacao, bloco_id, remetente, destinatario, valor, 
+                    (hash_transacao, bloco_id, remetente, destinatario, valor, taxa,
                      assinatura, chave_publica, timestamp, dados_extra, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     hash_transacao,
                     bloco_id,
                     transacao['remetente'],
                     transacao['destinatario'],
                     transacao['valor'],
+                    float(transacao.get('taxa', 0.0)),
                     transacao.get('assinatura', ''),
                     transacao.get('chave_publica', ''),
                     transacao['timestamp'],

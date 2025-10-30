@@ -28,6 +28,7 @@ class TransactionService:
         destinatario_endereco: str,
         valor: float,
         dados_extra: Dict[str, Any] | None = None,
+        taxa: float | None = None,
     ) -> Dict[str, Any]:
         """Cria, valida, processa e persiste uma transação.
 
@@ -54,6 +55,10 @@ class TransactionService:
             valor,
             dados_extra or {},
         )
+
+        # Anexar taxa (se fornecida) para persistência e validação
+        if taxa is not None:
+            transacao["taxa"] = float(taxa)
 
         # Validar
         validacao = self.transaction_validator.validar_transacao(transacao)

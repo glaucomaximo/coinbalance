@@ -193,10 +193,9 @@ class DatabaseOptimizer:
             cursor = conn.cursor()
             
             try:
-                # Ajustado ao schema real de `transacoes` (sem colunas taxa/criado_em)
                 query = f"""
                     SELECT id, hash_transacao, bloco_id, remetente, destinatario, 
-                           valor, timestamp, status
+                           valor, taxa, timestamp, status
                     FROM transacoes 
                     {where_clause}
                     ORDER BY timestamp DESC 
@@ -233,7 +232,7 @@ class DatabaseOptimizer:
             try:
                 # Transações enviadas
                 cursor.execute("""
-                    SELECT COUNT(*), COALESCE(SUM(valor), 0)
+                    SELECT COUNT(*), COALESCE(SUM(valor), 0), COALESCE(SUM(taxa), 0)
                     FROM transacoes 
                     WHERE remetente = ?
                 """, (endereco,))
@@ -256,8 +255,7 @@ class DatabaseOptimizer:
                     "saldo_atual": saldo[0] if saldo else 0,
                     "transacoes_enviadas": enviadas[0],
                     "total_enviado": enviadas[1],
-                    # A tabela não possui armazenamento de taxa; manter 0 por compatibilidade
-                    "total_taxas_pagas": 0,
+                    "total_taxas_pagas": enviadas[2],
                     "transacoes_recebidas": recebidas[0],
                     "total_recebido": recebidas[1],
                     "timestamp": time.time()

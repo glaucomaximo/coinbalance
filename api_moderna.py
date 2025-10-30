@@ -28,6 +28,7 @@ from health_monitor import health_monitor
 from database_optimizer import DatabaseOptimizer
 from tokenomics import Tokenomics, Governance
 from services.transaction_service import TransactionService
+from auth import create_access_token, get_current_user
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -72,6 +73,7 @@ db_optimizer = DatabaseOptimizer(db_manager)
 
 # Inicializar tempo de início da aplicação
 app.state.start_time = time.time()
+app.state.metrics = {"transactions_created": 0, "defi_stake_calls": 0, "defi_borrow_calls": 0}
 
 # Inicializar Tokenomics e Governance
 tokenomics = Tokenomics(db_manager)
@@ -128,6 +130,16 @@ class CarteiraResponse(BaseModel):
     chave_publica: str
     criado_em: float
 
+class TransacaoHistoricoItem(BaseModel):
+    id: int
+    hash_transacao: str
+    remetente: str
+    destinatario: str
+    valor: float
+    taxa: float
+    timestamp: float
+    status: str
+
 # Endpoints da API
 
 @app.get("/", summary="Status da API")
@@ -152,12 +164,13 @@ async def criar_carteira(request: CarteiraRequest):
         # Salvar no banco de dados
         db_manager.atualizar_saldo_carteira(carteira.endereco, 0.0)
         
-        return CarteiraResponse(
+        response = CarteiraResponse(
             endereco=carteira.endereco,
             saldo=carteira.saldo,
             chave_publica=carteira.public_key,
             criado_em=carteira._obter_timestamp()
         )
+        return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -186,7 +199,9 @@ async def criar_transacao(request: TransacaoRequest):
             destinatario_endereco=request.destinatario,
             valor=request.valor,
             dados_extra=request.dados_extra,
+            taxa=request.taxa,
         )
+        app.state.metrics["transactions_created"] += 1
         return {
             "sucesso": True,
             "mensagem": "Transação criada e processada com sucesso",
@@ -228,7 +243,7 @@ async def obter_bloco(indice: int):
     )
 
 @app.post("/defi/stake", summary="Fazer Stake")
-async def fazer_stake(request: StakeRequest):
+async def fazer_stake(request: StakeRequest, user: Dict = Depends(get_current_user)):
     """Faz stake de tokens em contrato de staking"""
     try:
         resultado = contract_manager.executar_contrato(
@@ -240,14 +255,14 @@ async def fazer_stake(request: StakeRequest):
         
         if not resultado['sucesso']:
             raise HTTPException(status_code=400, detail=resultado['erro'])
-        
+        app.state.metrics["defi_stake_calls"] += 1
         return resultado
         
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/defi/borrow", summary="Solicitar Empréstimo")
-async def solicitar_emprestimo(request: BorrowRequest):
+async def solicitar_emprestimo(request: BorrowRequest, user: Dict = Depends(get_current_user)):
     """Solicita empréstimo no protocolo DeFi"""
     try:
         resultado = contract_manager.executar_contrato(
@@ -262,7 +277,7 @@ async def solicitar_emprestimo(request: BorrowRequest):
         
         if not resultado['sucesso']:
             raise HTTPException(status_code=400, detail=resultado['erro'])
-        
+        app.state.metrics["defi_borrow_calls"] += 1
         return resultado
         
     except Exception as e:
@@ -287,6 +302,31 @@ async def info_staking():
     )
     
     return resultado
+
+@app.get("/transacoes/historico/{endereco}", summary="Histórico de transações por endereço", response_model=List[TransacaoHistoricoItem])
+async def historico_transacoes(endereco: str):
+    """Lista transações onde o endereço é remetente ou destinatário."""
+    try:
+        with db_manager.lock:
+            import sqlite3
+            conn = sqlite3.connect(db_manager.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, hash_transacao, remetente, destinatario, valor, COALESCE(taxa, 0) as taxa, timestamp, status
+                FROM transacoes
+                WHERE remetente = ? OR destinatario = ?
+                ORDER BY timestamp DESC
+                LIMIT 100
+                """,
+                (endereco, endereco),
+            )
+            rows = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return rows
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/governance/proposta", summary="Criar Proposta de Governança")
 async def criar_proposta(request: PropostaRequest):
@@ -445,6 +485,11 @@ async def metrics():
             "system": {
                 "uptime": time.time() - app.state.start_time if hasattr(app.state, 'start_time') else 0,
                 "memory_usage": psutil.virtual_memory().percent if 'psutil' in globals() else 0
+            },
+            "app": {
+                "transactions_created": app.state.metrics.get("transactions_created", 0),
+                "defi_stake_calls": app.state.metrics.get("defi_stake_calls", 0),
+                "defi_borrow_calls": app.state.metrics.get("defi_borrow_calls", 0)
             }
         }
     except Exception as e:
@@ -452,7 +497,7 @@ async def metrics():
         return {"error": str(e), "timestamp": time.time()}
 
 @app.get("/admin/errors", summary="Estatísticas de Erros")
-async def admin_errors():
+async def admin_errors(user: Dict = Depends(get_current_user)):
     """Retorna estatísticas detalhadas de erros (apenas para administradores)"""
     try:
         return error_handler.get_error_statistics()
@@ -460,7 +505,7 @@ async def admin_errors():
         return {"error": str(e), "timestamp": time.time()}
 
 @app.post("/admin/rate-limit/block", summary="Bloquear IP")
-async def block_ip(ip: str, reason: str = "Manual block"):
+async def block_ip(ip: str, reason: str = "Manual block", user: Dict = Depends(get_current_user)):
     """Bloqueia um IP (apenas para administradores)"""
     try:
         rate_limiter.block_ip(ip, reason)
@@ -469,7 +514,7 @@ async def block_ip(ip: str, reason: str = "Manual block"):
         return {"success": False, "error": str(e)}
 
 @app.delete("/admin/rate-limit/unblock", summary="Desbloquear IP")
-async def unblock_ip(ip: str):
+async def unblock_ip(ip: str, user: Dict = Depends(get_current_user)):
     """Desbloqueia um IP (apenas para administradores)"""
     try:
         rate_limiter.unblock_ip(ip)
@@ -478,7 +523,7 @@ async def unblock_ip(ip: str):
         return {"success": False, "error": str(e)}
 
 @app.post("/admin/database/optimize", summary="Otimizar Banco de Dados")
-async def optimize_database():
+async def optimize_database(user: Dict = Depends(get_current_user)):
     """Otimiza o banco de dados (apenas para administradores)"""
     try:
         # Criar índices
@@ -496,7 +541,7 @@ async def optimize_database():
         return {"success": False, "error": str(e)}
 
 @app.get("/admin/database/performance", summary="Análise de Performance")
-async def database_performance():
+async def database_performance(user: Dict = Depends(get_current_user)):
     """Retorna análise de performance do banco de dados"""
     try:
         performance = db_optimizer.analisar_performance()
@@ -509,7 +554,7 @@ async def database_performance():
         return {"status": "error", "error": str(e)}
 
 @app.get("/admin/database/cache", summary="Estatísticas do Cache")
-async def cache_statistics():
+async def cache_statistics(user: Dict = Depends(get_current_user)):
     """Retorna estatísticas do cache do banco de dados"""
     try:
         stats = db_optimizer.obter_estatisticas_cache()
@@ -522,7 +567,7 @@ async def cache_statistics():
         return {"status": "error", "error": str(e)}
 
 @app.post("/admin/database/cache/clear", summary="Limpar Cache")
-async def clear_cache():
+async def clear_cache(user: Dict = Depends(get_current_user)):
     """Limpa o cache do banco de dados"""
     try:
         db_optimizer.limpar_cache()
@@ -605,6 +650,12 @@ async def log_requests(request, call_next):
         process_time = time.time() - start_time
         logger.error(f"{request.method} {request.url} - ERROR - {process_time:.4f}s - {str(e)}")
         raise
+
+# Auth utilitária (demo): emitir token
+@app.post("/auth/token", summary="Emitir token JWT (demo)")
+async def emitir_token(username: str = "admin"):
+    token = create_access_token(subject=username)
+    return {"access_token": token, "token_type": "bearer"}
 
 if __name__ == "__main__":
     uvicorn.run(
