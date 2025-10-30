@@ -169,6 +169,12 @@ async def criar_transacao(request: TransacaoRequest):
         if not carteira_remetente:
             raise HTTPException(status_code=404, detail="Carteira remetente não encontrada")
         
+        # Sincronizar saldo da carteira a partir do banco antes de criar
+        try:
+            carteira_remetente.saldo = db_manager.obter_saldo_carteira(carteira_remetente.endereco)
+        except Exception:
+            pass
+
         # Criar transação
         transacao = carteira_remetente.criar_transacao(
             request.destinatario,
@@ -186,6 +192,12 @@ async def criar_transacao(request: TransacaoRequest):
         if not sucesso:
             raise HTTPException(status_code=500, detail="Erro ao processar transação")
         
+        # Persistir transação no banco (status pendente até mineração)
+        try:
+            db_manager.salvar_transacao(transacao)
+        except Exception:
+            logger.warning("Falha ao salvar transação no banco")
+
         return {
             "sucesso": True,
             "mensagem": "Transação criada e processada com sucesso",

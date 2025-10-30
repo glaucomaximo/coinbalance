@@ -48,17 +48,17 @@ class DatabaseOptimizer:
                     "CREATE INDEX IF NOT EXISTS idx_transacoes_valor ON transacoes(valor)"
                 ]
                 
-                # Índices para tabela de carteiras
+                # Índices para tabela de carteiras (ajustados ao schema real)
                 indices_carteiras = [
                     "CREATE INDEX IF NOT EXISTS idx_carteiras_endereco ON carteiras(endereco)",
-                    "CREATE INDEX IF NOT EXISTS idx_carteiras_public_key ON carteiras(public_key)",
-                    "CREATE INDEX IF NOT EXISTS idx_carteiras_balance ON carteiras(balance)"
+                    "CREATE INDEX IF NOT EXISTS idx_carteiras_chave_publica ON carteiras(chave_publica)",
+                    "CREATE INDEX IF NOT EXISTS idx_carteiras_saldo ON carteiras(saldo)"
                 ]
                 
-                # Índices para tabela de nós
+                # Índices para tabela de nós (ajustados ao schema real)
                 indices_nos = [
-                    "CREATE INDEX IF NOT EXISTS idx_nos_endereco ON nos(endereco)",
-                    "CREATE INDEX IF NOT EXISTS idx_nos_ultima_atividade ON nos(ultima_atividade)"
+                    "CREATE INDEX IF NOT EXISTS idx_nos_endereco ON nos_rede(endereco)",
+                    "CREATE INDEX IF NOT EXISTS idx_nos_ultima_sincronizacao ON nos_rede(ultima_sincronizacao)"
                 ]
                 
                 # Executar todos os índices
@@ -193,9 +193,10 @@ class DatabaseOptimizer:
             cursor = conn.cursor()
             
             try:
+                # Ajustado ao schema real de `transacoes` (sem colunas taxa/criado_em)
                 query = f"""
                     SELECT id, hash_transacao, bloco_id, remetente, destinatario, 
-                           valor, taxa, timestamp, assinatura, criado_em
+                           valor, timestamp, status
                     FROM transacoes 
                     {where_clause}
                     ORDER BY timestamp DESC 
@@ -232,7 +233,7 @@ class DatabaseOptimizer:
             try:
                 # Transações enviadas
                 cursor.execute("""
-                    SELECT COUNT(*), COALESCE(SUM(valor), 0), COALESCE(SUM(taxa), 0)
+                    SELECT COUNT(*), COALESCE(SUM(valor), 0)
                     FROM transacoes 
                     WHERE remetente = ?
                 """, (endereco,))
@@ -246,8 +247,8 @@ class DatabaseOptimizer:
                 """, (endereco,))
                 recebidas = cursor.fetchone()
                 
-                # Saldo atual
-                cursor.execute("SELECT balance FROM carteiras WHERE endereco = ?", (endereco,))
+                # Saldo atual (ajustado para coluna `saldo`)
+                cursor.execute("SELECT saldo FROM carteiras WHERE endereco = ?", (endereco,))
                 saldo = cursor.fetchone()
                 
                 stats = {
@@ -255,7 +256,8 @@ class DatabaseOptimizer:
                     "saldo_atual": saldo[0] if saldo else 0,
                     "transacoes_enviadas": enviadas[0],
                     "total_enviado": enviadas[1],
-                    "total_taxas_pagas": enviadas[2],
+                    # A tabela não possui armazenamento de taxa; manter 0 por compatibilidade
+                    "total_taxas_pagas": 0,
                     "transacoes_recebidas": recebidas[0],
                     "total_recebido": recebidas[1],
                     "timestamp": time.time()
