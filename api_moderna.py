@@ -29,6 +29,7 @@ from database_optimizer import DatabaseOptimizer
 from tokenomics import Tokenomics, Governance
 from services.transaction_service import TransactionService
 from auth import create_access_token, get_current_user
+from users import UserService
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -81,6 +82,7 @@ governance = Governance(tokenomics)
 
 # Serviços
 transaction_service = TransactionService(db_manager, wallet_manager, transaction_validator)
+user_service = UserService(db_manager)
 
 # Modelos Pydantic para validação
 class TransacaoRequest(BaseModel):
@@ -496,6 +498,28 @@ async def metrics():
         logger.error(f"Erro ao obter métricas: {e}")
         return {"error": str(e), "timestamp": time.time()}
 
+@app.get("/metrics/prometheus", summary="Métricas Prometheus", response_class=None)
+async def metrics_prometheus():
+    """Exposição simples de métricas em formato Prometheus (texto)."""
+    try:
+        lines = []
+        lines.append("# HELP app_transactions_created Total de transações criadas")
+        lines.append("# TYPE app_transactions_created counter")
+        lines.append(f"app_transactions_created {app.state.metrics.get('transactions_created', 0)}")
+
+        lines.append("# HELP app_defi_stake_calls Total de chamadas de stake")
+        lines.append("# TYPE app_defi_stake_calls counter")
+        lines.append(f"app_defi_stake_calls {app.state.metrics.get('defi_stake_calls', 0)}")
+
+        lines.append("# HELP app_defi_borrow_calls Total de chamadas de borrow")
+        lines.append("# TYPE app_defi_borrow_calls counter")
+        lines.append(f"app_defi_borrow_calls {app.state.metrics.get('defi_borrow_calls', 0)}")
+
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse("\n".join(lines) + "\n")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/admin/errors", summary="Estatísticas de Erros")
 async def admin_errors(user: Dict = Depends(get_current_user)):
     """Retorna estatísticas detalhadas de erros (apenas para administradores)"""
@@ -508,6 +532,8 @@ async def admin_errors(user: Dict = Depends(get_current_user)):
 async def block_ip(ip: str, reason: str = "Manual block", user: Dict = Depends(get_current_user)):
     """Bloqueia um IP (apenas para administradores)"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         rate_limiter.block_ip(ip, reason)
         return {"success": True, "message": f"IP {ip} bloqueado", "reason": reason}
     except Exception as e:
@@ -517,6 +543,8 @@ async def block_ip(ip: str, reason: str = "Manual block", user: Dict = Depends(g
 async def unblock_ip(ip: str, user: Dict = Depends(get_current_user)):
     """Desbloqueia um IP (apenas para administradores)"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         rate_limiter.unblock_ip(ip)
         return {"success": True, "message": f"IP {ip} desbloqueado"}
     except Exception as e:
@@ -526,6 +554,8 @@ async def unblock_ip(ip: str, user: Dict = Depends(get_current_user)):
 async def optimize_database(user: Dict = Depends(get_current_user)):
     """Otimiza o banco de dados (apenas para administradores)"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         # Criar índices
         db_optimizer.criar_indices()
         
@@ -544,6 +574,8 @@ async def optimize_database(user: Dict = Depends(get_current_user)):
 async def database_performance(user: Dict = Depends(get_current_user)):
     """Retorna análise de performance do banco de dados"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         performance = db_optimizer.analisar_performance()
         return {
             "status": "success",
@@ -557,6 +589,8 @@ async def database_performance(user: Dict = Depends(get_current_user)):
 async def cache_statistics(user: Dict = Depends(get_current_user)):
     """Retorna estatísticas do cache do banco de dados"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         stats = db_optimizer.obter_estatisticas_cache()
         return {
             "status": "success",
@@ -570,6 +604,8 @@ async def cache_statistics(user: Dict = Depends(get_current_user)):
 async def clear_cache(user: Dict = Depends(get_current_user)):
     """Limpa o cache do banco de dados"""
     try:
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Acesso negado")
         db_optimizer.limpar_cache()
         return {
             "success": True,
@@ -652,9 +688,25 @@ async def log_requests(request, call_next):
         raise
 
 # Auth utilitária (demo): emitir token
-@app.post("/auth/token", summary="Emitir token JWT (demo)")
-async def emitir_token(username: str = "admin"):
-    token = create_access_token(subject=username)
+@app.post("/auth/register", summary="Registrar novo usuário")
+async def register(username: str, password: str, role: str = "user"):
+    if not username or not password:
+        raise HTTPException(status_code=400, detail="Username e password são obrigatórios")
+    if user_service.get(username):
+        raise HTTPException(status_code=409, detail="Usuário já existe")
+    ok = user_service.register(username, password, role)
+    if not ok:
+        raise HTTPException(status_code=500, detail="Falha ao registrar usuário")
+    return {"sucesso": True}
+
+@app.post("/auth/login", summary="Login e emissão de JWT")
+async def login(username: str, password: str):
+    user = user_service.get(username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    if not user_service.verify_password(password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    token = create_access_token(subject=username, role=user.get("role", "user"))
     return {"access_token": token, "token_type": "bearer"}
 
 if __name__ == "__main__":

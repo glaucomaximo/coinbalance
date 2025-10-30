@@ -91,6 +91,17 @@ class DatabaseManager:
                     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+
+            # Tabela de usuários (autenticação)
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS usuarios (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    role TEXT DEFAULT 'user',
+                    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
             
             # Índices para performance
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_blocos_indice ON blocos(indice)')
@@ -306,3 +317,37 @@ class DatabaseManager:
                     os.remove(caminho_arquivo)
         except Exception as e:
             print(f"Erro ao limpar backups: {e}")
+
+    # ===== Usuários =====
+    def criar_usuario(self, username: str, password_hash: str, role: str = 'user') -> bool:
+        try:
+            with self.lock:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    INSERT INTO usuarios (username, password_hash, role)
+                    VALUES (?, ?, ?)
+                    """,
+                    (username, password_hash, role),
+                )
+                conn.commit()
+                conn.close()
+                return True
+        except Exception as e:
+            print(f"Erro ao criar usuário: {e}")
+            return False
+
+    def obter_usuario(self, username: str) -> Optional[Dict[str, Any]]:
+        try:
+            with self.lock:
+                conn = sqlite3.connect(self.db_path)
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute("SELECT id, username, password_hash, role, criado_em FROM usuarios WHERE username = ?", (username,))
+                row = cursor.fetchone()
+                conn.close()
+                return dict(row) if row else None
+        except Exception as e:
+            print(f"Erro ao obter usuário: {e}")
+            return None
