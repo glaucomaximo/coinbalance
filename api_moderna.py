@@ -26,6 +26,8 @@ from error_handlers import error_handler, setup_error_handlers, error_middleware
 from rate_limiter import rate_limit_middleware, rate_limiter
 from health_monitor import health_monitor
 from database_optimizer import DatabaseOptimizer
+from tokenomics import Tokenomics, Governance
+from services.transaction_service import TransactionService
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -71,6 +73,13 @@ db_optimizer = DatabaseOptimizer(db_manager)
 # Inicializar tempo de início da aplicação
 app.state.start_time = time.time()
 
+# Inicializar Tokenomics e Governance
+tokenomics = Tokenomics(db_manager)
+governance = Governance(tokenomics)
+
+# Serviços
+transaction_service = TransactionService(db_manager, wallet_manager, transaction_validator)
+
 # Modelos Pydantic para validação
 class TransacaoRequest(BaseModel):
     remetente: str = Field(..., description="Endereço do remetente")
@@ -90,6 +99,19 @@ class StakeRequest(BaseModel):
 class BorrowRequest(BaseModel):
     valor: float = Field(..., gt=0, description="Valor do empréstimo")
     colateral: float = Field(..., gt=0, description="Valor do colateral")
+
+class PropostaRequest(BaseModel):
+    titulo: str = Field(..., description="Título da proposta")
+    descricao: str = Field(..., description="Descrição da proposta")
+    tipo: str = Field(..., description="Tipo (mudanca_taxa, queima_tokens, novo_contrato)")
+    parametros: Dict[str, Any] = Field(default_factory=dict)
+    criador: str = Field("SYSTEM", description="Criador da proposta")
+
+class VotoRequest(BaseModel):
+    proposta_id: str = Field(..., description="ID da proposta")
+    voto: bool = Field(..., description="Voto favorável (true) ou contra (false)")
+    peso_voto: float = Field(..., gt=0, description="Peso do voto (ex.: saldo)")
+    votante: str = Field("USER_ADDRESS", description="Votante")
 
 class BlocoResponse(BaseModel):
     indice: int
@@ -159,52 +181,22 @@ async def obter_carteira(nome: str):
 async def criar_transacao(request: TransacaoRequest):
     """Cria e valida uma nova transação"""
     try:
-        # Obter carteira do remetente
-        carteira_remetente = None
-        for nome, carteira in wallet_manager.carteiras.items():
-            if carteira.endereco == request.remetente:
-                carteira_remetente = carteira
-                break
-        
-        if not carteira_remetente:
-            raise HTTPException(status_code=404, detail="Carteira remetente não encontrada")
-        
-        # Sincronizar saldo da carteira a partir do banco antes de criar
-        try:
-            carteira_remetente.saldo = db_manager.obter_saldo_carteira(carteira_remetente.endereco)
-        except Exception:
-            pass
-
-        # Criar transação
-        transacao = carteira_remetente.criar_transacao(
-            request.destinatario,
-            request.valor,
-            request.dados_extra
+        result = transaction_service.create_and_process(
+            remetente_endereco=request.remetente,
+            destinatario_endereco=request.destinatario,
+            valor=request.valor,
+            dados_extra=request.dados_extra,
         )
-        
-        # Validar transação
-        validacao = transaction_validator.validar_transacao(transacao)
-        if not validacao['valida']:
-            raise HTTPException(status_code=400, detail=f"Transação inválida: {validacao['erros']}")
-        
-        # Processar transação
-        sucesso = transaction_validator.processar_transacao(transacao)
-        if not sucesso:
-            raise HTTPException(status_code=500, detail="Erro ao processar transação")
-        
-        # Persistir transação no banco (status pendente até mineração)
-        try:
-            db_manager.salvar_transacao(transacao)
-        except Exception:
-            logger.warning("Falha ao salvar transação no banco")
-
         return {
             "sucesso": True,
             "mensagem": "Transação criada e processada com sucesso",
-            "hash_transacao": transaction_validator._gerar_hash_transacao(transacao),
-            "validacao": validacao
+            "hash_transacao": result["hash_transacao"],
+            "validacao": result["validacao"],
         }
-        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -295,6 +287,55 @@ async def info_staking():
     )
     
     return resultado
+
+@app.post("/governance/proposta", summary="Criar Proposta de Governança")
+async def criar_proposta(request: PropostaRequest):
+    """Cria uma proposta de governança."""
+    try:
+        result = governance.criar_proposta(
+            titulo=request.titulo,
+            descricao=request.descricao,
+            tipo=request.tipo,
+            parametros=request.parametros,
+            criador=request.criador,
+        )
+        if not result.get("sucesso"):
+            raise HTTPException(status_code=400, detail=result.get("erro", "Falha ao criar proposta"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/governance/votar", summary="Votar em Proposta")
+async def votar_proposta(request: VotoRequest):
+    """Registra um voto em uma proposta de governança."""
+    try:
+        result = governance.votar_proposta(
+            proposta_id=request.proposta_id,
+            voto=request.voto,
+            votante=request.votante,
+            peso_voto=request.peso_voto,
+        )
+        if not result.get("sucesso"):
+            raise HTTPException(status_code=400, detail=result.get("erro", "Falha ao votar"))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/governance/propostas", summary="Listar Propostas Ativas")
+async def listar_propostas():
+    """Lista as propostas de governança ativas."""
+    try:
+        return {"propostas": governance.obter_propostas_ativas(), "total": len(governance.propostas)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/governance/estatisticas", summary="Estatísticas de Governança")
+async def estatisticas_governanca():
+    """Retorna estatísticas do sistema de governança."""
+    try:
+        return governance.obter_estatisticas_governance()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/mineracao/minerar", summary="Minerar Novo Bloco")
 async def minerar_bloco(background_tasks: BackgroundTasks):
