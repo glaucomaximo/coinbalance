@@ -1,5 +1,5 @@
 # Dockerfile para Coinbalance - A Economia da Consciência
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Definir variáveis de ambiente
 ENV PYTHONDONTWRITEBYTECODE=1
