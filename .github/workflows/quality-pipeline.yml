@@ -97,7 +97,7 @@ jobs:
           echo "✅ Advanced security scan completed"
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: security-reports
           path: |
@@ -145,7 +145,7 @@ jobs:
           esac
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{ matrix.test-type }}
           path: |
@@ -183,7 +183,7 @@ jobs:
           echo "✅ Memory profiling completed"
 
       - name: Upload performance reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: performance-reports
           path: |
@@ -252,7 +252,7 @@ jobs:
           echo "4. ✅ Performance Testing: PASSED" >> quality-report.md
 
       - name: Upload Quality Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: quality-report
           path: quality-report.md

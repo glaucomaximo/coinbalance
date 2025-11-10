@@ -131,7 +131,7 @@ jobs:
           pytest tests/performance/ -v --benchmark-only --benchmark-save=performance
 
       - name: 📊 Upload performance results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: performance-results
           path: .benchmarks/
@@ -164,7 +164,7 @@ jobs:
         run: bandit -r src/ -f json -o bandit-report.json || true
 
       - name: 📊 Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: security-reports
           path: |
@@ -196,7 +196,7 @@ jobs:
           python -m build
 
       - name: 📊 Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: dist
           path: dist/
